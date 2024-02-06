@@ -1,0 +1,39 @@
+@startuml
+
+abstract class AAuditoryStimulus {
+  -Audio __audio
+  -list[ [float, float] ] __stimuli_intervals
+  -Optional[Audio] __audio_with_stimulus
+
+  +void __init__(audio: Audio, stimuli: list[(float, float)])
+  +void create()
+  +void present()
+
+  #Audio {abstract} _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
+
+}
+
+
+class N400Stimulus {
+  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
+}
+
+class ASSRStimulus {
+  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
+}
+
+class NoiseTaggingStimulus {
+  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
+}
+
+
+class MockStimulus {
+  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
+}
+
+AAuditoryStimulus <|-- N400Stimulus
+AAuditoryStimulus <|-- ASSRStimulus
+AAuditoryStimulus <|-- NoiseTaggingStimulus
+AAuditoryStimulus <|-- MockStimulus
+
+@enduml

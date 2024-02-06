@@ -1,0 +1,48 @@
+@startuml
+
+|Experimenter|
+
+start
+:explain experiment;
+
+|Subject|
+:start experiment;
+
+|Experiment Software|
+
+:show intro;
+
+fork
+  :show resting state;
+
+fork again
+  :record resting state;
+end fork {and}
+
+repeat
+  :draw scenario;
+  :draw stimulation;
+  :prime subject for scenario;
+
+  repeat
+    fork
+      :play stimulus;
+
+    fork again
+      :record brainacivity;
+    end fork {and}
+  repeat while(repeated 3 times?) is (yes) not (no)
+repeat while(scenarios left?) is (yes) not (no)
+
+fork
+  :show resting state;
+
+fork again
+  :record resting state;
+end fork {and}
+
+|Experimenter|
+:stop exirement;
+stop
+
+@enduml
