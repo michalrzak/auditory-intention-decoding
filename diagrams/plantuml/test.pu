@@ -3,6 +3,6 @@
 [First component]
 [Another component] as Comp2  
 component Comp3
-component [Last\ncomponent2] as Comp4
+component [Last\ncomponent33] as Comp4
 
 @enduml
