@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
 
-class ModelUpdateIdentifier(Enum):
+class EModelUpdateIdentifier(Enum):
     NEW_PROMPT = auto()
     EXPERIMENT_STATE_CHANGED = auto()

@@ -1,6 +1,6 @@
 from enum import Enum, auto
 
 
-class ExperimentState(Enum):
+class EExperimentState(Enum):
     RESTING_STATE = auto()
     EXPERIMENT = auto()

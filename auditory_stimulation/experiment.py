@@ -1,13 +1,13 @@
-from auditory_stimulation.model.experiment_state import ExperimentState
+from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.view.view import View
+from auditory_stimulation.view.view import AView
 
 
 class Experiment:
     __model: Model
-    __view: View
+    __view: AView
 
-    def __init__(self, model: Model, view: View) -> None:
+    def __init__(self, model: Model, view: AView) -> None:
         self.__model = model
         self.__view = view
 
@@ -15,5 +15,5 @@ class Experiment:
         self.__model.new_prompt("YO!")
         self.__view.get_confirmation()
         self.__model.new_prompt("How you doing bro?")
-        self.__model.change_experiment_state(ExperimentState.RESTING_STATE)
+        self.__model.change_experiment_state(EExperimentState.RESTING_STATE)
         self.__view.get_confirmation()

@@ -1,10 +1,10 @@
 from typing import Any
 
-from auditory_stimulation.model.model_update_identifier import ModelUpdateIdentifier
-from auditory_stimulation.view.view import View
+from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
+from auditory_stimulation.view.view import AView
 
 
-class CLIView(View):
+class CLIView(AView):
 
     # TODO: change type
     def __update_new_prompt(self, data: Any) -> None:
@@ -14,11 +14,11 @@ class CLIView(View):
     def __update_experiment_state_changed(self, data: Any) -> None:
         print(f"New State: {data}")
 
-    def update(self, data: Any, identifier: ModelUpdateIdentifier) -> None:
-        if identifier == ModelUpdateIdentifier.NEW_PROMPT:
+    def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
+        if identifier == EModelUpdateIdentifier.NEW_PROMPT:
             # TODO: assert type is correct
             self.__update_new_prompt(data)
-        elif identifier == ModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
+        elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             # TODO: assert type is correct
             self.__update_experiment_state_changed(data)
         else:
