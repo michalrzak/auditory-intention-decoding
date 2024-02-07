@@ -1,5 +1,35 @@
 @startuml
 
+class Experiment {
+    + void run()
+}
+
+class Model <<Observable>>{
+    -list[str] promptHistory
+    -str currentPrompt
+}
+
+enum ExperimentState {
+    RESTING_STATE_BEFORE
+    EXPERIMENT
+    RESTING_STATE_AFTER
+}
+
+abstract class View<<observer>> {
+    +void {abstract} update(data: Any, identifier: Identifier)
+}
+
+class PsychopyView {
+}
+
+class CLIView {
+}
+
+enum ModelUpdateIdentifier {
+    NEW_PROMPT
+    EXPERIMENT_STATE_CHANGED
+}
+
 abstract class AAuditoryStimulus {
   -Audio __audio
   -list[ [float, float] ] __stimuli_intervals
@@ -36,4 +66,13 @@ AAuditoryStimulus <|-- ASSRStimulus
 AAuditoryStimulus <|-- NoiseTaggingStimulus
 AAuditoryStimulus <|-- MockStimulus
 
+View <|-- PsychopyView
+View <|-- CLIView
+
+View ..> ModelUpdateIdentifier: "uses"
+
+Model "*" o--- "1" ExperimentState
+Experiment "1" *--- "1" Model
+
+Model "1" --- "*" View
 @enduml
