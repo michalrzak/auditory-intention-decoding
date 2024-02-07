@@ -8,3 +8,7 @@ class View(ABC):
     @abstractmethod
     def update(self, data: Any, identifier: ModelUpdateIdentifier) -> None:
         ...
+
+    @abstractmethod
+    def get_confirmation(self) -> bool:
+        ...

@@ -24,3 +24,7 @@ class CLIView(View):
         else:
             # this should never happen
             assert False
+
+    def get_confirmation(self) -> bool:
+        input("Please press the enter key")
+        return True
