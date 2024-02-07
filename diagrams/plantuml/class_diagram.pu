@@ -1,6 +1,7 @@
 @startuml
 
 class Experiment {
+    +Experiment(model: Model, view: AView)
     + void run()
 }
 
@@ -8,19 +9,20 @@ class Model <<Observable>>{
     -list[str] promptHistory
     -str currentPrompt
 
-    -void notify(data: Any, identifier: ModelUpdateIdentifier)
+    -void notify(data: Any, identifier: EModelUpdateIdentifier)
     +void register(view: View)
     +void new_prompt(prompt: str)
-    +void change_experiment_state(new_state: ExperimentState)
+    +void change_experiment_state(new_state: EExperimentState)
 }
 
-enum ExperimentState {
+enum EExperimentState {
     RESTING_STATE
     EXPERIMENT
 }
 
-abstract class View<<observer>> {
-    +void {abstract} update(data: Any, identifier: ModelUpdateIdentifier)
+abstract class AView<<observer>> {
+    +void {abstract} update(data: Any, identifier: EModelUpdateIdentifier)
+    +bool {abstract} get_confirmation()
 }
 
 class PsychopyView {
@@ -29,7 +31,7 @@ class PsychopyView {
 class CLIView {
 }
 
-enum ModelUpdateIdentifier {
+enum EModelUpdateIdentifier {
     NEW_PROMPT
     EXPERIMENT_STATE_CHANGED
 }
@@ -77,6 +79,7 @@ View ..> ModelUpdateIdentifier: "uses"
 
 Model "*" o--- "1" ExperimentState
 Experiment "1" *--- "1" Model
+Experiment "1" *--- "1" AView
 
 Model "1" --- "*" View
 @enduml
