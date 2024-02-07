@@ -7,16 +7,20 @@ class Experiment {
 class Model <<Observable>>{
     -list[str] promptHistory
     -str currentPrompt
+
+    -void notify(data: Any, identifier: ModelUpdateIdentifier)
+    +void register(view: View)
+    +void new_prompt(prompt: str)
+    +void change_experiment_state(new_state: ExperimentState)
 }
 
 enum ExperimentState {
-    RESTING_STATE_BEFORE
+    RESTING_STATE
     EXPERIMENT
-    RESTING_STATE_AFTER
 }
 
 abstract class View<<observer>> {
-    +void {abstract} update(data: Any, identifier: Identifier)
+    +void {abstract} update(data: Any, identifier: ModelUpdateIdentifier)
 }
 
 class PsychopyView {
