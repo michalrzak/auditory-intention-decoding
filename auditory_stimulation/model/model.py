@@ -7,35 +7,35 @@ from auditory_stimulation.model.model_update_identifier import ModelUpdateIdenti
 
 
 class Model:
-    prompt_history: List[str]
-    current_prompt: str
-    experiment_state: ExperimentState
+    __prompt_history: List[str]
+    __current_prompt: str
+    __experiment_state: ExperimentState
 
-    views: List[View]
+    __views: List[View]
 
     def __init__(self) -> None:
-        self.prompt_history = []
-        self.current_prompt = None  # TODO: not sure how to best initialize this
-        self.experiment_state = None  # TODO: I think this one should be passed in the constructor
-        self.views = []
+        self.__prompt_history = []
+        self.__current_prompt = None  # TODO: not sure how to best initialize this
+        self.__experiment_state = None  # TODO: I think this one should be passed in the constructor
+        self.__views = []
 
     def __notify(self, data: Any, identifier: ModelUpdateIdentifier) -> None:
-        for view in self.views:
+        for view in self.__views:
             view.update(data, identifier)
 
     def register(self, view: View) -> None:
-        self.views.append(view)
+        self.__views.append(view)
 
     def new_prompt(self, prompt: str) -> None:
-        self.prompt_history.append(self.current_prompt)
-        self.current_prompt = prompt
+        self.__prompt_history.append(self.__current_prompt)
+        self.__current_prompt = prompt
 
         self.__notify(prompt, ModelUpdateIdentifier.NEW_PROMPT)
 
     def change_experiment_state(self, new_state: ExperimentState) -> None:
-        assert new_state != self.experiment_state
-        if new_state == self.experiment_state:
+        assert new_state != self.__experiment_state
+        if new_state == self.__experiment_state:
             warnings.warn("The state was already at the changed value.")
 
-        self.experiment_state = new_state
-        self.__notify(self.experiment_state, ModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
+        self.__experiment_state = new_state
+        self.__notify(self.__experiment_state, ModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
