@@ -12,3 +12,4 @@ class AView(ABC):
     @abstractmethod
     def get_confirmation(self) -> bool:
         ...
+    
