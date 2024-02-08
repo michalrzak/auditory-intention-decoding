@@ -10,6 +10,7 @@ python = ">=3.8,<3.9.dev0"
 
 PyQt5-Qt5="5.15.2"
 psychopy = "^2023.2.3"
+pytest = "^8.0.0"
 
 [build-system]
 requires = ["poetry-core"]
