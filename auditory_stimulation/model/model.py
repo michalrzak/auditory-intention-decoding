@@ -39,3 +39,11 @@ class Model:
 
         self.__experiment_state = new_state
         self.__notify(self.__experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
+
+    @property
+    def current_prompt(self) -> str:
+        return self.__current_prompt
+
+    @property
+    def experiment_state(self) -> EExperimentState:
+        return self.__experiment_state
