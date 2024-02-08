@@ -5,7 +5,6 @@ import psychopy.visual
 from psychopy.hardware import keyboard
 
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.view.view import AView
 
 LETTER_SIZE = 0.05
@@ -66,4 +65,3 @@ class PsychopyView(AView):
 
     def __del__(self):
         self.close_view()
-

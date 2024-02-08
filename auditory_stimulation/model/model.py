@@ -2,8 +2,8 @@ import warnings
 from typing import List, Any
 
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.view.view import AView
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
+from auditory_stimulation.view.view import AView
 
 
 class Model:
