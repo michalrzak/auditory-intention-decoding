@@ -1192,6 +1192,17 @@ files = [
 ]
 
 [[package]]
+name = "mockito"
+version = "1.4.0"
+description = "Spying framework"
+optional = false
+python-versions = ">=2.7"
+files = [
+    {file = "mockito-1.4.0-py3-none-any.whl", hash = "sha256:1719c6bec3523f9b465c86d247bb76027f53ab10f76b2a126dde409d0492fe3e"},
+    {file = "mockito-1.4.0.tar.gz", hash = "sha256:409ab604c9ebe1bb7dc18ec6b0ed98a8ad5127b08273f5804b22f4d1b51e5222"},
+]
+
+[[package]]
 name = "msgpack"
 version = "1.0.7"
 description = "MessagePack serializer"
@@ -5084,4 +5095,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<3.9.dev0"
-content-hash = "5a25f07cbe5014f6e723b830588826f2fc8fe17101bc00e1f5ccbfb75a7f211a"
+content-hash = "c0472d5bfc5c3244259bb5dfdbf5413f82c6ecb3fdddf8f40b4029722b0c934a"
