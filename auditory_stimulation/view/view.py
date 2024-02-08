@@ -10,7 +10,7 @@ class AView(ABC):
     @abstractmethod
     def _update_new_prompt(self, data: str) -> None:
         ...
-    
+
     @abstractmethod
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
         ...
