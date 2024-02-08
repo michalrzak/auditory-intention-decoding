@@ -8,8 +8,15 @@ from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.view.view import AView
 
+LETTER_SIZE = 0.05
+TEXT_BOX_POSITION = (0, 0)
+TEXT_BOX_SIZE = (0.5, 0.5),
+TEXT_BOX_COLOR = 1.
+TEXT_BOX_COLOR_SPACE = 'rgb'
+TEXT_BOX_FONT = 'FreeSerif'
 
-class PsychopyDrawable(Protocol):
+
+class Drawable(Protocol):
     def draw(self) -> None:
         ...
 
@@ -43,18 +50,15 @@ class PsychopyView(AView):
 
     # ---------------------------
 
-    def __create_text_box(self, text: str) -> PsychopyDrawable:
+    def __create_text_box(self, text: str) -> Drawable:
         return psychopy.visual.TextBox2(win=self.window,
                                         text=text,
-                                        lineBreaking='uax14',
-                                        letterHeight=0.05,
-                                        pos=(0, 0),
-                                        size=(0.5, 0.5),
+                                        letterHeight=LETTER_SIZE,
+                                        pos=TEXT_BOX_POSITION,
+                                        size=TEXT_BOX_SIZE,
                                         color=1.,
-                                        colorSpace='rgb',
-                                        fillColor=None,
-                                        fillColorSpace='rgb',
-                                        font='FreeSerif')
+                                        colorSpace=TEXT_BOX_COLOR_SPACE,
+                                        font=TEXT_BOX_FONT)
 
     def close_view(self):
         self.window.close()
