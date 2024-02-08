@@ -67,16 +67,3 @@ class PsychopyView(AView):
     def __del__(self):
         self.close_view()
 
-
-win = psychopy.visual.Window(
-    size=(1024, 768), fullscr=True, screen=0,
-    winType='pyglet', allowGUI=False, allowStencil=False,
-    monitor='testMonitor', color=[0, 0, 0], colorSpace='rgb',
-    blendMode='avg', useFBO=True,
-    units='height')
-
-view = PsychopyView(win)
-view.update("test", EModelUpdateIdentifier.NEW_PROMPT)
-view.get_confirmation()
-view.update(EExperimentState.RESTING_STATE, EModelUpdateIdentifier.NEW_PROMPT)
-view.get_confirmation()
