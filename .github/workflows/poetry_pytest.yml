@@ -27,6 +27,8 @@ jobs:
         with:
           path: ./.venv
           key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Install wxPython buildDependencies
+        run: apt install libgtk-3-devel
       - name: Install the project dependencies
         run: poetry install
       - name: Run the automated tests (for example)
