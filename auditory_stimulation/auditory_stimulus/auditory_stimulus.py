@@ -1,14 +1,19 @@
 from abc import ABC, abstractmethod
 from typing import Any, List, Tuple, Optional
 
+import numpy.typing as npt
+import numpy as np
+
+Audio = npt.NDArray[np.float32]
+
 
 class AAuditoryStimulus(ABC):
-    __audio: Any  # TODO: specify type
+    __audio: Audio
     __stimuli_intervals: List[Tuple[float, float]]  # in seconds
-    __modified_audio: Optional[Any]  # TODO: specify type
+    __modified_audio: Optional[Audio]
 
     # TODO: specify type
-    def __init__(self, audio: Any, stimuli_intervals: List[Tuple[float, float]]) -> None:
+    def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> None:
         if audio is None:
             raise ValueError("audio cannot be none!")
 
@@ -24,7 +29,7 @@ class AAuditoryStimulus(ABC):
 
     # TODO: specify type
     @abstractmethod
-    def _create_modified_audio(self, audio: Any, stimuli_intervals: List[Tuple[float, float]]) -> Any:
+    def _create_modified_audio(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> Any:
         ...
 
     def create(self):
@@ -35,4 +40,3 @@ class AAuditoryStimulus(ABC):
             raise RuntimeError("create() has to be run before the stimulus can be presented!")
 
         raise NotImplementedError()
-
