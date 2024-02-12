@@ -13,7 +13,6 @@ psychopy = "^2023.2.3"
 pytest = "^8.0.0"
 mockito = "^1.4.0"
 pygame = "^2.5.2"
-pyaudio = "^0.2.14"
 
 [build-system]
 requires = ["poetry-core"]
