@@ -1,43 +1,29 @@
-from copy import copy
-
 import numpy.typing as npt
 import numpy as np
-import pyaudio
 
 from psychopy.sound.backend_pygame import SoundPygame
 
 
-def psychopy_player(audio: npt.NDArray[np.float32]):
-    """ Plays the give audio
+def psychopy_player(audio: npt.NDArray[np.float32], sampling_rate: int = 44100) -> None:
+    """ Plays the given audio. Function is blocking and returns after the audio has finished playing
 
-    :param audio: Nx2 dimensional array of the audio. Audio needs to be in the range [-1, 1]
+    :param audio: Nx2 dimensional numpy array of the audio. Audio needs to be in the range [-1, 1]
+    :param sampling_rate: integer of the sampling rate of the audio. Default is 44100.
     :return:
     """
 
+    if audio.shape[1] != 2:
+        raise ValueError("The audio has to be stereo! I.e. in the shape Nx2")
+
+    if audio.dtype != np.float32:
+        raise ValueError("The audio has to be of the type np.float32!")
+
+    assert np.max(audio) <= 1
+    assert np.min(audio) >= -1
+
+    if sampling_rate <= 0:
+        raise ValueError("Sampling rate has to be > 0")
+
     # use the pygame backend, as it allows to play sounds from arrays, not only from files
-    sound = SoundPygame(value = audio)
+    sound = SoundPygame(value=audio)
     sound.play()
-    raise NotImplementedError()
-
-CHUNK = 1024
-def pyaudio_player(audio: npt.NDArray[np.float32]):
-
-    audio_copy = copy(audio)
-    # Insate PyAudio and initialize PortAudio system resources (1)
-    p = pyaudio.PyAudio()
-
-    # Open stream (2)
-    stream = p.open(format=pyaudio.paFloat32,
-                    channels=2,
-                    rate=44100,
-                    output=True)
-
-    # Play samples from the wave file (3)
-    while len(data := audio_copy[:CHUNK]):
-        stream.write(data)
-
-    # Close stream (4)
-    stream.close()
-
-    # Release PortAudio system resources (5)
-    p.terminate()
