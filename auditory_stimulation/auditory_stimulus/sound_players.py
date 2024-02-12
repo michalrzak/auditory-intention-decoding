@@ -1,10 +1,10 @@
-import numpy.typing as npt
 import numpy as np
 
 from psychopy.sound.backend_pygame import SoundPygame
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 
 
-def psychopy_player(audio: npt.NDArray[np.float32], sampling_rate: int = 44100) -> None:
+def psychopy_player(audio: Audio, sampling_rate: int = 44100) -> None:
     """ Plays the given audio. Function is blocking and returns after the audio has finished playing
 
     :param audio: Nx2 dimensional numpy array of the audio. Audio needs to be in the range [-1, 1]
