@@ -1,3 +1,4 @@
+import copy
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Optional, Callable
 from dataclasses import dataclass
@@ -10,6 +11,9 @@ import numpy as np
 class Audio:
     audio: npt.NDArray[np.float32]
     sampling_frequency: int
+
+    def __copy__(self) -> "Audio":
+        return Audio(np.copy(self.audio), self.sampling_frequency)
 
 
 class AAuditoryStimulus(ABC):
@@ -46,3 +50,10 @@ class AAuditoryStimulus(ABC):
             raise RuntimeError("create() has to be run before the stimulus can be presented!")
 
         self.__audio_player(self.__modified_audio)
+
+    @property
+    def modified_audio(self) -> Optional[Audio]:
+        if self.__modified_audio is None:
+            return None
+
+        return copy.copy(self.__modified_audio)
