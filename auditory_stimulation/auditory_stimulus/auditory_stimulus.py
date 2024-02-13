@@ -39,7 +39,7 @@ class AAuditoryStimulus(ABC):
         ...
 
     def create(self):
-        self.__audio = self._create_modified_audio(self.__audio, self.__stimuli_intervals)
+        self.__modified_audio = self._create_modified_audio(self.__audio, self.__stimuli_intervals)
 
     def present(self):
         if self.__modified_audio is None:
