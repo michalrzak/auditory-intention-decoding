@@ -18,7 +18,6 @@ class AAuditoryStimulus(ABC):
     __modified_audio: Optional[Audio]
     __audio_player: Callable[[Audio], None]
 
-    # TODO: specify type
     def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]],
                  audio_player: Callable[[Audio], None]) -> None:
         if audio is None:
