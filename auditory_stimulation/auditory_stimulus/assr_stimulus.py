@@ -1,6 +1,7 @@
 from typing import List, Tuple, Callable
 
 import numpy as np
+import numpy.typing as npt
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio
 
@@ -17,7 +18,7 @@ class ASSRStimulus(AAuditoryStimulus):
 
         self.__frequency = frequency
 
-    def __generate_added_signal(self, length: int):
+    def __generate_added_signal(self, length: int) -> npt.NDArray[np.float32]:
         return np.sin(2 * np.pi * self.__frequency * np.array(range(length)))
 
     def _create_modified_audio(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> Audio:
