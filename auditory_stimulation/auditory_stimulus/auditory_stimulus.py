@@ -1,10 +1,15 @@
 from abc import ABC, abstractmethod
-from typing import Any, List, Tuple, Optional, Callable
+from typing import List, Tuple, Optional, Callable
+from dataclasses import dataclass
 
 import numpy.typing as npt
 import numpy as np
 
-Audio = npt.NDArray[np.float32]
+
+@dataclass
+class Audio:
+    audio: npt.NDArray[np.float32]
+    sampling_frequency: int
 
 
 class AAuditoryStimulus(ABC):
