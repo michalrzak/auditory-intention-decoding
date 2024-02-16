@@ -6,9 +6,11 @@ from auditory_stimulation.auditory_stimulus.assr_stimulus import ASSRStimulus
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 
 
-def get_mocked_audio(n_input: int, sampling_frequency: int) -> Audio:
+def get_mocked_audio(n_input: int, sampling_frequency: int, seed: int = 100) -> Audio:
+    np.random.seed(seed)
+
     audio = mockito.mock(Audio)
-    audio.audio = np.zeros((n_input, 2))
+    audio.audio = np.random.rand(n_input, 2)
     audio.sampling_frequency = sampling_frequency
 
     return audio
@@ -16,10 +18,10 @@ def get_mocked_audio(n_input: int, sampling_frequency: int) -> Audio:
 
 def test_ASSRStimulus_create_validCall_audioShouldBeModified():
     n_input = 100
-    sampling_frequency = 2
+    sampling_frequency = 12
     audio = get_mocked_audio(n_input, sampling_frequency)
 
-    stimulus_frequency = 40
+    stimulus_frequency = 2
 
     stimulus = ASSRStimulus(audio,
                             [(0, n_input / sampling_frequency)],
@@ -42,7 +44,7 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
     sampling_frequency = 2
     audio = get_mocked_audio(n_input, sampling_frequency)
 
-    stimulus_frequency = 40
+    stimulus_frequency = 1
 
     stimulus = ASSRStimulus(audio,
                             [(0, n_input / sampling_frequency / 2)],
@@ -59,3 +61,4 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
     assert modified_audio.sampling_frequency == sampling_frequency
     assert np.any(modified_audio.audio[:n_input // 2, :] != audio.audio[:n_input // 2, :])
     assert np.all(modified_audio.audio[n_input // 2:, :] == audio.audio[n_input // 2:, :])
+
