@@ -53,7 +53,7 @@ class AAuditoryStimulus(ABC):
 
     @property
     def modified_audio(self) -> Optional[Audio]:
-        if self.__modified_audio is None:
+        if self._modified_audio is None:
             return None
 
-        return copy.copy(self.__modified_audio)
+        return copy.copy(self._modified_audio)
