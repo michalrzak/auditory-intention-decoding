@@ -30,11 +30,11 @@ class ASSRStimulus(AAuditoryStimulus):
 
         return np.array([np.copy(signal), np.copy(signal)]).T
 
-    def _create_modified_audio(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> Audio:
-        audio_copy = np.copy(audio.audio)
+    def _create_modified_audio(self) -> Audio:
+        audio_copy = np.copy(self._audio.audio)
 
-        for interval in stimuli_intervals:
-            sample_range = (int(interval[0] * audio.sampling_frequency), int(interval[1] * audio.sampling_frequency))
+        for interval in self._stimuli_intervals:
+            sample_range = (int(interval[0] * self._audio.sampling_frequency), int(interval[1] * audio.sampling_frequency))
 
             # generate sine of the appropriate frequency
             added_signal = self.__generate_added_signal(sample_range[1] - sample_range[0])
@@ -43,4 +43,4 @@ class ASSRStimulus(AAuditoryStimulus):
             audio_copy[sample_range[0]:sample_range[1]] += duplicated_signal
 
         new_max = np.max([np.abs(np.min(audio_copy)), np.max(audio_copy)])
-        return Audio(audio_copy / new_max, audio.sampling_frequency)
+        return Audio(audio_copy / new_max, self._audio.sampling_frequency)

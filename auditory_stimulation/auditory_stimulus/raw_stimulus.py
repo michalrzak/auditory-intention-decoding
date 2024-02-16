@@ -4,5 +4,5 @@ from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditorySt
 
 
 class RawStimulus(AAuditoryStimulus):
-    def _create_modified_audio(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> Audio:
-        return audio
+    def _create_modified_audio(self) -> Audio:
+        return self._audio
