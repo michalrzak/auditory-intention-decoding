@@ -1,32 +1,14 @@
-from typing import Callable
-
-import mockito
-
 import numpy as np
 import pytest
 
 from auditory_stimulation.auditory_stimulus.assr_stimulus import ASSRStimulus
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
-
-
-def get_mocked_audio(n_input: int, sampling_frequency: int, seed: int = 100) -> Audio:
-    np.random.seed(seed)
-
-    audio = mockito.mock(Audio)
-    audio.audio = np.random.rand(n_input, 2)
-    audio.sampling_frequency = sampling_frequency
-
-    return audio
-
-
-def get_mock_audio_player() -> Callable[[Audio], None]:
-    return lambda a: None
+from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_audio_player
 
 
 def test_ASSRStimulus_create_validCall_audioShouldBeModified():
     n_input = 100
     sampling_frequency = 12
-    audio = get_mocked_audio(n_input, sampling_frequency)
+    audio = get_mock_audio(n_input, sampling_frequency)
 
     stimulus_frequency = 2
 
@@ -49,7 +31,7 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModified():
 def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
     n_input = 100
     sampling_frequency = 2
-    audio = get_mocked_audio(n_input, sampling_frequency)
+    audio = get_mock_audio(n_input, sampling_frequency)
 
     stimulus_frequency = 1
 
@@ -73,7 +55,7 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
 def test_ASSRStimulus_invalidFrequency_doesNotDivide_shouldThrow():
     n_input = 1000
     sampling_frequency = 17
-    audio = get_mocked_audio(n_input, sampling_frequency)
+    audio = get_mock_audio(n_input, sampling_frequency)
 
     stimulus_frequency = 5
 
@@ -82,7 +64,7 @@ def test_ASSRStimulus_invalidFrequency_doesNotDivide_shouldThrow():
 
 
 def test_ASSRStimulus_invalidFrequency_0_shouldThrwo():
-    audio = get_mocked_audio(100, 12)
+    audio = get_mock_audio(100, 12)
     stimulus_frequency = 0
 
     with pytest.raises(ValueError):
@@ -90,7 +72,7 @@ def test_ASSRStimulus_invalidFrequency_0_shouldThrwo():
 
 
 def test_ASSRStimulus_invalidFrequency_negative_shouldThrwo():
-    audio = get_mocked_audio(100, 12)
+    audio = get_mock_audio(100, 12)
     stimulus_frequency = -1
 
     with pytest.raises(ValueError):
