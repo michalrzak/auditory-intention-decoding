@@ -53,8 +53,8 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
         random_zero_one = np.array(random_floats > 0.5, dtype=np.int16)
         code = random_zero_one * 2 - 1
 
-        # TODO need to duplicate each entry bit_width times
-        self.__code = np.array([code, code]).T  # duplicate code to both audio channels
+        code_normalized = np.repeat(code, bit_width)
+        self.__code = np.array([code_normalized, code_normalized]).T  # duplicate code to both audio channels
         assert self.__code.shape[1] == 2
 
     def __get_code(self, length: int) -> Code:
@@ -62,7 +62,8 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
             raise ValueError("You must run __generate_code() first before you can run this method")
 
         repeat = length // self.__code.shape[0]
-        long_code = np.repeat(self.__code, repeat, axis=0)
+        long_code = np.tile(self.__code.T, repeat).T
+        assert long_code.shape[0] == self.__code.shape[0] * repeat
 
         if long_code.shape[0] == length:
             assert long_code.shape[1] == 2
