@@ -14,14 +14,16 @@ def test_create_validCall_channelsShouldBeTheSame():
     sampling_frequency = 12
     audio = get_mock_audio(n_input, sampling_frequency)
 
+    bits_per_second = 6
+    length_bit = 20
+
     stimulus = NoiseTaggingStimulus(audio,
                                     [(0, n_input / sampling_frequency)],
                                     get_mock_audio_player(),
-                                    10,
-                                    20,
+                                    bits_per_second,
+                                    length_bit,
                                     SEED)
     stimulus.create()
-
     code = stimulus.code
 
     assert np.all(code[:, 0] == code[:, 1])
@@ -79,5 +81,8 @@ def test_create_validCall_codeRepeatsCorrectly():
     assert np.all(
         modified_audio.audio[labeled_interval[1] * sampling_frequency // 2:labeled_interval[1] * sampling_frequency, :]
         == code)
+
+
+#def test_create_
 
 # TODO probably need to check how stuff behaves if bitwidth does not divide the sampling frequency

@@ -9,7 +9,7 @@ Code = npt.NDArray[np.int16]
 
 class NoiseTaggingStimulus(AAuditoryStimulus):
     __seed: Optional[int]
-    __bits_per_second: int
+    __bit_width: int
     __length_bit: int
     __code: Optional[Code]  # can only contain 1 and -1
 
@@ -28,10 +28,15 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
         if bits_per_second <= 0:
             raise ValueError("bits_per_second has to be a positive number")
 
+        if self._audio.sampling_frequency // bits_per_second != self._audio.sampling_frequency / bits_per_second:
+            raise ValueError("bits_per_second must fully divide the sampling frequency of the audio, otherwise the code"
+                             " cannot be fully created")
+
         if length_bit <= 0:
             raise ValueError("length_bit has to be a positive number")
 
-        self.__bits_per_second = bits_per_second
+        # save only the bit_width and not the bits_per_seconds, as the latter is not used anywhere later in the code
+        self.__bit_width = self._audio.sampling_frequency // bits_per_second
         self.__length_bit = length_bit
 
         self.__code = None
@@ -46,14 +51,11 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
         if self.__seed is not None:
             np.random.seed(self.__seed)
 
-        bit_width = self._audio.sampling_frequency // self.__bits_per_second
-        assert bit_width == self._audio.sampling_frequency / self.__bits_per_second
-
         random_floats = np.random.rand(self.__length_bit)  # Nx1 as I want the same code for both audio channels
         random_zero_one = np.array(random_floats > 0.5, dtype=np.int16)
         code = random_zero_one * 2 - 1
 
-        code_normalized = np.repeat(code, bit_width)
+        code_normalized = np.repeat(code, self.__bit_width)
         self.__code = np.array([code_normalized, code_normalized]).T  # duplicate code to both audio channels
         assert self.__code.shape[1] == 2
 
@@ -70,7 +72,7 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
             return long_code
 
         assert length - long_code.shape[0] > 0
-        out = np.append(long_code, self.__code[:length - long_code.shape[0], :], axis=2)
+        out = np.append(long_code, self.__code[:length - long_code.shape[0], :], axis=0)
 
         assert out.shape[0] == length, f"out.shape[0]: {out.shape[0]}; length: {length}"
         assert out.shape[1] == 2
