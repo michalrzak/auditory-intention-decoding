@@ -5,6 +5,7 @@ from auditory_stimulation.auditory_stimulus.noise_tagging_stimulus import NoiseT
 from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_audio_player
 
 import numpy as np
+import pytest
 
 SEED = 123
 
@@ -83,6 +84,56 @@ def test_create_validCall_codeRepeatsCorrectly():
         == code)
 
 
-#def test_create_
+def test_create_shouldThrow_bitsPerSecondDoesNotDivideSamplingFrequency():
+    n_input = 100
+    sampling_frequency = 10
+    audio = get_mock_audio(n_input, sampling_frequency)
 
-# TODO probably need to check how stuff behaves if bitwidth does not divide the sampling frequency
+    labeled_interval = (0, 2)  # 2 seconds labeled
+    bits_per_second = 3
+    length = bits_per_second  # code of length 1 second
+
+    with pytest.raises(ValueError):
+        stimulus = NoiseTaggingStimulus(audio,
+                                        [labeled_interval],
+                                        get_mock_audio_player(),
+                                        bits_per_second,
+                                        length,
+                                        SEED)
+
+
+def test_create_shouldThrow_bitsPerSecondZero():
+    n_input = 100
+    sampling_frequency = 10
+    audio = get_mock_audio(n_input, sampling_frequency)
+
+    labeled_interval = (0, 2)  # 2 seconds labeled
+    bits_per_second = 0
+    length = bits_per_second  # code of length 1 second
+
+    with pytest.raises(ValueError):
+        stimulus = NoiseTaggingStimulus(audio,
+                                        [labeled_interval],
+                                        get_mock_audio_player(),
+                                        bits_per_second,
+                                        length,
+                                        SEED)
+
+
+def test_create_shouldThrow_bitsPerSecondBellowZero():
+    n_input = 100
+    sampling_frequency = 10
+    audio = get_mock_audio(n_input, sampling_frequency)
+
+    labeled_interval = (0, 2)  # 2 seconds labeled
+    bits_per_second = -1
+    length = bits_per_second  # code of length 1 second
+
+    with pytest.raises(ValueError):
+        stimulus = NoiseTaggingStimulus(audio,
+                                        [labeled_interval],
+                                        get_mock_audio_player(),
+                                        bits_per_second,
+                                        length,
+                                        SEED)
+       
