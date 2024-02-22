@@ -28,13 +28,11 @@ jobs:
         with:
           path: ./.venv
           key: venv-${{ hashFiles('poetry.lock') }}
-      # - name: Install wxPython buildDependencies
-      #   uses: awalsh128/cache-apt-pkgs-action@latest
-      #   with:
-      #     packages: libgtk-3-devel
-      #     version: 1.0
-
+        
       - name: Install the project dependencies
         run: poetry install
-      - name: Run the automated tests (for example)
+      - name: Run the automated tests
         run: poetry run pytest -v
+
+      - name: List test directory
+        run: dir /s
