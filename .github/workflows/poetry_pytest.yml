@@ -35,4 +35,4 @@ jobs:
         run: poetry run pytest -v
 
       - name: List test directory
-        run: dir /tests
+        run: dir tests
