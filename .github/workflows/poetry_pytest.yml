@@ -33,6 +33,3 @@ jobs:
         run: poetry install
       - name: Run the automated tests
         run: poetry run pytest -v
-
-      - name: List test directory
-        run: dir /s
