@@ -100,6 +100,7 @@ def test_ASSRStimulus_create_validCall():
                         mock_stimulus_generation)
     stim.create()
 
+
 def test_clickingStimulus_validCall_shouldHaveCorrectFrequency():
     epsilon = 0.1
 
@@ -120,12 +121,62 @@ def test_clickingStimulus_validCall_shouldHaveCorrectFrequency():
 
         assert peak_frequency - epsilon <= stimulus_frequency <= peak_frequency + epsilon
 
+
 def test_clickingStimulus_invalidFrequency_doesNotDivide_shouldThrow():
     length = 1000
     sampling_frequency = 17
 
-    stimulus_frequency = 5
+    frequency = 5
 
     with pytest.raises(ValueError):
-        clicking_signal(length, stimulus_frequency, sampling_frequency)
-        
+        clicking_signal(length, frequency, sampling_frequency)
+
+
+def test_clickingStimulus_invalidFrequency_negative_shouldThrow():
+    length = 1000
+    sampling_frequency = 20
+
+    frequency = -5
+
+    with pytest.raises(ValueError):
+        clicking_signal(length, frequency, sampling_frequency)
+
+
+def test_clickingStimulus_invalidFrequency_0_shouldThrow():
+    length = 1000
+    sampling_frequency = 20
+
+    frequency = 0
+
+    with pytest.raises(ValueError):
+        clicking_signal(length, frequency, sampling_frequency)
+
+
+def test_clickingStimulus_invalidSamplingFrequency_negative_shouldThrow():
+    length = 1000
+    sampling_frequency = -20
+
+    frequency = 5
+
+    with pytest.raises(ValueError):
+        clicking_signal(length, frequency, sampling_frequency)
+
+
+def test_clickingStimulus_invalidSamplingFrequency_0_shouldThrow():
+    length = 1000
+    sampling_frequency = 0
+
+    frequency = 5
+
+    with pytest.raises(ValueError):
+        clicking_signal(length, frequency, sampling_frequency)
+
+
+def test_clickingStimulus_invalidSamplingFrequency_and_invalidFrequency_bellowZero_shouldThrow():
+    length = 1000
+    sampling_frequency = -20
+
+    frequency = -5
+
+    with pytest.raises(ValueError):
+        clicking_signal(length, frequency, sampling_frequency)

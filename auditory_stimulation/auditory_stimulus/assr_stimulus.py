@@ -25,7 +25,6 @@ def duplicate_signal(signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
 
 def clicking_signal(length: int, frequency: int, sampling_frequency: int) -> npt.NDArray[np.float32]:
     """ Used to generate the modulating ASSR signal of the given length.
-    TODO: tests
 
     :param length: The length in samples of the modulating ASSR signal.
     :param frequency: The frequency of the to be generated signal
