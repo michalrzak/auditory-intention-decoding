@@ -1,3 +1,4 @@
+from numbers import Number
 from typing import List, Tuple, Callable, Any
 
 import numpy as np
@@ -14,6 +15,15 @@ class ASSRStimulus(AAuditoryStimulus):
 
     def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]],
                  audio_player: Callable[[Audio], None], frequency: int) -> None:
+        """Constructs the ASSRStimulus object
+
+        :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
+        :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
+         intervals must be contained within the audio.
+        :param audio_player: A function, which if given an audio plays it.
+        :param frequency: The frequency of the ASSR stimulus
+        """
+
         super().__init__(audio, stimuli_intervals, audio_player)
 
         if frequency <= 0:
@@ -29,6 +39,12 @@ class ASSRStimulus(AAuditoryStimulus):
         self.__frequency = frequency
 
     def __generate_added_signal(self, length: int) -> npt.NDArray[np.float32]:
+        """ Private function, used to generate the modulating ASSR signal of the given length.
+
+        :param length: The length in samples of the modulating ASSR signal.
+        :return: The modulating ASSR signal.
+        """
+
         # TODO: add tests if this becomes the default
         # set all values to 1 as default
         signal = np.ones(length)
@@ -37,21 +53,38 @@ class ASSRStimulus(AAuditoryStimulus):
         first = self._audio.sampling_frequency // (self.__frequency * 2)
         step = self._audio.sampling_frequency // self.__frequency
         for i in range(first, length, step):
-            interval_end = i + step // 2 if i + step // 2 <= length else length
+
+            # calculate modified interval end. If the interval end is out of range, set it to the range
+            interval_end = i + step // 2
+            if i + step // 2 > length:
+                interval_end = length
+
             signal[i:interval_end] = -np.ones(interval_end - i)
 
         return signal
 
-    def __duplicate_to_audio_channels(self, signal: npt.NDArray[Any], audio: npt.NDArray[np.float32]):
-        if len(signal.shape) != 1:
-            raise ValueError("Signal has to have zero dimensions in the second dimension")
+    def __duplicate_to_audio_channels(self, signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
+        """Given a one dimensional signal (N/Nx1) returns the signal duplicated to two dimensions (Nx2).
 
-        if audio.shape[1] != 2:
-            raise NotImplementedError("Sorry, but only audio of size Nx2 is supported at the moment")
+        :param signal: The to be duplicated signal.
+        :return: The duplicated signal.
+        """
+        if len(signal.shape) > 1 or (len(signal.shape) == 2 and signal.shape[1] == 1):
+            raise ValueError("The passed signal needs to be one dimensional!")
 
-        return np.array([np.copy(signal), np.copy(signal)]).T
+        output = np.array([np.copy(signal), np.copy(signal)]).T
+        assert output.shape[1] == 2
+        assert output.shape[0] == signal.shape[0]
+
+        return output
 
     def _create_modified_audio(self) -> Audio:
+        """This method is implemented from the abstract super class. When called, it generates the ASSR stimulus
+        modified audio.
+
+        :return: The ASSR stimulus modified audio.
+        """
+
         audio_copy = np.copy(self._audio.audio)
 
         for interval in self._stimuli_intervals:
@@ -61,7 +94,7 @@ class ASSRStimulus(AAuditoryStimulus):
             # generate sine of the appropriate frequency
             added_signal = self.__generate_added_signal(sample_range[1] - sample_range[0])
 
-            duplicated_signal = self.__duplicate_to_audio_channels(added_signal, self._audio.audio)
+            duplicated_signal = self.__duplicate_to_audio_channels(added_signal)
             audio_copy[sample_range[0]:sample_range[1]] *= duplicated_signal
 
         # new_max = np.max([np.abs(np.min(audio_copy)), np.max(audio_copy)])
