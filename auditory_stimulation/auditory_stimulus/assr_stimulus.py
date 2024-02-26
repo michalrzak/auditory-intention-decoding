@@ -33,6 +33,21 @@ def clicking_signal(length: int, frequency: int, sampling_frequency: int) -> npt
     :return: The modulating ASSR clicking signal.
     """
 
+    if length <= 0:
+        raise ValueError("Length must be a positive integer!")
+
+    if frequency <= 0:
+        raise ValueError("Frequency must be a positive integer!")
+
+    if sampling_frequency <= 0:
+        raise ValueError("Sampling frequency must be a positive integer!")
+
+    # in order to be able to generate the altering signal properly, the 2 x frequency needs to divide the
+    #  sampling rate of the original audio signal. if this is not the case, one of the saw-teeth will be longer
+    #  than other, which may mess with the frequency
+    if sampling_frequency // (frequency * 2) != sampling_frequency / (frequency * 2):
+        raise ValueError("The frequency has to be fully divisible by the audio sampling frequency!")
+
     # set all values to 1 as default
     signal = np.ones(length)
 
@@ -76,13 +91,6 @@ class ASSRStimulus(AAuditoryStimulus):
 
         if frequency <= 0:
             raise ValueError("The frequency has to be a positive number")
-
-        # in order to be able to generate the altering signal properly, the 2 x frequency needs to divide the
-        #  sampling rate of the original audio signal. if this is not the case, one of the saw-teeth will be longer
-        #  than other, which may mess with the frequency
-        if audio.sampling_frequency // (frequency * 2) != \
-                audio.sampling_frequency / (frequency * 2):
-            raise ValueError("The frequency has to be fully divisible by the audio sampling frequency!")
 
         self.__frequency = frequency
         self.__stimulus_generation = stimulus_generation

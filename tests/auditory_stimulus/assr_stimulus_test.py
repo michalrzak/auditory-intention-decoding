@@ -62,21 +62,6 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
     assert np.all(modified_audio.audio[n_input // 2:, :] == audio.audio[n_input // 2:, :])
 
 
-def test_ASSRStimulus_invalidFrequency_doesNotDivide_shouldThrow():
-    n_input = 1000
-    sampling_frequency = 17
-    audio = get_mock_audio(n_input, sampling_frequency)
-
-    stimulus_frequency = 5
-
-    with pytest.raises(ValueError):
-        stim = ASSRStimulus(audio,
-                            [(0, 1)],
-                            get_mock_audio_player(),
-                            stimulus_frequency,
-                            mock_stimulus_generation)
-
-
 def test_ASSRStimulus_invalidFrequency_0_shouldThrow():
     audio = get_mock_audio(100, 12)
     stimulus_frequency = 0
@@ -134,3 +119,13 @@ def test_clickingStimulus_validCall_shouldHaveCorrectFrequency():
         peak_frequency = peak * sampling_frequency / length
 
         assert peak_frequency - epsilon <= stimulus_frequency <= peak_frequency + epsilon
+
+def test_clickingStimulus_invalidFrequency_doesNotDivide_shouldThrow():
+    length = 1000
+    sampling_frequency = 17
+
+    stimulus_frequency = 5
+
+    with pytest.raises(ValueError):
+        clicking_signal(length, stimulus_frequency, sampling_frequency)
+        
