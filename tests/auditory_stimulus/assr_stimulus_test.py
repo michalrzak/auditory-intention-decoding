@@ -63,7 +63,7 @@ def test_ASSRStimulus_invalidFrequency_doesNotDivide_shouldThrow():
         stim = ASSRStimulus(audio, [(0, 1)], get_mock_audio_player(), stimulus_frequency)
 
 
-def test_ASSRStimulus_invalidFrequency_0_shouldThrwo():
+def test_ASSRStimulus_invalidFrequency_0_shouldThrow():
     audio = get_mock_audio(100, 12)
     stimulus_frequency = 0
 
@@ -71,7 +71,7 @@ def test_ASSRStimulus_invalidFrequency_0_shouldThrwo():
         stim = ASSRStimulus(audio, [(0, 1)], get_mock_audio_player(), stimulus_frequency)
 
 
-def test_ASSRStimulus_invalidFrequency_negative_shouldThrwo():
+def test_ASSRStimulus_invalidFrequency_negative_shouldThrow():
     audio = get_mock_audio(100, 12)
     stimulus_frequency = -1
 
