@@ -7,6 +7,16 @@ import numpy.typing as npt
 import numpy as np
 
 
+def to_sample(time: float, sampling_frequency: int) -> int:
+    """Function, which converts the given time to a sample
+
+    :param time: The to be converted time.
+    :param sampling_frequency: The sampling frequency based on which the sample is computed.
+    :return: The converted sample.
+    """
+    return int(time * sampling_frequency)
+
+
 @dataclass
 class Audio:
     audio: npt.NDArray[np.float32]
@@ -32,6 +42,15 @@ class AAuditoryStimulus(ABC):
 
         if len(stimuli_intervals) == 0:
             raise ValueError("Must supply at least one stimulus")
+
+        # check whether all intervals are contained in the audio
+        # check whether all left intervals are < right intervals
+        for stimulus in stimuli_intervals:
+            if stimulus[0] >= stimulus[1]:
+                raise ValueError("All intervals must have their beginning < end")
+
+            if to_sample(stimulus[1], self._audio.sampling_frequency) > self._audio.audio.shape[0]:
+                raise ValueError(f"The stimuli intervals must be contained within the audio. ")
 
         self._audio = audio
         self._stimuli_intervals = stimuli_intervals
