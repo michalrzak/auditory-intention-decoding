@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
-from auditory_stimulation.auditory_stimulus.sound_players import psychopy_player
+from auditory_stimulation.auditory_stimulus.helper.sound_players import psychopy_player
 
 
 def test_psychopy_player_valid_call():

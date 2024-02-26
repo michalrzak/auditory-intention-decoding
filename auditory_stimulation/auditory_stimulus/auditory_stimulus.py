@@ -49,7 +49,7 @@ class AAuditoryStimulus(ABC):
             if stimulus[0] >= stimulus[1]:
                 raise ValueError("All intervals must have their beginning < end")
 
-            if to_sample(stimulus[1], self._audio.sampling_frequency) > self._audio.audio.shape[0]:
+            if to_sample(stimulus[1], audio.sampling_frequency) > audio.audio.shape[0]:
                 raise ValueError(f"The stimuli intervals must be contained within the audio. ")
 
         self._audio = audio
