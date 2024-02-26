@@ -2,7 +2,7 @@ import mockito
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.auditory_stimulus.noise_tagging_stimulus import NoiseTaggingStimulus
-from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_audio_player
+from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_audio_player, get_mock_ones_audio
 
 import numpy as np
 import pytest
@@ -56,9 +56,7 @@ def test_create_validCall_codeHasCorrectResolution():
 def test_create_validCall_codeRepeatsCorrectly():
     n_input = 100
     sampling_frequency = 10
-    audio = mockito.mock(Audio)
-    audio.audio = np.ones((n_input, 2))
-    audio.sampling_frequency = sampling_frequency
+    audio = get_mock_ones_audio(n_input, sampling_frequency)
 
     labeled_interval = (0, 2)  # 2 seconds labeled
     bits_per_second = 5
