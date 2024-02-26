@@ -1,10 +1,20 @@
 from numbers import Number
-from typing import List, Tuple, Callable, Any
+from typing import List, Tuple, Callable
 
 import numpy as np
 import numpy.typing as npt
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio
+
+
+def to_sample(time: float, sampling_frequency: int) -> int:
+    """Function, which converts the given time to a sample
+
+    :param time: The to be converted time.
+    :param sampling_frequency: The sampling frequency based on which the sample is computed.
+    :return: The converted sample.
+    """
+    return int(time * sampling_frequency)
 
 
 class ASSRStimulus(AAuditoryStimulus):
@@ -35,6 +45,15 @@ class ASSRStimulus(AAuditoryStimulus):
         if audio.sampling_frequency // (frequency * 2) != \
                 audio.sampling_frequency / (frequency * 2):
             raise ValueError("The frequency has to be fully divisible by the audio sampling frequency!")
+
+        # check whether all intervals are contained in the audio
+        # check whether all left intervals are < right intervals
+        for stimulus in stimuli_intervals:
+            if stimulus[0] >= stimulus[1]:
+                raise ValueError("All intervals must have their beginning < end")
+
+            if to_sample(stimulus[1], self._audio.sampling_frequency) > self._audio.audio.shape[0]:
+                raise ValueError(f"The stimuli intervals must be contained within the audio. ")
 
         self.__frequency = frequency
 
