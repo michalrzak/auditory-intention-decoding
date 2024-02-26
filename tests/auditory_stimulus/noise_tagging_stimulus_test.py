@@ -136,4 +136,3 @@ def test_create_shouldThrow_bitsPerSecondBellowZero():
                                         bits_per_second,
                                         length,
                                         SEED)
-       
