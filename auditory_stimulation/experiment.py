@@ -10,6 +10,7 @@ STIMULUS_REPEAT = 5
 RESTING_STATE_SECS = 5
 PRIMER_SECS = 5
 
+
 class Experiment:
     __model: Model
     __view: AView
