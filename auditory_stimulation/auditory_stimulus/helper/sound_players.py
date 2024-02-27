@@ -5,7 +5,8 @@ from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 
 
 def psychopy_player(audio: Audio, play_audio: bool = True) -> None:
-    """ Plays the given audio. Function is blocking and returns after the audio has finished playing
+    """ Plays the given audio. Function is NON blocking and returns after the audio has STARTED playing
+    TODO: MAKE BLOCKING
 
     :param audio: a dataclass consisting of
      * audio: Nx2 dimensional numpy array of the audio. Audio needs to be in the range [-1, 1]
