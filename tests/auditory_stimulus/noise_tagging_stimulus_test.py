@@ -1,6 +1,3 @@
-import mockito
-
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.auditory_stimulus.noise_tagging_stimulus import NoiseTaggingStimulus
 from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_audio_player, get_mock_ones_audio
 
