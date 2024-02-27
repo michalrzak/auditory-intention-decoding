@@ -1,4 +1,5 @@
-from typing import List, Tuple, Callable, Any
+from numbers import Number
+from typing import List, Tuple, Callable
 
 import numpy as np
 import numpy.typing as npt
@@ -11,47 +12,43 @@ class ASSRStimulus(AAuditoryStimulus):
     signal, with a sawtooth signal (between -1 and 1) of the appropriate frequency.
     """
     __frequency: int
+    __stimulus_generation: Callable[[int, int, int], npt.NDArray[np.float32]]
+    __modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[npt.NDArray[np.float32]]]
 
-    def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]],
-                 audio_player: Callable[[Audio], None], frequency: int) -> None:
+    def __init__(self,
+                 audio: Audio,
+                 stimuli_intervals: List[Tuple[float, float]],
+                 audio_player: Callable[[Audio], None],
+                 frequency: int,
+                 stimulus_generation: Callable[[int, int, int], npt.NDArray[np.float32]],
+                 modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]],
+                                     npt.NDArray[npt.NDArray[np.float32]]]
+                 ) -> None:
+        """Constructs the ASSRStimulus object
+
+        :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
+        :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
+         intervals must be contained within the audio.
+        :param audio_player: A function, which if given an audio plays it.
+        :param frequency: The frequency of the ASSR stimulus
+        """
+
         super().__init__(audio, stimuli_intervals, audio_player)
 
         if frequency <= 0:
             raise ValueError("The frequency has to be a positive number")
 
-        # in order to be able to generate the altering signal properly, the 2 x frequency needs to divide the
-        #  sampling rate of the original audio signal. if this is not the case, one of the saw-teeth will be longer
-        #  than other, which may mess with the frequency
-        if audio.sampling_frequency // (frequency * 2) != \
-                audio.sampling_frequency / (frequency * 2):
-            raise ValueError("The frequency has to be fully divisible by the audio sampling frequency!")
-
         self.__frequency = frequency
-
-    def __generate_added_signal(self, length: int) -> npt.NDArray[np.float32]:
-        # TODO: add tests if this becomes the default
-        # set all values to 1 as default
-        signal = np.ones(length)
-
-        # set all necessary to -1
-        first = self._audio.sampling_frequency // (self.__frequency * 2)
-        step = self._audio.sampling_frequency // self.__frequency
-        for i in range(first, length, step):
-            interval_end = i + step // 2 if i + step // 2 <= length else length
-            signal[i:interval_end] = -np.ones(interval_end - i)
-
-        return signal
-
-    def __duplicate_to_audio_channels(self, signal: npt.NDArray[Any], audio: npt.NDArray[np.float32]):
-        if len(signal.shape) != 1:
-            raise ValueError("Signal has to have zero dimensions in the second dimension")
-
-        if audio.shape[1] != 2:
-            raise NotImplementedError("Sorry, but only audio of size Nx2 is supported at the moment")
-
-        return np.array([np.copy(signal), np.copy(signal)]).T
+        self.__stimulus_generation = stimulus_generation
+        self.__modulator = modulator
 
     def _create_modified_audio(self) -> Audio:
+        """This method is implemented from the abstract super class. When called, it generates the ASSR stimulus
+        modified audio.
+
+        :return: The ASSR stimulus modified audio.
+        """
+
         audio_copy = np.copy(self._audio.audio)
 
         for interval in self._stimuli_intervals:
@@ -59,11 +56,9 @@ class ASSRStimulus(AAuditoryStimulus):
                             int(interval[1] * self._audio.sampling_frequency))
 
             # generate sine of the appropriate frequency
-            added_signal = self.__generate_added_signal(sample_range[1] - sample_range[0])
+            added_signal = self.__stimulus_generation(sample_range[1] - sample_range[0],
+                                                      self.__frequency, self._audio.sampling_frequency)
+            modulated_chunk = self.__modulator(audio_copy[sample_range[0]:sample_range[1]], added_signal)
+            audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
 
-            duplicated_signal = self.__duplicate_to_audio_channels(added_signal, self._audio.audio)
-            audio_copy[sample_range[0]:sample_range[1]] *= duplicated_signal
-
-        # new_max = np.max([np.abs(np.min(audio_copy)), np.max(audio_copy)])
-        # return Audio(audio_copy / new_max, self._audio.sampling_frequency)
         return Audio(audio_copy, self._audio.sampling_frequency)
