@@ -12,7 +12,7 @@ TEXT_BOX_POSITION = (0, 0)
 TEXT_BOX_SIZE = (0.5, 0.5),
 TEXT_BOX_COLOR = 1.
 TEXT_BOX_COLOR_SPACE = 'rgb'
-TEXT_BOX_FONT = 'FreeSerif'
+TEXT_BOX_FONT = 'Caladea'
 
 
 class Drawable(Protocol):
