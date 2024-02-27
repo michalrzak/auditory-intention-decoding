@@ -2,7 +2,7 @@ from auditory_stimulation.auditory_stimulus.helper.load_wav_as_numpy_array impor
 
 
 def test_load_wav_as_numpy_array_valid_call():
-    path = "tests/auditory_stimulus/helper/test.wav"
+    path = "test_sounds/test.wav"
 
     result = load_wav_as_numpy_array(path)
 
