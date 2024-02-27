@@ -18,13 +18,6 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
                  seed: Optional[int]) -> None:
         super().__init__(audio, stimuli_intervals, audio_player)
 
-        if seed is not None:
-            if seed <= 0:
-                ...
-                # TODO: check. does the seed need to be a positive integer?
-
-        self.__seed = seed
-
         if bits_per_second <= 0:
             raise ValueError("bits_per_second has to be a positive number")
 
@@ -34,6 +27,8 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
 
         if length_bit <= 0:
             raise ValueError("length_bit has to be a positive number")
+
+        self.__seed = seed
 
         # save only the bit_width and not the bits_per_seconds, as the latter is not used anywhere later in the code
         self.__bit_width = self._audio.sampling_frequency // bits_per_second
