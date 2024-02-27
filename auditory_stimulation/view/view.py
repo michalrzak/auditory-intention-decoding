@@ -29,3 +29,7 @@ class AView(ABC):
     @abstractmethod
     def get_confirmation(self) -> bool:
         ...
+
+    @abstractmethod
+    def wait(self, secs: int) -> None:
+        ...

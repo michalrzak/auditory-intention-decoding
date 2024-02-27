@@ -47,6 +47,9 @@ class PsychopyView(AView):
 
         return True
 
+    def wait(self, secs: int) -> None:
+        psychopy.core.wait(secs)
+
     # ---------------------------
 
     def __create_text_box(self, text: str) -> Drawable:

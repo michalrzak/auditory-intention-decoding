@@ -1,3 +1,5 @@
+import time
+
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.view.view import AView
 
@@ -13,3 +15,6 @@ class CLIView(AView):
     def get_confirmation(self) -> bool:
         input("Please press the enter key")
         return True
+
+    def wait(self, secs: int) -> None:
+        time.sleep(secs)
