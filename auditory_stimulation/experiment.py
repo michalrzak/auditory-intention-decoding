@@ -11,6 +11,8 @@ class Experiment:
         self.__model = model
         self.__view = view
 
+        assert self.__model.experiment_state == EExperimentState.INACTIVE
+
     def run(self) -> None:
         self.__model.new_prompt("YO!")
         self.__view.get_confirmation()

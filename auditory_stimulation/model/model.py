@@ -16,7 +16,7 @@ class Model:
     def __init__(self) -> None:
         self.__prompt_history = []
         self.__current_prompt = None  # TODO: not sure how to best initialize this
-        self.__experiment_state = None  # TODO: I think this one should be passed in the constructor
+        self.__experiment_state = EExperimentState.INACTIVE  # TODO: This one should be passed in the constructor
         self.__views = []
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
