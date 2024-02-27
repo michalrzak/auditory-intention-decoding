@@ -25,10 +25,14 @@ class PsychopyView(AView):
     def __init__(self, window: psychopy.visual.Window):
         self.window = window
 
-    # Overriden methods
-    # ---------------------------
-    def _update_new_prompt(self, data: str) -> None:
-        prompt = self.__create_text_box(data)
+    def _update_new_prompt(self, prompt: str) -> None:
+        prompt = self.__create_text_box(prompt)
+
+        prompt.draw()
+        self.window.flip()
+
+    def _update_new_primer(self, primer: str) -> None:
+        prompt = self.__create_text_box(primer)
 
         prompt.draw()
         self.window.flip()
@@ -49,8 +53,6 @@ class PsychopyView(AView):
 
     def wait(self, secs: int) -> None:
         psychopy.core.wait(secs)
-
-    # ---------------------------
 
     def __create_text_box(self, text: str) -> Drawable:
         return psychopy.visual.TextBox2(win=self.window,

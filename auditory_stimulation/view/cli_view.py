@@ -6,8 +6,11 @@ from auditory_stimulation.view.view import AView
 
 class CLIView(AView):
 
-    def _update_new_prompt(self, data: str) -> None:
-        print(f"Prompt: {data}")
+    def _update_new_prompt(self, prompt: str) -> None:
+        print(f"Prompt: {prompt}")
+
+    def _update_new_primer(self, primer: str) -> None:
+        print(f"Primer: {primer}")
 
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
         print(f"New State: {data}")
