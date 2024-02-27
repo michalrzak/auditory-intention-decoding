@@ -21,7 +21,7 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
                  audio_player: Callable[[Audio], None],
                  bits_per_second: int,
                  length_bit: int,
-                 seed: Optional[int]) -> None:
+                 seed: Optional[int] = None) -> None:
         """Constructs the NoiseTaggingStimulus object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
