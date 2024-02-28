@@ -1,6 +1,6 @@
 from typing import List, Tuple, Callable, Optional
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio, AAuditoryStimulusFactory
 import numpy as np
 import numpy.typing as npt
 
@@ -121,3 +121,27 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
             return None
 
         return np.copy(self.__code)
+
+
+class NoiseTaggingStimulusFactory(AAuditoryStimulusFactory):
+    _bits_per_second: int
+    _length_bit: int
+    _seed: Optional[int]
+
+    def __init__(self,
+                 audio_player: Callable[[Audio], None],
+                 bits_per_second: int,
+                 length_bit: int,
+                 seed: Optional[int] = None) -> None:
+        super().__init__(audio_player)
+        self._bits_per_second = bits_per_second
+        self._length_bit = length_bit
+        self._seed = seed
+
+    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAuditoryStimulus:
+        return NoiseTaggingStimulus(audio,
+                                    stimuli_intervals,
+                                    self._audio_player,
+                                    self._bits_per_second,
+                                    self._length_bit,
+                                    self._seed)

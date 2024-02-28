@@ -76,3 +76,14 @@ class AAuditoryStimulus(ABC):
             return None
 
         return copy.copy(self._modified_audio)
+
+
+class AAuditoryStimulusFactory(ABC):
+    _audio_player: Callable[[Audio], None]
+
+    def __init__(self, audio_player: Callable[[Audio], None]) -> None:
+        self._audio_player = audio_player
+
+    @abstractmethod
+    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAuditoryStimulus:
+        ...

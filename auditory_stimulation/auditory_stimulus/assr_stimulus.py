@@ -4,7 +4,7 @@ from typing import List, Tuple, Callable
 import numpy as np
 import numpy.typing as npt
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio, AAuditoryStimulusFactory
 
 
 class ASSRStimulus(AAuditoryStimulus):
@@ -66,3 +66,29 @@ class ASSRStimulus(AAuditoryStimulus):
             audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
 
         return Audio(audio_copy, self._audio.sampling_frequency)
+
+
+class ASSRStimulusFactory(AAuditoryStimulusFactory):
+    _frequency: int
+    _stimulus_generator: Callable[[int, int, int], npt.NDArray[np.float32]]
+    _modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[npt.NDArray[np.float32]]]
+
+    def __init__(self,
+                 audio_player: Callable[[Audio], None],
+                 frequency: int,
+                 stimulus_generation: Callable[[int, int, int], npt.NDArray[np.float32]],
+                 modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]],
+                                     npt.NDArray[npt.NDArray[np.float32]]]
+                 ) -> None:
+        super().__init__(audio_player)
+        self._frequency = frequency
+        self._stimulus_generator = stimulus_generation
+        self._modulator = modulator
+
+    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAuditoryStimulus:
+        return ASSRStimulus(audio,
+                            stimuli_intervals,
+                            self._audio_player,
+                            self._frequency,
+                            self._stimulus_generator,
+                            self._modulator)
