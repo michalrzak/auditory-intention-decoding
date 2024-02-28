@@ -1,13 +1,13 @@
 import time
 
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.stimulus import Stimulus
+from auditory_stimulation.stimulus import CreatedStimulus
 from auditory_stimulation.view.view import AView
 
 
 class CLIView(AView):
 
-    def _update_new_stimulus(self, stimulus: Stimulus) -> None:
+    def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
         print(f"Prompt: {stimulus.prompt}")
 
     def _update_new_primer(self, primer: str) -> None:

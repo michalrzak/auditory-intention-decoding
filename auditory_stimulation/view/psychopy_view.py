@@ -6,7 +6,7 @@ from psychopy.hardware import keyboard
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.stimulus import Stimulus
+from auditory_stimulation.stimulus import CreatedStimulus
 from auditory_stimulation.view.view import AView
 
 LETTER_SIZE = 0.05
@@ -28,13 +28,13 @@ class PsychopyView(AView):
         super().__init__(sound_player)
         self.window = window
 
-    def _update_new_stimulus(self, stimulus: Stimulus) -> None:
+    def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
         prompt = self.__create_text_box(stimulus.prompt)
 
         prompt.draw()
         self.window.flip()
 
-        self._sound_player(stimulus.audio)
+        self._sound_player(stimulus.modified_audio)
 
     def _update_new_primer(self, primer: str) -> None:
         prompt = self.__create_text_box(primer)
@@ -51,6 +51,7 @@ class PsychopyView(AView):
     def get_confirmation(self) -> bool:
         kb = keyboard.Keyboard()
 
+        kb.clearEvents()  # clear keys in case the key was already pressed before
         while len(kb.getKeys(["space"])) == 0:
             ...
 
