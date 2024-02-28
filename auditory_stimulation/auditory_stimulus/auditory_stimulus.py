@@ -25,6 +25,9 @@ class Audio:
     def __copy__(self) -> "Audio":
         return Audio(np.copy(self.audio), self.sampling_frequency)
 
+    def __eq__(self, other: "Audio") -> bool:
+        return np.all(self.audio == other.audio) and self.sampling_frequency == other.sampling_frequency
+
 
 class AAuditoryStimulus(ABC):
     _audio: Audio
