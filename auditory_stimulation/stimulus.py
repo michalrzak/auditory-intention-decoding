@@ -45,7 +45,7 @@ def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
     if len(stimulus_raw["options"]) != len(stimulus_raw["time-stamps"]):
         raise LookupError("For every option specified, a time stamp needs to be specified")
 
-    for time_stamp in stimulus_raw["time-stamp"]:
+    for time_stamp in stimulus_raw["time-stamps"]:
         if len(time_stamp) != 2:
             raise ValueError("The time-stamp needs to consist of exactly 2 values")
 
@@ -64,11 +64,7 @@ def load_stimuli(path_to_yaml: str) -> List[Stimulus]:
 
     for stimulus_index in stimuli_raw:
         stimulus_raw = stimuli_raw[stimulus_index]
-
-        try:
-            __validate_stimulus_raw(stimulus_raw)
-        except Exception as e:
-            raise Exception(str(e) + f" Inside {stimulus_index}")
+        __validate_stimulus_raw(stimulus_raw)
 
         audio = load_wav_as_numpy_array(stimulus_raw["file"])
         time_stamps = [(time_stamp[0], time_stamp[1]) for time_stamp in stimulus_raw["time-stamps"]]
