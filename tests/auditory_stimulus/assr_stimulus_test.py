@@ -1,13 +1,11 @@
 from numbers import Number
-from typing import Tuple
 
 import numpy as np
 import pytest
 import numpy.typing as npt
 
 from auditory_stimulation.auditory_stimulus.assr_stimulus import ASSRStimulus
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
-from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_audio_player
+from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio
 
 
 def mock_stimulus_generation(length: int, frequency: int, sampling_frequency: int) -> npt.NDArray[np.float32]:
@@ -32,7 +30,6 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModified():
 
     stimulus = ASSRStimulus(audio,
                             [(0, n_input / sampling_frequency)],
-                            get_mock_audio_player(),
                             stimulus_frequency,
                             mock_stimulus_generation,
                             mock_modulator)
@@ -56,7 +53,6 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
 
     stimulus = ASSRStimulus(audio,
                             [(0, n_input / sampling_frequency / 2)],
-                            get_mock_audio_player(),
                             stimulus_frequency,
                             mock_stimulus_generation,
                             mock_modulator)
@@ -80,7 +76,6 @@ def test_ASSRStimulus_invalidFrequency_0_shouldThrow():
     with pytest.raises(ValueError):
         stim = ASSRStimulus(audio,
                             [(0, 1)],
-                            get_mock_audio_player(),
                             stimulus_frequency,
                             mock_stimulus_generation,
                             mock_modulator)
@@ -93,7 +88,6 @@ def test_ASSRStimulus_invalidFrequency_negative_shouldThrow():
     with pytest.raises(ValueError):
         stim = ASSRStimulus(audio,
                             [(0, 1)],
-                            get_mock_audio_player(),
                             stimulus_frequency,
                             mock_stimulus_generation,
                             mock_modulator)
@@ -108,7 +102,6 @@ def test_ASSRStimulus_create_validCall():
 
     stim = ASSRStimulus(audio,
                         [(0, n_input / sampling_frequency)],
-                        get_mock_audio_player(),
                         stimulus_frequency,
                         mock_stimulus_generation,
                         mock_modulator)

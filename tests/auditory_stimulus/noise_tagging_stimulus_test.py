@@ -1,5 +1,5 @@
 from auditory_stimulation.auditory_stimulus.noise_tagging_stimulus import NoiseTaggingStimulus
-from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_audio_player, get_mock_ones_audio
+from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_ones_audio
 
 import numpy as np
 import pytest
@@ -17,7 +17,6 @@ def test_create_validCall_channelsShouldBeTheSame():
 
     stimulus = NoiseTaggingStimulus(audio,
                                     [(0, n_input / sampling_frequency)],
-                                    get_mock_audio_player(),
                                     bits_per_second,
                                     length_bit,
                                     SEED)
@@ -37,7 +36,6 @@ def test_create_validCall_codeHasCorrectResolution():
     length = bits_per_second * 2
     stimulus = NoiseTaggingStimulus(audio,
                                     [labeled_interval],
-                                    get_mock_audio_player(),
                                     bits_per_second,
                                     length,
                                     SEED)
@@ -61,7 +59,6 @@ def test_create_validCall_codeRepeatsCorrectly():
 
     stimulus = NoiseTaggingStimulus(audio,
                                     [labeled_interval],
-                                    get_mock_audio_player(),
                                     bits_per_second,
                                     length,
                                     SEED)
@@ -91,7 +88,6 @@ def test_create_shouldThrow_bitsPerSecondDoesNotDivideSamplingFrequency():
     with pytest.raises(ValueError):
         stimulus = NoiseTaggingStimulus(audio,
                                         [labeled_interval],
-                                        get_mock_audio_player(),
                                         bits_per_second,
                                         length,
                                         SEED)
@@ -109,7 +105,6 @@ def test_create_shouldThrow_bitsPerSecondZero():
     with pytest.raises(ValueError):
         stimulus = NoiseTaggingStimulus(audio,
                                         [labeled_interval],
-                                        get_mock_audio_player(),
                                         bits_per_second,
                                         length,
                                         SEED)
@@ -127,7 +122,6 @@ def test_create_shouldThrow_bitsPerSecondBellowZero():
     with pytest.raises(ValueError):
         stimulus = NoiseTaggingStimulus(audio,
                                         [labeled_interval],
-                                        get_mock_audio_player(),
                                         bits_per_second,
                                         length,
                                         SEED)
