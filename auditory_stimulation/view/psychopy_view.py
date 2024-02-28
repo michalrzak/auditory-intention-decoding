@@ -35,7 +35,6 @@ class PsychopyView(AView):
         self.window.flip()
 
         self._sound_player(stimulus.audio)
-        self.wait(10)  # TODO: this should not be here
 
     def _update_new_primer(self, primer: str) -> None:
         prompt = self.__create_text_box(primer)
