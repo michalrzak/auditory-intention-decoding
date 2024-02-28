@@ -4,12 +4,12 @@ from typing import List, Any, Optional
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.stimulus import Stimulus
+from auditory_stimulation.stimulus import CreatedStimulus
 from auditory_stimulation.view.view import AView
 
 
 class Model:
-    __stimulus_history: List[Stimulus]
+    __stimulus_history: List[CreatedStimulus]
     __primer_history: List[str]
     __experiment_state: EExperimentState
 
@@ -29,7 +29,7 @@ class Model:
     def register(self, view: AView) -> None:
         self.__views.append(view)
 
-    def new_stimulus(self, stimulus: Stimulus) -> None:
+    def new_stimulus(self, stimulus: CreatedStimulus) -> None:
         self.__stimulus_history.append(stimulus)
         self.__notify(stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
 

@@ -6,7 +6,7 @@ from psychopy.hardware import keyboard
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.stimulus import Stimulus
+from auditory_stimulation.stimulus import CreatedStimulus
 from auditory_stimulation.view.view import AView
 
 LETTER_SIZE = 0.05
@@ -28,7 +28,7 @@ class PsychopyView(AView):
         super().__init__(sound_player)
         self.window = window
 
-    def _update_new_stimulus(self, stimulus: Stimulus) -> None:
+    def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
         prompt = self.__create_text_box(stimulus.prompt)
 
         prompt.draw()

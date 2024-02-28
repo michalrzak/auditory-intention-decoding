@@ -4,7 +4,7 @@ from typing import Callable, Any
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.stimulus import Stimulus
+from auditory_stimulation.stimulus import CreatedStimulus
 
 
 class AView(ABC):
@@ -14,7 +14,7 @@ class AView(ABC):
         self._sound_player = sound_player
 
     @abstractmethod
-    def _update_new_stimulus(self, stimulus: Stimulus) -> None:
+    def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
         ...
 
     @abstractmethod
