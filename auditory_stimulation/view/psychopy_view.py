@@ -1,10 +1,13 @@
+from typing import Callable
 from typing import Protocol
 
 import psychopy
 import psychopy.visual
 from psychopy.hardware import keyboard
 
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
+from auditory_stimulation.stimulus import Stimulus
 from auditory_stimulation.view.view import AView
 
 LETTER_SIZE = 0.05
@@ -22,14 +25,18 @@ class Drawable(Protocol):
 
 class PsychopyView(AView):
 
-    def __init__(self, window: psychopy.visual.Window):
+    def __init__(self, sound_player: Callable[[Audio], None], window: psychopy.visual.Window) -> None:
+        super().__init__(sound_player)
         self.window = window
 
-    def _update_new_prompt(self, prompt: str) -> None:
-        prompt = self.__create_text_box(prompt)
+    def _update_new_stimulus(self, stimulus: Stimulus) -> None:
+        prompt = self.__create_text_box(stimulus.prompt)
 
         prompt.draw()
         self.window.flip()
+
+        self._sound_player(stimulus.audio)
+        self.wait(10)  # TODO: this should not be here
 
     def _update_new_primer(self, primer: str) -> None:
         prompt = self.__create_text_box(primer)

@@ -23,7 +23,7 @@ def test_update_new_prompt():
     cli_view = CLIView()
     new_prompt = "New prompt!"
 
-    outputted = __capture_console_output(lambda: cli_view.update(new_prompt, EModelUpdateIdentifier.NEW_PROMPT))
+    outputted = __capture_console_output(lambda: cli_view.update(new_prompt, EModelUpdateIdentifier.NEW_STIMULUS))
 
     assert outputted is not None
     assert len(outputted) != 0

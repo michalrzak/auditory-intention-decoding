@@ -12,7 +12,7 @@ def test_new_prompt():
     new_prompt = "new prompt"
 
     previous_value = model.current_prompt
-    model.new_prompt(new_prompt)
+    model.new_stimulus(new_prompt)
     changed_value = model.current_prompt
 
     assert changed_value is not None
@@ -49,9 +49,9 @@ def test_register_view_and_new_prompt_should_get_updated():
 
     model.register(mock_view)
 
-    model.new_prompt(new_prompt)
+    model.new_stimulus(new_prompt)
 
-    verify(mock_view).update(new_prompt, EModelUpdateIdentifier.NEW_PROMPT)
+    verify(mock_view).update(new_prompt, EModelUpdateIdentifier.NEW_STIMULUS)
 
 def test_register_view_and_change_state_should_get_updated():
     model = Model()
