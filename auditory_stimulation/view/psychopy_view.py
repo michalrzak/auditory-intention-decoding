@@ -51,6 +51,7 @@ class PsychopyView(AView):
     def get_confirmation(self) -> bool:
         kb = keyboard.Keyboard()
 
+        kb.clearEvents()  # clear keys in case the key was already pressed before
         while len(kb.getKeys(["space"])) == 0:
             ...
 
