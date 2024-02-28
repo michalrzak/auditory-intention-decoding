@@ -1,5 +1,6 @@
-import numpy as np
 import wave
+
+import numpy as np
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 

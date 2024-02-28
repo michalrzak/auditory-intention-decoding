@@ -1,22 +1,25 @@
 import warnings
-from typing import List, Any
+from typing import List, Any, Optional
 
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
+from auditory_stimulation.stimulus import Stimulus
 from auditory_stimulation.view.view import AView
 
 
 class Model:
-    __prompt_history: List[str]
-    __current_prompt: str
+    __stimulus_history: List[Stimulus]
+    __primer_history: List[str]
     __experiment_state: EExperimentState
 
     __views: List[AView]
 
     def __init__(self) -> None:
-        self.__prompt_history = []
-        self.__current_prompt = None  # TODO: not sure how to best initialize this
-        self.__experiment_state = None  # TODO: I think this one should be passed in the constructor
+        self.__stimulus_history = []
+        self.__primer_history = []
+
+        self.__experiment_state = EExperimentState.INACTIVE  # TODO: This one should be passed in the constructor
         self.__views = []
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
@@ -26,11 +29,13 @@ class Model:
     def register(self, view: AView) -> None:
         self.__views.append(view)
 
-    def new_prompt(self, prompt: str) -> None:
-        self.__prompt_history.append(self.__current_prompt)
-        self.__current_prompt = prompt
+    def new_stimulus(self, stimulus: Stimulus) -> None:
+        self.__stimulus_history.append(stimulus)
+        self.__notify(stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
 
-        self.__notify(prompt, EModelUpdateIdentifier.NEW_PROMPT)
+    def new_primer(self, primer: str) -> None:
+        self.__primer_history.append(primer)
+        self.__notify(primer, EModelUpdateIdentifier.NEW_PRIMER)
 
     def change_experiment_state(self, new_state: EExperimentState) -> None:
         assert new_state != self.__experiment_state
@@ -41,8 +46,22 @@ class Model:
         self.__notify(self.__experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
 
     @property
-    def current_prompt(self) -> str:
-        return self.__current_prompt
+    def current_prompt(self) -> Optional[str]:
+        if len(self.__stimulus_history) == 0:
+            return None
+        return self.__stimulus_history[-1].prompt
+
+    @property
+    def current_audio(self) -> Optional[Audio]:
+        if len(self.__stimulus_history) == 0:
+            return None
+        return self.__stimulus_history[-1].audio
+
+    @property
+    def current_primer(self) -> Optional[str]:
+        if len(self.__primer_history) == 0:
+            return None
+        return self.__primer_history[-1]
 
     @property
     def experiment_state(self) -> EExperimentState:

@@ -1,14 +1,24 @@
 from abc import ABC, abstractmethod
-from typing import Any
+from typing import Callable, Any
 
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
+from auditory_stimulation.stimulus import Stimulus
 
 
 class AView(ABC):
+    _sound_player: Callable[[Audio], None]
+
+    def __init__(self, sound_player: Callable[[Audio], None]) -> None:
+        self._sound_player = sound_player
 
     @abstractmethod
-    def _update_new_prompt(self, data: str) -> None:
+    def _update_new_stimulus(self, stimulus: Stimulus) -> None:
+        ...
+
+    @abstractmethod
+    def _update_new_primer(self, primer: str) -> None:
         ...
 
     @abstractmethod
@@ -16,9 +26,12 @@ class AView(ABC):
         ...
 
     def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
-        if identifier == EModelUpdateIdentifier.NEW_PROMPT:
+        if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
             # TODO: assert type is correct
-            self._update_new_prompt(data)
+            self._update_new_stimulus(data)
+        elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
+            # TODO: assert type is correct
+            self._update_new_primer(data)
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             # TODO: assert type is correct
             self._update_experiment_state_changed(data)
@@ -28,4 +41,8 @@ class AView(ABC):
 
     @abstractmethod
     def get_confirmation(self) -> bool:
+        ...
+
+    @abstractmethod
+    def wait(self, secs: int) -> None:
         ...

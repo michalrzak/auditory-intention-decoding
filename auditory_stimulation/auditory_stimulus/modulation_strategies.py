@@ -1,8 +1,8 @@
 from numbers import Number
 from typing import Callable
 
-import numpy.typing as npt
 import numpy as np
+import numpy.typing as npt
 
 modulate_signal = Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[npt.NDArray[np.float32]]]
 
@@ -61,6 +61,5 @@ def frequency_modulation(signal: npt.NDArray[np.float32],
     :return:
     """
     ...
-
 
 # TODO: the last modulation technique

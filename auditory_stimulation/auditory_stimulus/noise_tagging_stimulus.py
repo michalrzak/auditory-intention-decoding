@@ -1,8 +1,9 @@
-from typing import List, Tuple, Callable, Optional
+from typing import List, Tuple, Optional
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio
 import numpy as np
 import numpy.typing as npt
+
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio, AAuditoryStimulusFactory
 
 Code = npt.NDArray[np.int16]
 
@@ -18,7 +19,6 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
     def __init__(self,
                  audio: Audio,
                  stimuli_intervals: List[Tuple[float, float]],
-                 audio_player: Callable[[Audio], None],
                  bits_per_second: int,
                  length_bit: int,
                  seed: Optional[int] = None) -> None:
@@ -27,12 +27,11 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
          intervals must be contained within the audio.
-        :param audio_player: A function, which if given an audio plays it
         :param bits_per_second: The resolution of the noise tagging stimulus.
         :param length_bit: The length of the tag in bits.
         :param seed: An Optional seed for the tag generation.
         """
-        super().__init__(audio, stimuli_intervals, audio_player)
+        super().__init__(audio, stimuli_intervals)
 
         if bits_per_second <= 0:
             raise ValueError("bits_per_second has to be a positive number")
@@ -121,3 +120,24 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
             return None
 
         return np.copy(self.__code)
+
+
+class NoiseTaggingStimulusFactory(AAuditoryStimulusFactory):
+    _bits_per_second: int
+    _length_bit: int
+    _seed: Optional[int]
+
+    def __init__(self,
+                 bits_per_second: int,
+                 length_bit: int,
+                 seed: Optional[int] = None) -> None:
+        self._bits_per_second = bits_per_second
+        self._length_bit = length_bit
+        self._seed = seed
+
+    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAuditoryStimulus:
+        return NoiseTaggingStimulus(audio,
+                                    stimuli_intervals,
+                                    self._bits_per_second,
+                                    self._length_bit,
+                                    self._seed)

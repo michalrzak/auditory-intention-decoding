@@ -1,7 +1,7 @@
 from typing import Callable
 
-import numpy as np
 import mockito
+import numpy as np
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 
@@ -22,6 +22,7 @@ def get_mock_ones_audio(n_input: int, sampling_frequency: int) -> Audio:
     audio.sampling_frequency = sampling_frequency
 
     return audio
+
 
 def get_mock_audio_player() -> Callable[[Audio], None]:
     return lambda a: None
