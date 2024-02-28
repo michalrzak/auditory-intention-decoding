@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable
-from typing import Any
+from typing import Callable, Any
 
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState

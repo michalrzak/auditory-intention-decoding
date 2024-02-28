@@ -1,5 +1,4 @@
-from typing import Callable
-from typing import Protocol
+from typing import Callable, Protocol
 
 import psychopy
 import psychopy.visual

@@ -1,8 +1,8 @@
 from numbers import Number
 
 import numpy as np
-import pytest
 import numpy.typing as npt
+import pytest
 
 from auditory_stimulation.auditory_stimulus.assr_stimulus import ASSRStimulus
 from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio

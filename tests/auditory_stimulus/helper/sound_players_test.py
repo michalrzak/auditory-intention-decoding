@@ -75,6 +75,3 @@ def test_psychopy_player_sampling_rate_zero_should_throw():
 
     with pytest.raises(ValueError):
         psychopy_player(audio, False)
-
-
-

@@ -2,7 +2,6 @@ import psychopy.visual
 
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.view.cli_view import CLIView
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 

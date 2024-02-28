@@ -1,8 +1,9 @@
-from typing import List, Tuple, Callable, Optional
+from typing import List, Tuple, Optional
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio, AAuditoryStimulusFactory
 import numpy as np
 import numpy.typing as npt
+
+from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulus, Audio, AAuditoryStimulusFactory
 
 Code = npt.NDArray[np.int16]
 

@@ -1,6 +1,6 @@
 import numpy as np
-
 from psychopy.sound.backend_pygame import SoundPygame
+
 from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
 
 

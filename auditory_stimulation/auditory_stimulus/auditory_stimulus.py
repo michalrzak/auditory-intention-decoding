@@ -1,10 +1,10 @@
 import copy
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Optional, Callable
 from dataclasses import dataclass
+from typing import List, Tuple, Optional, Callable
 
-import numpy.typing as npt
 import numpy as np
+import numpy.typing as npt
 
 
 def to_sample(time: float, sampling_frequency: int) -> int:

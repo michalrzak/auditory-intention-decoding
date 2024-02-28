@@ -1,7 +1,7 @@
+import io
+import sys
 from typing import Callable
 
-import sys
-import io
 import mockito
 
 from auditory_stimulation.model.experiment_state import EExperimentState
