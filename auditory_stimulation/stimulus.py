@@ -25,13 +25,10 @@ class CreatedStimulus(Stimulus):
     def from_stimulus(stimulus: Stimulus, modified_audio: Audio) -> "CreatedStimulus":
         return CreatedStimulus(stimulus.audio,
                                stimulus.prompt,
-                               stimulus.prompt,
+                               stimulus.primer,
                                stimulus.options,
                                stimulus.time_stamps,
                                modified_audio)
-
-    # TODO: This could potentially be modified to also generate the stimulus instead of having to do it outside and then
-    #  passing it
 
 
 def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
