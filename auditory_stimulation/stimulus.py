@@ -21,6 +21,15 @@ class Stimulus:
 class CreatedStimulus(Stimulus):
     modified_audio: Audio
 
+    @staticmethod
+    def from_stimulus(stimulus: Stimulus, modified_audio: Audio) -> "CreatedStimulus":
+        return CreatedStimulus(stimulus.audio,
+                               stimulus.prompt,
+                               stimulus.prompt,
+                               stimulus.options,
+                               stimulus.time_stamps,
+                               modified_audio)
+
     # TODO: This could potentially be modified to also generate the stimulus instead of having to do it outside and then
     #  passing it
 
