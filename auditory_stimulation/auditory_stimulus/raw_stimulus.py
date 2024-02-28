@@ -10,4 +10,4 @@ class RawStimulus(AAuditoryStimulus):
 
 class RawStimulusFactory(AAuditoryStimulusFactory):
     def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAuditoryStimulus:
-        return RawStimulus(audio, stimuli_intervals, self._audio_player)
+        return RawStimulus(audio, stimuli_intervals)
