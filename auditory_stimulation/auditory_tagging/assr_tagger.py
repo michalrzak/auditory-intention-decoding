@@ -4,7 +4,8 @@ from typing import List, Tuple, Callable
 import numpy as np
 import numpy.typing as npt
 
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, Audio, AAudioTaggerFactory
+from auditory_stimulation.audio import Audio
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory
 
 
 class ASSRTagger(AAudioTagger):

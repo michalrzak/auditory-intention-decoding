@@ -1,9 +1,7 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 from typing import List, Tuple
 
-import numpy as np
-import numpy.typing as npt
+from auditory_stimulation.audio import Audio
 
 
 def to_sample(time: float, sampling_frequency: int) -> int:
@@ -14,18 +12,6 @@ def to_sample(time: float, sampling_frequency: int) -> int:
     :return: The converted sample.
     """
     return int(time * sampling_frequency)
-
-
-@dataclass
-class Audio:
-    audio: npt.NDArray[np.float32]
-    sampling_frequency: int
-
-    def __copy__(self) -> "Audio":
-        return Audio(np.copy(self.audio), self.sampling_frequency)
-
-    def __eq__(self, other: "Audio") -> bool:
-        return np.all(self.audio == other.audio) and self.sampling_frequency == other.sampling_frequency
 
 
 class AAudioTagger(ABC):

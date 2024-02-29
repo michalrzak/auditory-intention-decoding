@@ -2,7 +2,7 @@ import numpy as np
 import psychopy.core
 from psychopy.sound.backend_pygame import SoundPygame
 
-from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
+from auditory_stimulation.audio import Audio
 
 
 def psychopy_player(audio: Audio, play_audio: bool = True) -> None:

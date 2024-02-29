@@ -3,7 +3,7 @@ from typing import Callable
 import mockito
 import numpy as np
 
-from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
+from auditory_stimulation.audio import Audio
 
 
 def get_mock_audio(n_input: int, sampling_frequency: int, seed: int = 100) -> Audio:
