@@ -10,6 +10,8 @@ from auditory_stimulation.auditory_stimulus.helper.load_wav_as_numpy_array impor
 
 @dataclass
 class Stimulus:
+    """Simple data class, used to store all information of a stimulus. Should contain the same information as the
+    stimulus YAML file, but this is not explicitly checked."""
     audio: Audio
     prompt: str
     primer: str
@@ -19,10 +21,18 @@ class Stimulus:
 
 @dataclass
 class CreatedStimulus(Stimulus):
+    """Extends the Stimulus class with the modified audio field. To be used once an auditory stimulation technique
+     is applied"""
     modified_audio: Audio
 
     @staticmethod
     def from_stimulus(stimulus: Stimulus, modified_audio: Audio) -> "CreatedStimulus":
+        """Helps to construct a CreatedStimulus from a Stimulus + a modified audio
+
+        :param stimulus: A stimulus instance, which fields will be copied.
+        :param modified_audio: The modified_audio to be added to the class.
+        :return: A new instance of CreatedStimulus with the specified fields in stimulus and the modified_audio
+        """
         return CreatedStimulus(stimulus.audio,
                                stimulus.prompt,
                                stimulus.primer,
@@ -60,6 +70,13 @@ def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
 
 
 def load_stimuli(path_to_yaml: str) -> List[Stimulus]:
+    """Function, which loads all stimuli contained in the provided YAML file. For the syntax of the YAML file, please
+    refer to the examples.
+    TODO: Probably need to make the syntax explicit somewhere
+
+    :param path_to_yaml: A system path to a valid yaml file containing the stimuli.
+    :return: A list of the loaded stimuli, from the provided file.
+    """
     with open(path_to_yaml, 'r') as file:
         stimuli_raw = yaml.safe_load(file)
 

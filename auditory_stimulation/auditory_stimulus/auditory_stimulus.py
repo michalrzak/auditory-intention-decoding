@@ -74,6 +74,8 @@ class AAuditoryStimulus(ABC):
 
 
 class AAuditoryStimulusFactory(ABC):
+    """Class, used to construct AuditoryStimuli."""
+
     @abstractmethod
     def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAuditoryStimulus:
         ...

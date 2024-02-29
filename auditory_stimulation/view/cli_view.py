@@ -6,6 +6,7 @@ from auditory_stimulation.view.view import AView
 
 
 class CLIView(AView):
+    """Simple view, utilizing the console as its output. Can be used for debugging."""
 
     def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
         print(f"Prompt: {stimulus.prompt}")

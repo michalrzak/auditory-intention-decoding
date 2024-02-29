@@ -23,8 +23,15 @@ class Drawable(Protocol):
 
 
 class PsychopyView(AView):
+    """A view, implementing the psychopy frontend.
+    """
 
     def __init__(self, sound_player: Callable[[Audio], None], window: psychopy.visual.Window) -> None:
+        """Constructs a PsychopyView object
+
+        :param sound_player: The sound player to be used by the view.
+        :param window: The psychopy window to be used to display the elements.
+        """
         super().__init__(sound_player)
         self.window = window
 
@@ -71,6 +78,7 @@ class PsychopyView(AView):
                                         font=TEXT_BOX_FONT)
 
     def close_view(self):
+        """Closes the view properly."""
         self.window.close()
         # psychopy.core.quit()
 

@@ -8,6 +8,9 @@ from auditory_stimulation.stimulus import CreatedStimulus
 
 
 class AView(ABC):
+    """Abstract class, to be implemented by new Views of the MVC pattern.
+    Implements the Observer pattern.
+    """
     _sound_player: Callable[[Audio], None]
 
     def __init__(self, sound_player: Callable[[Audio], None]) -> None:
@@ -26,6 +29,12 @@ class AView(ABC):
         ...
 
     def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
+        """From the observer pattern. To be used by Observables (the model) to notify the view about changes.
+
+        :param data: The changed data.
+        :param identifier: An identifier, signal what sort of data got updated.
+        :return:
+        """
         if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
             # TODO: assert type is correct
             self._update_new_stimulus(data)
@@ -41,8 +50,11 @@ class AView(ABC):
 
     @abstractmethod
     def get_confirmation(self) -> bool:
+        """Wait for the user to confirm with some action.
+        """
         ...
 
     @abstractmethod
     def wait(self, secs: int) -> None:
+        """Wait for the specified amount of time."""
         ...
