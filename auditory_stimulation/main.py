@@ -1,3 +1,7 @@
+import logging
+import pathlib
+from datetime import datetime
+
 import psychopy.visual
 
 from auditory_stimulation.auditory_tagging.assr_tagger import ASSRTaggerFactory
@@ -10,9 +14,23 @@ from auditory_stimulation.stimulus import load_stimuli
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 
+LOGGING_DIRECTORY = "logs/"
 
-def main():
-    model = Model()
+
+def create_directory_if_not_exists(directory: str) -> None:
+    pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
+
+
+def main() -> None:
+    create_directory_if_not_exists(LOGGING_DIRECTORY)
+    logging.basicConfig(filename=f"{LOGGING_DIRECTORY}/{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}.log",
+                        filemode='w',
+                        format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                        datefmt='%H:%M:%S',
+                        level=logging.DEBUG)
+
+    logger = logging.getLogger("model-logger")
+    model = Model(logger)
 
     experiment_texts = load_experiment_texts("auditory_stimulation/experiment_texts.yaml")
     window = psychopy.visual.Window(fullscr=True)

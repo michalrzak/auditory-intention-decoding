@@ -1,3 +1,5 @@
+import logging
+
 import mockito
 from mockito import verify, when, ANY
 
@@ -9,8 +11,18 @@ from auditory_stimulation.view.view import AView
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
+def get_mock_logger():
+    logger = mockito.mock(logging.Logger)
+    when(logger).debug(ANY).thenReturn(None)
+    when(logger).info(ANY).thenReturn(None)
+    when(logger).warning(ANY).thenReturn(None)
+    when(logger).error(ANY).thenReturn(None)
+    when(logger).critical(ANY).thenReturn(None)
+    return logger
+
+
 def test_new_stimulus():
-    model = Model()
+    model = Model(get_mock_logger())
 
     new_prompt = "new prompt"
     new_audio = get_mock_audio(1000, 100)
@@ -30,7 +42,7 @@ def test_new_stimulus():
 
 
 def test_change_experiment_state():
-    model = Model()
+    model = Model(get_mock_logger())
     new_experiment_state = EExperimentState.RESTING_STATE_EYES_CLOSED
 
     previous_value = model.experiment_state
@@ -43,14 +55,14 @@ def test_change_experiment_state():
 
 
 def test_register_view_should_not_fail():
-    model = Model()
+    model = Model(get_mock_logger())
     mock_view = mockito.mock(AView)
 
     model.register(mock_view)
 
 
 def test_register_view_and_new_stimulus_should_get_updated():
-    model = Model()
+    model = Model(get_mock_logger())
     new_prompt = "new prompt"
     new_audio = get_mock_audio(1000, 100)
 
@@ -68,7 +80,7 @@ def test_register_view_and_new_stimulus_should_get_updated():
 
 
 def test_register_view_and_change_state_should_get_updated():
-    model = Model()
+    model = Model(get_mock_logger())
     new_experiment_state = EExperimentState.RESTING_STATE_EYES_CLOSED
 
     mock_view = mockito.mock(AView)
