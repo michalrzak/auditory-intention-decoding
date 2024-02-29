@@ -5,7 +5,7 @@ from typing import List, Optional
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.stimulus import Stimulus, CreatedStimulus
+from auditory_stimulation.model.stimulus import Stimulus, CreatedStimulus
 from auditory_stimulation.view.view import AView
 
 STIMULUS_REPEAT = 5

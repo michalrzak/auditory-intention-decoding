@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, Audio, AAudioTaggerFactory
+from auditory_stimulation.audio import Audio
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory
 
 
 class RawTagger(AAudioTagger):

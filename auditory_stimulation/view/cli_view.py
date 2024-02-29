@@ -1,7 +1,7 @@
 import time
 
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import CreatedStimulus
 from auditory_stimulation.view.view import AView
 
 

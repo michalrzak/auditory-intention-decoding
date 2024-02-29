@@ -10,7 +10,7 @@ from auditory_stimulation.auditory_tagging.tag_generators import clicking_signal
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.stimulus import load_stimuli
+from auditory_stimulation.model.stimulus import load_stimuli
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 
