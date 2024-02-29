@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Any
+from typing import Callable, Any, Dict, Optional
 
 from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
@@ -12,9 +12,13 @@ class AView(ABC):
     Implements the Observer pattern.
     """
     _sound_player: Callable[[Audio], None]
+    _experiment_texts: Dict[EExperimentState, Optional[str]]
 
-    def __init__(self, sound_player: Callable[[Audio], None]) -> None:
+    def __init__(self,
+                 sound_player: Callable[[Audio], None],
+                 experiment_texts: Dict[EExperimentState, Optional[str]]) -> None:
         self._sound_player = sound_player
+        self._experiment_texts = experiment_texts
 
     @abstractmethod
     def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
