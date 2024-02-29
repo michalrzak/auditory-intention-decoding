@@ -14,7 +14,7 @@ TEXT_BOX_COLOR = 1.
 TEXT_BOX_COLOR_SPACE = 'rgb'
 
 EXPERIMENT_STATE_TEXT_BOX_POSITION = (0, 0)
-EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.5, 0.5)
+EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.8, 0.5)
 
 CONFIRMATION_TEXT = "Please press 'space' to continue"
 CONFIRMATION_TEXT_BOX_POSITION = (0, -0.8)
@@ -114,7 +114,6 @@ class PsychopyView(AView):
     def close_view(self):
         """Closes the view properly."""
         self.__window.close()
-        # psychopy.core.quit()
 
     def __del__(self):
         self.close_view()
