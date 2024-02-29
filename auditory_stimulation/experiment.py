@@ -2,7 +2,7 @@ import copy
 import random
 from typing import List, Optional
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditoryStimulusFactory
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model import Model
 from auditory_stimulation.stimulus import Stimulus, CreatedStimulus
@@ -21,18 +21,18 @@ class Experiment:
     __model: Model
     __view: AView
     __stimuli: List[Stimulus]
-    __auditory_stimulus_factories: List[AAuditoryStimulusFactory]
+    __auditory_stimulus_factories: List[AAudioTaggerFactory]
     __created_stimuli: Optional[List[CreatedStimulus]]
 
     def __init__(self, model: Model, view: AView, stimuli: List[Stimulus],
-                 auditory_stimulus_factories: List[AAuditoryStimulusFactory]) -> None:
+                 auditory_stimulus_factories: List[AAudioTaggerFactory]) -> None:
         """Constructs an Experiment instance.
 
         :param model: The underlying model of the experiment, saving all relevant experiment data.
         :param view: The used view of the experiment, showing the current state of the model and interacting with users
         :param stimuli: A list of stimuli which will be used throughout the experiment.
         :param auditory_stimulus_factories: The to be used auditory_stimuli. Note that the number of
-         auditory_stimulus_factories must divide the number of stimuli, to ensure that each auditory_stimulus can be
+         auditory_stimulus_factories must divide the number of stimuli, to ensure that each auditory_tagging can be
          shown the same number of times
         """
         self.__model = model

@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from auditory_stimulation.auditory_stimulus.assr_stimulus import ASSRStimulus
+from auditory_stimulation.auditory_tagging.assr_tagger import ASSRTagger
 from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio
 
 
@@ -28,11 +28,11 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModified():
 
     stimulus_frequency = 2
 
-    stimulus = ASSRStimulus(audio,
-                            [(0, n_input / sampling_frequency)],
-                            stimulus_frequency,
-                            mock_stimulus_generation,
-                            mock_modulator)
+    stimulus = ASSRTagger(audio,
+                          [(0, n_input / sampling_frequency)],
+                          stimulus_frequency,
+                          mock_stimulus_generation,
+                          mock_modulator)
     modified_audio = stimulus.create()
 
     assert modified_audio is not None
@@ -50,11 +50,11 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
 
     stimulus_frequency = 1
 
-    stimulus = ASSRStimulus(audio,
-                            [(0, n_input / sampling_frequency / 2)],
-                            stimulus_frequency,
-                            mock_stimulus_generation,
-                            mock_modulator)
+    stimulus = ASSRTagger(audio,
+                          [(0, n_input / sampling_frequency / 2)],
+                          stimulus_frequency,
+                          mock_stimulus_generation,
+                          mock_modulator)
     modified_audio = stimulus.create()
 
     assert modified_audio is not None
@@ -71,11 +71,11 @@ def test_ASSRStimulus_invalidFrequency_0_shouldThrow():
     stimulus_frequency = 0
 
     with pytest.raises(ValueError):
-        stim = ASSRStimulus(audio,
-                            [(0, 1)],
-                            stimulus_frequency,
-                            mock_stimulus_generation,
-                            mock_modulator)
+        stim = ASSRTagger(audio,
+                          [(0, 1)],
+                          stimulus_frequency,
+                          mock_stimulus_generation,
+                          mock_modulator)
 
 
 def test_ASSRStimulus_invalidFrequency_negative_shouldThrow():
@@ -83,11 +83,11 @@ def test_ASSRStimulus_invalidFrequency_negative_shouldThrow():
     stimulus_frequency = -1
 
     with pytest.raises(ValueError):
-        stim = ASSRStimulus(audio,
-                            [(0, 1)],
-                            stimulus_frequency,
-                            mock_stimulus_generation,
-                            mock_modulator)
+        stim = ASSRTagger(audio,
+                          [(0, 1)],
+                          stimulus_frequency,
+                          mock_stimulus_generation,
+                          mock_modulator)
 
 
 def test_ASSRStimulus_create_validCall():
@@ -97,9 +97,9 @@ def test_ASSRStimulus_create_validCall():
 
     stimulus_frequency = 5
 
-    stim = ASSRStimulus(audio,
-                        [(0, n_input / sampling_frequency)],
-                        stimulus_frequency,
-                        mock_stimulus_generation,
-                        mock_modulator)
+    stim = ASSRTagger(audio,
+                      [(0, n_input / sampling_frequency)],
+                      stimulus_frequency,
+                      mock_stimulus_generation,
+                      mock_modulator)
     stim.create()

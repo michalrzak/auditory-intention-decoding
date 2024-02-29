@@ -1,7 +1,7 @@
 import warnings
 from typing import List, Any, Optional
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
+from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.stimulus import CreatedStimulus

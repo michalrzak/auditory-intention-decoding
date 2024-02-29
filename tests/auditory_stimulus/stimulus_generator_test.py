@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from auditory_stimulation.auditory_stimulus.stimulus_generators import clicking_signal, sine_signal
+from auditory_stimulation.auditory_tagging.tag_generators import clicking_signal, sine_signal
 
 STIMULUS_GENERATORS = [clicking_signal, sine_signal]
 

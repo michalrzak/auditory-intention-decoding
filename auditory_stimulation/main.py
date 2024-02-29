@@ -1,8 +1,8 @@
 import psychopy.visual
 
-from auditory_stimulation.auditory_stimulus.assr_stimulus import ASSRStimulusFactory
-from auditory_stimulation.auditory_stimulus.modulation_strategies import amplitude_modulation
-from auditory_stimulation.auditory_stimulus.stimulus_generators import clicking_signal
+from auditory_stimulation.auditory_tagging.assr_tagger import ASSRTaggerFactory
+from auditory_stimulation.auditory_tagging.modulation_strategies import amplitude_modulation
+from auditory_stimulation.auditory_tagging.tag_generators import clicking_signal
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.model import Model
 from auditory_stimulation.stimulus import load_stimuli
@@ -20,7 +20,7 @@ def main():
 
     stimuli = load_stimuli("auditory_stimulation/stimuli.yaml")
 
-    experiment = Experiment(model, view, stimuli, [ASSRStimulusFactory(42, clicking_signal, amplitude_modulation)])
+    experiment = Experiment(model, view, stimuli, [ASSRTaggerFactory(42, clicking_signal, amplitude_modulation)])
     experiment.create_stimuli()
     experiment.run()
 

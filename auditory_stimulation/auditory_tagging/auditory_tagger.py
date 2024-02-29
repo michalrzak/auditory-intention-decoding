@@ -28,7 +28,7 @@ class Audio:
         return np.all(self.audio == other.audio) and self.sampling_frequency == other.sampling_frequency
 
 
-class AAuditoryStimulus(ABC):
+class AAudioTagger(ABC):
     _audio: Audio
     _stimuli_intervals: List[Tuple[float, float]]  # in seconds
     __audio_player: Callable[[Audio], None]
@@ -62,9 +62,9 @@ class AAuditoryStimulus(ABC):
         ...
 
 
-class AAuditoryStimulusFactory(ABC):
+class AAudioTaggerFactory(ABC):
     """Class, used to construct AuditoryStimuli."""
 
     @abstractmethod
-    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAuditoryStimulus:
+    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         ...
