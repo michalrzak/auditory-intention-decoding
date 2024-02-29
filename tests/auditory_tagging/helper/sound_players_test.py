@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
+from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.view.sound_players import psychopy_player
 
 

@@ -4,8 +4,8 @@ from typing import List, Dict, Any, Tuple
 
 import yaml
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
-from auditory_stimulation.auditory_stimulus.helper.load_wav_as_numpy_array import load_wav_as_numpy_array
+from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
+from auditory_stimulation.auditory_tagging.helper.load_wav_as_numpy_array import load_wav_as_numpy_array
 
 
 @dataclass

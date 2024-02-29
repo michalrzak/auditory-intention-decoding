@@ -2,7 +2,7 @@ import wave
 
 import numpy as np
 
-from auditory_stimulation.auditory_stimulus.auditory_stimulus import Audio
+from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 
 
 def load_wav_as_numpy_array(wav_path: str) -> Audio:

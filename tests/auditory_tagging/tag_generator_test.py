@@ -1,13 +1,13 @@
 import numpy as np
 import pytest
 
-from auditory_stimulation.auditory_stimulus.stimulus_generators import clicking_signal, sine_signal
+from auditory_stimulation.auditory_tagging.tag_generators import clicking_signal, sine_signal
 
 STIMULUS_GENERATORS = [clicking_signal, sine_signal]
 
 
 @pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_stimulusGeneration_validCall_shouldHaveCorrectFrequency(stimulus_generation):
+def test_tagGeneration_validCall_shouldHaveCorrectFrequency(stimulus_generation):
     epsilon = 0.1
 
     sampling_frequencies = [12, 20, 24, 60]
@@ -29,7 +29,7 @@ def test_stimulusGeneration_validCall_shouldHaveCorrectFrequency(stimulus_genera
 
 
 @pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_stimulusGeneration_invalidFrequency_negative_shouldThrow(stimulus_generation):
+def test_tagGeneration_invalidFrequency_negative_shouldThrow(stimulus_generation):
     length = 1000
     sampling_frequency = 20
 
@@ -40,7 +40,7 @@ def test_stimulusGeneration_invalidFrequency_negative_shouldThrow(stimulus_gener
 
 
 @pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_stimulusGeneration_invalidFrequency_0_shouldThrow(stimulus_generation):
+def test_tagGeneration_invalidFrequency_0_shouldThrow(stimulus_generation):
     length = 1000
     sampling_frequency = 20
 
@@ -51,7 +51,7 @@ def test_stimulusGeneration_invalidFrequency_0_shouldThrow(stimulus_generation):
 
 
 @pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_stimulusGeneration_invalidSamplingFrequency_negative_shouldThrow(stimulus_generation):
+def test_tagGeneration_invalidSamplingFrequency_negative_shouldThrow(stimulus_generation):
     length = 1000
     sampling_frequency = -20
 
@@ -62,7 +62,7 @@ def test_stimulusGeneration_invalidSamplingFrequency_negative_shouldThrow(stimul
 
 
 @pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_stimulusGeneration_invalidSamplingFrequency_0_shouldThrow(stimulus_generation):
+def test_tagGeneration_invalidSamplingFrequency_0_shouldThrow(stimulus_generation):
     length = 1000
     sampling_frequency = 0
 
@@ -73,7 +73,7 @@ def test_stimulusGeneration_invalidSamplingFrequency_0_shouldThrow(stimulus_gene
 
 
 @pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_stimulusGeneration_invalidSamplingFrequency_and_invalidFrequency_bellowZero_shouldThrow(stimulus_generation):
+def test_tagGeneration_invalidSamplingFrequency_and_invalidFrequency_bellowZero_shouldThrow(stimulus_generation):
     length = 1000
     sampling_frequency = -20
 
@@ -83,7 +83,7 @@ def test_stimulusGeneration_invalidSamplingFrequency_and_invalidFrequency_bellow
         stimulus_generation(length, frequency, sampling_frequency)
 
 
-def test_clickingStimulus_invalidFrequency_doesNotDivide_shouldThrow():
+def test_tagGeneration_invalidFrequency_doesNotDivide_shouldThrow():
     length = 1000
     sampling_frequency = 17
 
