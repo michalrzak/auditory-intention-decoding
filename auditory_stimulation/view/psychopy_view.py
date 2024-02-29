@@ -37,42 +37,55 @@ class PsychopyView(AView):
         :param window: The psychopy window to be used to display the elements.
         """
         super().__init__(sound_player, experiment_texts)
-        self.window = window
+        self.__window = window
+        self.__keyboard = keyboard.Keyboard()
+
+    def __try_to_quit(self):
+        if len(self.__keyboard.getKeys(["escape"])) != 0:
+            self.close_view()
 
     def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
+        self.__try_to_quit()
+
         prompt = self.__create_text_box(stimulus.prompt)
 
         prompt.draw()
-        self.window.flip()
+        self.__window.flip()
 
         self._sound_player(stimulus.modified_audio)
 
     def _update_new_primer(self, primer: str) -> None:
+        self.__try_to_quit()
+
         prompt = self.__create_text_box(primer)
 
         prompt.draw()
-        self.window.flip()
+        self.__window.flip()
 
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
+        self.__try_to_quit()
+
         text = self.__create_text_box(self._experiment_texts[data])
 
         text.draw()
-        self.window.flip()
+        self.__window.flip()
 
     def get_confirmation(self) -> bool:
-        kb = keyboard.Keyboard()
+        self.__try_to_quit()
 
-        kb.clearEvents()  # clear keys in case the key was already pressed before
-        while len(kb.getKeys(["space"])) == 0:
+        self.__keyboard.clearEvents()  # clear keys in case the key was already pressed before
+        while len(self.__keyboard.getKeys(["space"])) == 0:
             ...
 
         return True
 
     def wait(self, secs: int) -> None:
+        self.__try_to_quit()
+
         psychopy.core.wait(secs)
 
     def __create_text_box(self, text: str) -> Drawable:
-        return psychopy.visual.TextBox2(win=self.window,
+        return psychopy.visual.TextBox2(win=self.__window,
                                         text=text,
                                         letterHeight=LETTER_SIZE,
                                         pos=TEXT_BOX_POSITION,
@@ -83,7 +96,7 @@ class PsychopyView(AView):
 
     def close_view(self):
         """Closes the view properly."""
-        self.window.close()
+        self.__window.close()
         # psychopy.core.quit()
 
     def __del__(self):
