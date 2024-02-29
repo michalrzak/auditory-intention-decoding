@@ -23,7 +23,7 @@ def __capture_console_output(func: Callable[[], None]) -> str:
 
 def test_update_new_prompt():
     # initialize object
-    cli_view = CLIView(get_mock_audio_player())
+    cli_view = CLIView(get_mock_audio_player(), {})
 
     new_prompt = "new prompt"
     new_audio = get_mock_audio(1000, 100)
@@ -40,7 +40,7 @@ def test_update_new_prompt():
 
 
 def test_update_change_experiment_state():
-    cli_view = CLIView(get_mock_audio_player())
+    cli_view = CLIView(get_mock_audio_player(), {})
     new_state = EExperimentState.RESTING_STATE_EYES_CLOSED
 
     outputted = __capture_console_output(

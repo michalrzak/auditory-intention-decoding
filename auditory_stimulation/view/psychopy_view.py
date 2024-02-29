@@ -1,4 +1,4 @@
-from typing import Callable, Protocol
+from typing import Callable, Protocol, Dict, Optional
 
 import psychopy
 import psychopy.visual
@@ -26,13 +26,17 @@ class PsychopyView(AView):
     """A view, implementing the psychopy frontend.
     """
 
-    def __init__(self, sound_player: Callable[[Audio], None], window: psychopy.visual.Window) -> None:
+    def __init__(self,
+                 sound_player: Callable[[Audio], None],
+                 experiment_texts: Dict[EExperimentState, Optional[str]],
+                 window: psychopy.visual.Window) -> None:
         """Constructs a PsychopyView object
 
         :param sound_player: The sound player to be used by the view.
+        :param experiment_texts: Dictionary, containing the displayed experiment texts.
         :param window: The psychopy window to be used to display the elements.
         """
-        super().__init__(sound_player)
+        super().__init__(sound_player, experiment_texts)
         self.window = window
 
     def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
@@ -50,7 +54,7 @@ class PsychopyView(AView):
         self.window.flip()
 
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
-        text = self.__create_text_box(str(data))
+        text = self.__create_text_box(self._experiment_texts[data])
 
         text.draw()
         self.window.flip()

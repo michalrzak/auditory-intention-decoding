@@ -4,6 +4,7 @@ from auditory_stimulation.auditory_tagging.assr_tagger import ASSRTaggerFactory
 from auditory_stimulation.auditory_tagging.modulation_strategies import amplitude_modulation
 from auditory_stimulation.auditory_tagging.tag_generators import clicking_signal
 from auditory_stimulation.experiment import Experiment
+from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.model import Model
 from auditory_stimulation.stimulus import load_stimuli
 from auditory_stimulation.view.psychopy_view import PsychopyView
@@ -13,8 +14,9 @@ from auditory_stimulation.view.sound_players import psychopy_player
 def main():
     model = Model()
 
-    window = psychopy.visual.Window()
-    view = PsychopyView(psychopy_player, window)
+    experiment_texts = load_experiment_texts("auditory_stimulation/experiment_texts.yaml")
+    window = psychopy.visual.Window(fullscr=True)
+    view = PsychopyView(psychopy_player, experiment_texts, window)
 
     model.register(view)
 
