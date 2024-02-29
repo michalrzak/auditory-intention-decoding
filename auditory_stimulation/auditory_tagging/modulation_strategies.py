@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 import numpy.typing as npt
 
-modulate_signal = Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[npt.NDArray[np.float32]]]
+modulate_signal = Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[np.float32]]
 
 
 def __duplicate_signal(signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
@@ -25,7 +25,7 @@ def __duplicate_signal(signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
 
 def amplitude_modulation(signal: npt.NDArray[np.float32],
                          modulation_code: npt.NDArray[Number]
-                         ) -> npt.NDArray[npt.NDArray[np.float32]]:
+                         ) -> npt.NDArray[np.float32]:
     """Applies amplitude modulation to signal and modulation code and returns the resulting signal. The modulation code
     has to be of the same length as the signal.
 
@@ -53,7 +53,7 @@ def amplitude_modulation(signal: npt.NDArray[np.float32],
 
 def frequency_modulation(signal: npt.NDArray[np.float32],
                          modulation_code: npt.NDArray[Number]
-                         ) -> npt.NDArray[npt.NDArray[np.float32]]:
+                         ) -> npt.NDArray[np.float32]:
     """
 
     :param signal:

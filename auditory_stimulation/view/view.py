@@ -4,7 +4,7 @@ from typing import Callable, Any, Dict, Optional
 from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import CreatedStimulus
 
 
 class AView(ABC):

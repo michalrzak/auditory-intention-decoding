@@ -13,15 +13,14 @@ class ASSRTagger(AAudioTagger):
     """
     __frequency: int
     __stimulus_generation: Callable[[int, int, int], npt.NDArray[np.float32]]
-    __modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[npt.NDArray[np.float32]]]
+    __modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[np.float32]]
 
     def __init__(self,
                  audio: Audio,
                  stimuli_intervals: List[Tuple[float, float]],
                  frequency: int,
                  stimulus_generation: Callable[[int, int, int], npt.NDArray[np.float32]],
-                 modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]],
-                                     npt.NDArray[npt.NDArray[np.float32]]]
+                 modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[np.float32]]
                  ) -> None:
         """Constructs the ASSRStimulus object
 
@@ -69,13 +68,12 @@ class ASSRTagger(AAudioTagger):
 class ASSRTaggerFactory(AAudioTaggerFactory):
     _frequency: int
     _stimulus_generator: Callable[[int, int, int], npt.NDArray[np.float32]]
-    _modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[npt.NDArray[np.float32]]]
+    _modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[np.float32]]
 
     def __init__(self,
                  frequency: int,
                  stimulus_generation: Callable[[int, int, int], npt.NDArray[np.float32]],
-                 modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]],
-                                     npt.NDArray[npt.NDArray[np.float32]]]
+                 modulator: Callable[[npt.NDArray[np.float32], npt.NDArray[Number]], npt.NDArray[np.float32]]
                  ) -> None:
         self._frequency = frequency
         self._stimulus_generator = stimulus_generation

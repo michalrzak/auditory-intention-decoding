@@ -6,7 +6,7 @@ from psychopy.hardware import keyboard
 
 from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import CreatedStimulus
 from auditory_stimulation.view.view import AView
 
 LETTER_SIZE = 0.05
