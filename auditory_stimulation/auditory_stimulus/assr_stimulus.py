@@ -44,7 +44,7 @@ class ASSRStimulus(AAuditoryStimulus):
         self.__stimulus_generation = stimulus_generation
         self.__modulator = modulator
 
-    def _create_modified_audio(self) -> Audio:
+    def create(self) -> Audio:
         """This method is implemented from the abstract super class. When called, it generates the ASSR stimulus
         modified audio.
 

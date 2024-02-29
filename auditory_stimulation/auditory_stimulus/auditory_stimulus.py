@@ -1,7 +1,6 @@
-import copy
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Callable
+from typing import List, Tuple, Callable
 
 import numpy as np
 import numpy.typing as npt
@@ -32,7 +31,6 @@ class Audio:
 class AAuditoryStimulus(ABC):
     _audio: Audio
     _stimuli_intervals: List[Tuple[float, float]]  # in seconds
-    _modified_audio: Optional[Audio]
     __audio_player: Callable[[Audio], None]
 
     def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> None:
@@ -59,18 +57,9 @@ class AAuditoryStimulus(ABC):
         self._modified_audio = None
 
     @abstractmethod
-    def _create_modified_audio(self) -> Audio:
+    def create(self) -> Audio:
+        """Constructs the modified audio."""
         ...
-
-    def create(self):
-        self._modified_audio = self._create_modified_audio()
-
-    @property
-    def modified_audio(self) -> Optional[Audio]:
-        if self._modified_audio is None:
-            return None
-
-        return copy.copy(self._modified_audio)
 
 
 class AAuditoryStimulusFactory(ABC):

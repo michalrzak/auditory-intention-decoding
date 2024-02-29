@@ -96,7 +96,7 @@ class NoiseTaggingStimulus(AAuditoryStimulus):
         assert out.shape[1] == 2
         return out
 
-    def _create_modified_audio(self) -> Audio:
+    def create(self) -> Audio:
         """This method is implemented from the abstract super class. When called, it generates the noise tagging
          stimulus modified audio.
 

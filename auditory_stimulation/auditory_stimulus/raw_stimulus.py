@@ -6,7 +6,7 @@ from auditory_stimulation.auditory_stimulus.auditory_stimulus import AAuditorySt
 class RawStimulus(AAuditoryStimulus):
     """Simple, debug stimulus, which does not change the signal at all."""
 
-    def _create_modified_audio(self) -> Audio:
+    def create(self) -> Audio:
         return self._audio
 
 

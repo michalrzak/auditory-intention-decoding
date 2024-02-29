@@ -33,8 +33,7 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModified():
                             stimulus_frequency,
                             mock_stimulus_generation,
                             mock_modulator)
-    stimulus.create()
-    modified_audio = stimulus.modified_audio
+    modified_audio = stimulus.create()
 
     assert modified_audio is not None
     assert modified_audio.audio is not None
@@ -56,9 +55,7 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
                             stimulus_frequency,
                             mock_stimulus_generation,
                             mock_modulator)
-    stimulus.create()
-
-    modified_audio = stimulus.modified_audio
+    modified_audio = stimulus.create()
 
     assert modified_audio is not None
     assert modified_audio.audio is not None

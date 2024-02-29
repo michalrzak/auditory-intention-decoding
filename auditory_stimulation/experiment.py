@@ -71,8 +71,7 @@ class Experiment:
         created_stimuli = []
         for factory, stimulus in zip(applied_factories, self.__stimuli):
             auditory_stimulus = factory.create_auditory_stimulus(stimulus.audio, stimulus.time_stamps, )
-            auditory_stimulus.create()
-            modified_audio = auditory_stimulus.modified_audio
+            modified_audio = auditory_stimulus.create()
             created_stimuli.append(CreatedStimulus.from_stimulus(stimulus, modified_audio))
 
         self.__created_stimuli = created_stimuli

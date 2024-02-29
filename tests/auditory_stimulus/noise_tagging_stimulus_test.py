@@ -62,11 +62,10 @@ def test_create_validCall_codeRepeatsCorrectly():
                                     bits_per_second,
                                     length,
                                     SEED)
-    stimulus.create()
+    modified_audio = stimulus.create()
 
     # since the code is 1 second and the interval is 2 seconds, the code should repeat twice
     code = stimulus.code
-    modified_audio = stimulus.modified_audio
 
     assert np.all(
         modified_audio.audio[labeled_interval[0] * sampling_frequency:labeled_interval[1] * sampling_frequency // 2, :]
