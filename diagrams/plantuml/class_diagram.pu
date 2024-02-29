@@ -1,85 +1,182 @@
 @startuml
+note as n
+  <b>Note</b>: To save space, constructor parameter types,
+  which match the types of the class parameters,
+  are not specified
+end note
+
+class Audio {
+        +NDArray[float] audio
+        +int sampling_frequency
+    }
+
+package view {
+    abstract class AView<<Observer>> {
+        #Callable[[Audio], None] sound_player
+        #Dict[EExperimentState, Optional[str]] experiment_texts
+
+        +AView(sound_player, experiment_texts)
+
+        #void {abstract} update_new_stimulus(stimulus: CreatedStimulus)
+        #void {abstract} updated_new_primer(primer: str)
+        #void {abstract} update_experiment_state_changed(data: EExperimentState)
+        +void update(data: Any, identifier: EModelUpdateIdentifier
+        +bool {abstract} get_confirmation()
+        +void {abstract} wait(secs: int)
+    }
+
+    class PsychopyView {
+    }
+
+    class CLIView {
+    }
+}
+
+package model {
+    class Model <<Observable>>{
+        -List[str] primer_history
+        -Logger logger
+
+        -Model(logger)
+        -void notify(data: Any, identifier: EModelUpdateIdentifier)
+        +void register(view: View)
+        +void new_stimulus(stimulus: CreatedStimulus)
+        +void new_primer(stimulus: CreatedStimulus)
+        +void change_experiment_state(new_state: EExperimentState)
+    }
+
+    package constants {
+    enum EExperimentState {
+        INACTIVE
+        INTRODUCTION
+        RESTING_STATE_EYES_OPEN
+        RESTING_STATE_EYES_CLOSED
+        EXPERIMENT_INTRODUCTION
+        EXPERIMENT
+    }
+
+    enum EModelUpdateIdentifier {
+        NEW_STIMULUS
+        NEW_PRIMER
+        EXPERIMENT_STATE_CHANGED
+    }
+    }
+
+    class Stimulus {
+        +str prompt
+        +str primer
+        +List[str] options
+        +List[Tuple[float, float]] time_stamps
+    }
+    Stimulus "1" *-- "1" Audio: audio
+
+    class CreatedStimulus {
+        CreatedStimulus from_stimulus(stimulus: Stimulus, modified_audio: Audio)
+    }
+    CreatedStimulus "1" *-l- "1" Audio: modified_audio
+
+
+    CreatedStimulus --|> Stimulus
+}
+AView ..> constants: "uses"
+
+Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
+Model "*" o--- "1" EExperimentState: "experiment_state"
+Model "1" o-l-- "*" AView: views
+Model ..> EModelUpdateIdentifier: "uses"
+
+
+package auditory_tagging {
+    abstract class AAuditoryTagger {
+      #list[ [float, float] ] stimuli_intervals
+
+      +AAuditoryTagger(audio, stimuli)
+      +void {abstract} create()
+    }
+
+    AAuditoryTagger "1" *-- "1" Audio: audio
+
+
+    abstract class AAudioTaggerFactory {
+      +AAudioTagger {abstract} create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+
+
+    class ASSRTagger {
+      -int frequency
+      -Callable[[int, int, int], NDArray[float] stimulus_generation
+      -Callable[[NDArray[float], NDArray[Number]], NDArray[float]] modulator
+
+      +ASSRTagger(audio, stimuli_intervals, frequency, stimulus_generation, modulator)
+      +void create()
+    }
+
+    class ASSRTaggerFactory {
+      -int frequency
+      -Callable[[int, int, int], NDArray[float]] stimulus_generator
+      -Callable[[NDArray[float], NDArray[Number]], NDArray[float]] modulator
+      +ASSRTaggerFactory(frequency, stimulus_generation, modulator)
+      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+
+    class NoiseTaggingTagger {
+      -Optional[int] seed
+      -int bit_width
+      -int length_bit
+      +Optional[Code] code
+
+      +NoiseTaggingTagger(audio, stimuli_intervals, bits_per_second: int, length_bit, seed)
+      +void create()
+      -void __generate_code()
+      -void __get_code(length: int)
+    }
+
+    class NoiseTaggingTaggerFactory {
+      -int bits_per_second
+      -int length_bit
+      -Optional[int] seed
+
+      +NoiseTaggingTaggerFactory(bits_per_second, length_bit, seed)
+      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+
+    class RawTagger {
+      +void create()
+    }
+
+    class RawTaggerFactory {
+      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+}
+
+AAuditoryTagger <|-- RawTagger
+AAuditoryTagger <|-- ASSRTagger
+AAuditoryTagger <|-- NoiseTaggingTagger
+
+AAudioTaggerFactory <|-u- ASSRTaggerFactory
+AAudioTaggerFactory <|-u- NoiseTaggingTaggerFactory
+AAudioTaggerFactory <|-u- RawTaggerFactory
+
+ASSRTagger <.. ASSRTaggerFactory: "creates"
+NoiseTaggingTagger <.. NoiseTaggingTaggerFactory: "creates"
+RawTagger <.. RawTaggerFactory: "creates"
+
+AView <|-- PsychopyView
+AView <|-- CLIView
+
+
 
 class Experiment {
-    +Experiment(model: Model, view: AView)
-    + void run()
+    +Experiment(model: Model, view: AView, stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
+    +void create_stimuli()
+    +void run()
 }
-
-class Model <<Observable>>{
-    -list[str] promptHistory
-    -str currentPrompt
-
-    -void notify(data: Any, identifier: EModelUpdateIdentifier)
-    +void register(view: View)
-    +void new_prompt(prompt: str)
-    +void change_experiment_state(new_state: EExperimentState)
-}
-
-enum EExperimentState {
-    RESTING_STATE
-    EXPERIMENT
-}
-
-abstract class AView<<observer>> {
-    +void {abstract} update(data: Any, identifier: EModelUpdateIdentifier)
-    +bool {abstract} get_confirmation()
-}
-
-class PsychopyView {
-}
-
-class CLIView {
-}
-
-enum EModelUpdateIdentifier {
-    NEW_PROMPT
-    EXPERIMENT_STATE_CHANGED
-}
-
-abstract class AAuditoryStimulus {
-  -Audio __audio
-  -list[ [float, float] ] __stimuli_intervals
-  -Optional[Audio] __audio_with_stimulus
-
-  +void __init__(audio: Audio, stimuli: list[(float, float)])
-  +void create()
-  +void present()
-
-  #Audio {abstract} _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
-
-}
+Experiment "1" *-d- "1" Model
+Experiment "1" *-r- "1" AView
+Experiment "1" *-u- "*" AAudioTaggerFactory
+Experiment "1" *-- "*" CreatedStimulus
+note on link: Created by calling  `create_stimuli()`
 
 
-class N400Stimulus {
-  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
-}
 
-class ASSRStimulus {
-  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
-}
-
-class NoiseTaggingStimulus {
-  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
-}
-
-
-class MockStimulus {
-  #Audio _create_modified_audio(audio: Audio, stimuli: list[(float, float)])
-}
-
-AAuditoryStimulus <|-- N400Stimulus
-AAuditoryStimulus <|-- ASSRStimulus
-AAuditoryStimulus <|-- NoiseTaggingStimulus
-AAuditoryStimulus <|-- MockStimulus
-
-View <|-- PsychopyView
-View <|-- CLIView
-
-View ..> ModelUpdateIdentifier: "uses"
-
-Model "*" o--- "1" ExperimentState
-Experiment "1" *--- "1" Model
-Experiment "1" *--- "1" AView
-
-Model "1" --- "*" View
 @enduml
