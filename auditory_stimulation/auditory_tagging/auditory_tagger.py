@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import List, Tuple, Callable
+from typing import List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -31,7 +31,6 @@ class Audio:
 class AAudioTagger(ABC):
     _audio: Audio
     _stimuli_intervals: List[Tuple[float, float]]  # in seconds
-    __audio_player: Callable[[Audio], None]
 
     def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> None:
         if audio is None:
