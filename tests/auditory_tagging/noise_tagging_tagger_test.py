@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
-from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio, get_mock_ones_audio
+from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio, get_mock_ones_audio
 
 SEED = 123
 

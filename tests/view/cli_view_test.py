@@ -8,7 +8,7 @@ from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.stimulus import CreatedStimulus
 from auditory_stimulation.view.cli_view import CLIView
-from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio_player, get_mock_audio
+from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio_player, get_mock_audio
 
 
 def __capture_console_output(func: Callable[[], None]) -> str:

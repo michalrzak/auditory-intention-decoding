@@ -6,7 +6,7 @@ from auditory_stimulation.model.model import Model
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.stimulus import CreatedStimulus
 from auditory_stimulation.view.view import AView
-from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio
+from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
 def test_new_stimulus():

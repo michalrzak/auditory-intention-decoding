@@ -5,7 +5,7 @@ import numpy.typing as npt
 import pytest
 
 from auditory_stimulation.auditory_tagging.assr_tagger import ASSRTagger
-from tests.auditory_stimulus.stimulus_test_helpers import get_mock_audio
+from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
 def mock_stimulus_generation(length: int, frequency: int, sampling_frequency: int) -> npt.NDArray[np.float32]:
@@ -21,7 +21,7 @@ def mock_modulator(signal: npt.NDArray[np.float32],
     return 0.5 * np.ones(signal.shape)
 
 
-def test_ASSRStimulus_create_validCall_audioShouldBeModified():
+def test_ASSRTagger_create_validCall_audioShouldBeModified():
     n_input = 100
     sampling_frequency = 12
     audio = get_mock_audio(n_input, sampling_frequency)
@@ -43,7 +43,7 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModified():
     assert np.any(modified_audio.audio != audio.audio)
 
 
-def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
+def test_ASSRTagger_create_validCall_audioShouldBeModifiedToHalfPoint():
     n_input = 100
     sampling_frequency = 2
     audio = get_mock_audio(n_input, sampling_frequency)
@@ -66,7 +66,7 @@ def test_ASSRStimulus_create_validCall_audioShouldBeModifiedToHalfPoint():
     assert np.all(modified_audio.audio[n_input // 2:, :] == audio.audio[n_input // 2:, :])
 
 
-def test_ASSRStimulus_invalidFrequency_0_shouldThrow():
+def test_ASSRTagger_invalidFrequency_0_shouldThrow():
     audio = get_mock_audio(100, 12)
     stimulus_frequency = 0
 
@@ -78,7 +78,7 @@ def test_ASSRStimulus_invalidFrequency_0_shouldThrow():
                           mock_modulator)
 
 
-def test_ASSRStimulus_invalidFrequency_negative_shouldThrow():
+def test_ASSRTagger_invalidFrequency_negative_shouldThrow():
     audio = get_mock_audio(100, 12)
     stimulus_frequency = -1
 
@@ -90,7 +90,7 @@ def test_ASSRStimulus_invalidFrequency_negative_shouldThrow():
                           mock_modulator)
 
 
-def test_ASSRStimulus_create_validCall():
+def test_ASSRTagger_create_validCall():
     n_input = 1000
     sampling_frequency = 20
     audio = get_mock_audio(n_input, sampling_frequency)
