@@ -25,8 +25,7 @@ def __duplicate_signal(signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
 
 
 def amplitude_modulation(signal: npt.NDArray[np.float32],
-                         modulation_code: npt.NDArray[Number]
-                         ) -> npt.NDArray[np.float32]:
+                         modulation_code: npt.NDArray[Number]) -> npt.NDArray[np.float32]:
     """Applies amplitude modulation to signal and modulation code and returns the resulting signal. The modulation code
     has to be of the same length as the signal.
 
