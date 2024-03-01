@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from auditory_stimulation.auditory_tagging.assr_tagger import ASSRTagger
+from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
@@ -21,18 +21,17 @@ def mock_modulator(signal: npt.NDArray[np.float32],
     return 0.5 * np.ones(signal.shape)
 
 
-def test_ASSRTagger_create_validCall_audioShouldBeModified():
+def test_AMTagger_create_validCall_audioShouldBeModified():
     n_input = 100
     sampling_frequency = 12
     audio = get_mock_audio(n_input, sampling_frequency)
 
     stimulus_frequency = 2
 
-    stimulus = ASSRTagger(audio,
-                          [(0, n_input / sampling_frequency)],
-                          stimulus_frequency,
-                          mock_stimulus_generation,
-                          mock_modulator)
+    stimulus = AMTagger(audio,
+                        [(0, n_input / sampling_frequency)],
+                        stimulus_frequency,
+                        mock_stimulus_generation)
     modified_audio = stimulus.create()
 
     assert modified_audio is not None
@@ -43,18 +42,17 @@ def test_ASSRTagger_create_validCall_audioShouldBeModified():
     assert np.any(modified_audio.audio != audio.audio)
 
 
-def test_ASSRTagger_create_validCall_audioShouldBeModifiedToHalfPoint():
+def test_AMTagger_create_validCall_audioShouldBeModifiedToHalfPoint():
     n_input = 100
     sampling_frequency = 2
     audio = get_mock_audio(n_input, sampling_frequency)
 
     stimulus_frequency = 1
 
-    stimulus = ASSRTagger(audio,
-                          [(0, n_input / sampling_frequency / 2)],
-                          stimulus_frequency,
-                          mock_stimulus_generation,
-                          mock_modulator)
+    stimulus = AMTagger(audio,
+                        [(0, n_input / sampling_frequency / 2)],
+                        stimulus_frequency,
+                        mock_stimulus_generation)
     modified_audio = stimulus.create()
 
     assert modified_audio is not None
@@ -66,40 +64,37 @@ def test_ASSRTagger_create_validCall_audioShouldBeModifiedToHalfPoint():
     assert np.all(modified_audio.audio[n_input // 2:, :] == audio.audio[n_input // 2:, :])
 
 
-def test_ASSRTagger_invalidFrequency_0_shouldThrow():
+def test_AMTagger_invalidFrequency_0_shouldThrow():
     audio = get_mock_audio(100, 12)
     stimulus_frequency = 0
 
     with pytest.raises(ValueError):
-        stim = ASSRTagger(audio,
-                          [(0, 1)],
-                          stimulus_frequency,
-                          mock_stimulus_generation,
-                          mock_modulator)
+        stim = AMTagger(audio,
+                        [(0, 1)],
+                        stimulus_frequency,
+                        mock_stimulus_generation)
 
 
-def test_ASSRTagger_invalidFrequency_negative_shouldThrow():
+def test_AMTagger_invalidFrequency_negative_shouldThrow():
     audio = get_mock_audio(100, 12)
     stimulus_frequency = -1
 
     with pytest.raises(ValueError):
-        stim = ASSRTagger(audio,
-                          [(0, 1)],
-                          stimulus_frequency,
-                          mock_stimulus_generation,
-                          mock_modulator)
+        stim = AMTagger(audio,
+                        [(0, 1)],
+                        stimulus_frequency,
+                        mock_stimulus_generation)
 
 
-def test_ASSRTagger_create_validCall():
+def test_AMTagger_create_validCall():
     n_input = 1000
     sampling_frequency = 20
     audio = get_mock_audio(n_input, sampling_frequency)
 
     stimulus_frequency = 5
 
-    stim = ASSRTagger(audio,
-                      [(0, n_input / sampling_frequency)],
-                      stimulus_frequency,
-                      mock_stimulus_generation,
-                      mock_modulator)
+    stim = AMTagger(audio,
+                    [(0, n_input / sampling_frequency)],
+                    stimulus_frequency,
+                    mock_stimulus_generation)
     stim.create()
