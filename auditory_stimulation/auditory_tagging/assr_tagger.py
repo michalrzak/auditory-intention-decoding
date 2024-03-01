@@ -172,14 +172,14 @@ class FMTagger(AAudioTagger):
 
 class AMTaggerFactory(AAudioTaggerFactory):
     _frequency: int
-    _stimulus_generator: Callable[[int, int, int], npt.NDArray[np.float32]]
+    _tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]]
 
     def __init__(self,
                  frequency: int,
-                 stimulus_generation: Callable[[int, int, int], npt.NDArray[np.float32]],
+                 tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]],
                  ) -> None:
         self._frequency = frequency
-        self._stimulus_generator = stimulus_generation
+        self._stimulus_generator = tag_generator
 
     def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return AMTagger(audio,
