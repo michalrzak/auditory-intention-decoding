@@ -91,7 +91,7 @@ package auditory_tagging {
       #list[ [float, float] ] stimuli_intervals
 
       +AAuditoryTagger(audio, stimuli)
-      +void {abstract} create()
+      +Audio {abstract} create()
     }
 
     AAuditoryTagger "1" *-- "1" Audio: audio
@@ -101,22 +101,37 @@ package auditory_tagging {
       +AAudioTagger {abstract} create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
     }
 
+    package assr_tagger {
+        class AMTagger {
+          -int frequency
+          -Callable[[int, int, int], NDArray[float] tag_generator
 
-    class ASSRTagger {
-      -int frequency
-      -Callable[[int, int, int], NDArray[float] stimulus_generation
-      -Callable[[NDArray[float], NDArray[Number]], NDArray[float]] modulator
+          +ASSRTagger(audio, stimuli_intervals, frequency, tag_generator)
+          +Audio create()
+        }
 
-      +ASSRTagger(audio, stimuli_intervals, frequency, stimulus_generation, modulator)
-      +void create()
-    }
+        class FMTagger {
+          -int frequency
 
-    class ASSRTaggerFactory {
-      -int frequency
-      -Callable[[int, int, int], NDArray[float]] stimulus_generator
-      -Callable[[NDArray[float], NDArray[Number]], NDArray[float]] modulator
-      +ASSRTaggerFactory(frequency, stimulus_generation, modulator)
-      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+          +FMTagger(audio, stimuli_intervals, frequency)
+          +Audio create()
+
+        }
+
+        class AMTaggerFactory {
+          -int frequency
+          -Callable[[int, int, int], NDArray[float]] tag_generator
+
+          +AMTaggerFactory(frequency, tag_generator)
+          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+        }
+
+        class FMTaggerFactory {
+          -int frequency
+
+          +FMTaggerFactory(frequency)
+          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+        }
     }
 
     class NoiseTaggingTagger {
@@ -126,7 +141,7 @@ package auditory_tagging {
       +Optional[Code] code
 
       +NoiseTaggingTagger(audio, stimuli_intervals, bits_per_second: int, length_bit, seed)
-      +void create()
+      +Audio create()
       -void __generate_code()
       -void __get_code(length: int)
     }
@@ -141,7 +156,7 @@ package auditory_tagging {
     }
 
     class RawTagger {
-      +void create()
+      +Audio create()
     }
 
     class RawTaggerFactory {
@@ -150,14 +165,17 @@ package auditory_tagging {
 }
 
 AAuditoryTagger <|-- RawTagger
-AAuditoryTagger <|-- ASSRTagger
 AAuditoryTagger <|-- NoiseTaggingTagger
+AAuditoryTagger <|-- AMTagger
+AAuditoryTagger <|-- FMTagger
 
-AAudioTaggerFactory <|-u- ASSRTaggerFactory
+AAudioTaggerFactory <|-u- AMTaggerFactory
+AAudioTaggerFactory <|-u- FMTaggerFactory
 AAudioTaggerFactory <|-u- NoiseTaggingTaggerFactory
 AAudioTaggerFactory <|-u- RawTaggerFactory
 
-ASSRTagger <.. ASSRTaggerFactory: "creates"
+AMTagger <.. AMTaggerFactory: "creates"
+FMTagger <.. FMTaggerFactory: "creates"
 NoiseTaggingTagger <.. NoiseTaggingTaggerFactory: "creates"
 RawTagger <.. RawTaggerFactory: "creates"
 

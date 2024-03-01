@@ -4,8 +4,7 @@ from datetime import datetime
 
 import psychopy.visual
 
-from auditory_stimulation.auditory_tagging.assr_tagger import ASSRTaggerFactory
-from auditory_stimulation.auditory_tagging.modulation_strategies import amplitude_modulation
+from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory
 from auditory_stimulation.auditory_tagging.tag_generators import clicking_signal
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
@@ -40,7 +39,7 @@ def main() -> None:
 
     stimuli = load_stimuli("auditory_stimulation/stimuli.yaml")
 
-    experiment = Experiment(model, view, stimuli, [ASSRTaggerFactory(42, clicking_signal, amplitude_modulation)])
+    experiment = Experiment(model, view, stimuli, [AMTaggerFactory(42, clicking_signal)])
     experiment.create_stimuli()
     experiment.run()
 
