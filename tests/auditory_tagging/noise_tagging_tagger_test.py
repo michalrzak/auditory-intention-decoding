@@ -68,10 +68,10 @@ def test_create_validCall_codeRepeatsCorrectly():
     code = stimulus.code
 
     assert np.all(
-        modified_audio.audio[labeled_interval[0] * sampling_frequency:labeled_interval[1] * sampling_frequency // 2, :]
+        modified_audio.array[labeled_interval[0] * sampling_frequency:labeled_interval[1] * sampling_frequency // 2, :]
         == code)
     assert np.all(
-        modified_audio.audio[labeled_interval[1] * sampling_frequency // 2:labeled_interval[1] * sampling_frequency, :]
+        modified_audio.array[labeled_interval[1] * sampling_frequency // 2:labeled_interval[1] * sampling_frequency, :]
         == code)
 
 

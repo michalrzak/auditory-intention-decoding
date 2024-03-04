@@ -7,17 +7,40 @@ import numpy.typing as npt
 
 @dataclass
 class Audio:
-    audio: npt.NDArray[np.float32]
+    """A store of all audio related information.
+
+    :param array: An array storing the actual audio information. Needs to be between -1 and 1
+    :param sampling_frequency: The sampling frequency of the used audio. Needs to be a positive integer.
+    """
+    array: npt.NDArray[np.float32]
     sampling_frequency: int
 
+    def __post_init__(self):
+        if len(self.array.shape) != 2 or self.array.shape[1] != 2:
+            raise ValueError("The supplied audio must be of shape Nx2!")
+
+        if self.sampling_frequency <= 0:
+            raise ValueError("The sampling frequency must be a positive integer!")
+
+        if np.any(self.array > 1) or np.any(self.array < -1):
+            raise ValueError("The supplied audio must be in the range -1 and 1")
+
     def __copy__(self) -> "Audio":
-        return Audio(np.copy(self.audio), self.sampling_frequency)
+        return Audio(np.copy(self.array), self.sampling_frequency)
 
     def __eq__(self, other: "Audio") -> bool:
-        return np.all(self.audio == other.audio) and self.sampling_frequency == other.sampling_frequency
+        return np.all(self.array == other.array) and self.sampling_frequency == other.sampling_frequency
+
+    def __repr__(self) -> str:
+        return f"Audio(audio-shape={self.array.shape}, sampling_frequency={self.sampling_frequency})"
 
 
 def load_wav_as_numpy_array(wav_path: str) -> Audio:
+    """Opens the specified wav file and creates an Audio class. wav must be a PCM-wav file
+
+    :param wav_path: Path to the to be opened wav file
+    :return: An Audio object created from the wav file.
+    """
     with wave.open(wav_path) as f:
         buffer = f.readframes(f.getnframes())
         bit_depth = f.getsampwidth() * 8
@@ -29,7 +52,13 @@ def load_wav_as_numpy_array(wav_path: str) -> Audio:
 
 
 def save_audio_as_wav(audio: Audio, target_file_path: str) -> None:
-    audio_bytes = (audio.audio * (2 ** 15 - 1)).astype("<h")
+    """Saves the given audio as a 16 bit PCM wav file in the specified target location.
+
+    :param audio: The to be saved audio.
+    :param target_file_path: The target file, where the audio will be saved.
+    :return: None
+    """
+    audio_bytes = (audio.array * (2 ** 15 - 1)).astype("<h")
 
     with wave.open(target_file_path, "w") as f:
         f.setnchannels(2)

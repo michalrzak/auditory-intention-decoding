@@ -42,11 +42,11 @@ def test_ASSRTagger_create_validCall_audioShouldBeModified(tagger_getter):
     modified_audio = stimulus.create()
 
     assert modified_audio is not None
-    assert modified_audio.audio is not None
+    assert modified_audio.array is not None
     assert modified_audio.sampling_frequency is not None
 
     assert modified_audio.sampling_frequency == sampling_frequency
-    assert np.any(modified_audio.audio != audio.audio)
+    assert np.any(modified_audio.array != audio.array)
 
 
 @pytest.mark.parametrize("tagger_getter", TAGGER_GETTERS)
@@ -63,12 +63,12 @@ def test_ASSRTagger_create_validCall_audioShouldBeModifiedToHalfPoint(tagger_get
     modified_audio = stimulus.create()
 
     assert modified_audio is not None
-    assert modified_audio.audio is not None
+    assert modified_audio.array is not None
     assert modified_audio.sampling_frequency is not None
 
     assert modified_audio.sampling_frequency == sampling_frequency
-    assert np.any(modified_audio.audio[:n_input // 2, :] != audio.audio[:n_input // 2, :])
-    assert np.all(modified_audio.audio[n_input // 2:, :] == audio.audio[n_input // 2:, :])
+    assert np.any(modified_audio.array[:n_input // 2, :] != audio.array[:n_input // 2, :])
+    assert np.all(modified_audio.array[n_input // 2:, :] == audio.array[n_input // 2:, :])
 
 
 @pytest.mark.parametrize("tagger_getter", TAGGER_GETTERS)

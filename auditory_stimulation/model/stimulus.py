@@ -17,6 +17,15 @@ class Stimulus:
     options: List[str]
     time_stamps: List[Tuple[float, float]]
 
+    def __post_init__(self):
+        if len(self.options) != len(self.time_stamps):
+            raise LookupError("For every option specified, there needs to be a time-stamp specified!")
+
+        for ts in self.time_stamps:
+            if ts[0] > ts[1]:
+                raise ValueError("The time-stamp needs to be a proper interval, having the lower interval index at "
+                                 "pos. 0 and the higer interval index at pos. 1")
+
 
 @dataclass
 class CreatedStimulus(Stimulus):
