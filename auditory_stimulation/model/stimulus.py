@@ -1,5 +1,7 @@
 import numbers
+import pathlib
 from dataclasses import dataclass
+from os import PathLike
 from typing import List, Dict, Any, Tuple
 
 import yaml
@@ -77,7 +79,7 @@ def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
             raise TypeError("The time-stamp needs to consist of two numbers")
 
 
-def load_stimuli(path_to_yaml: str) -> List[Stimulus]:
+def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
     """Function, which loads all stimuli contained in the provided YAML file. For the syntax of the YAML file, please
     refer to the examples.
     TODO: Probably need to make the syntax explicit somewhere
@@ -97,7 +99,7 @@ def load_stimuli(path_to_yaml: str) -> List[Stimulus]:
         stimulus_raw = stimuli_raw[stimulus_index]
         __validate_stimulus_raw(stimulus_raw)
 
-        audio = load_wav_as_numpy_array(stimulus_raw["file"])
+        audio = load_wav_as_numpy_array(pathlib.Path(stimulus_raw["file"]))
         time_stamps = [(time_stamp[0], time_stamp[1]) for time_stamp in stimulus_raw["time-stamps"]]
 
         stimulus = Stimulus(audio,

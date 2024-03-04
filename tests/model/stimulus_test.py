@@ -74,7 +74,7 @@ def test_load_stimuli_valid_call(tmp_path):
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
-    stimuli = load_stimuli(str(file))
+    stimuli = load_stimuli(file)
 
     assert len(stimuli) == 1
     assert stimuli[0].prompt == prompt
@@ -90,7 +90,7 @@ def test_load_stimuli_2_options_1_time_stamp_should_fail(tmp_path):
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_1_options_2_time_stamp_should_fail(tmp_path):
@@ -100,7 +100,7 @@ def test_load_stimuli_1_options_2_time_stamp_should_fail(tmp_path):
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_file_none_should_fail(tmp_path):
@@ -118,7 +118,7 @@ def test_load_stimuli_file_none_should_fail(tmp_path):
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_prompt_none_should_fail(tmp_path):
@@ -127,7 +127,7 @@ def test_load_stimuli_prompt_none_should_fail(tmp_path):
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_primer_none_should_fail(tmp_path):
@@ -136,7 +136,7 @@ def test_load_stimuli_primer_none_should_fail(tmp_path):
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_options_and_time_stamps_none_should_fail(tmp_path):
@@ -146,7 +146,7 @@ def test_load_stimuli_options_and_time_stamps_none_should_fail(tmp_path):
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_file_missing_should_fail(tmp_path):
@@ -162,7 +162,7 @@ def test_load_stimuli_file_missing_should_fail(tmp_path):
     create_yaml(contents, file)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_prompt_missing_should_fail(tmp_path):
@@ -178,7 +178,7 @@ def test_load_stimuli_prompt_missing_should_fail(tmp_path):
     create_yaml(contents, file)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_primer_missing_should_fail(tmp_path):
@@ -194,7 +194,7 @@ def test_load_stimuli_primer_missing_should_fail(tmp_path):
     create_yaml(contents, file)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_options_missing_should_fail(tmp_path):
@@ -210,7 +210,7 @@ def test_load_stimuli_options_missing_should_fail(tmp_path):
     create_yaml(contents, file)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_time_stamp_missing_should_fail(tmp_path):
@@ -226,7 +226,7 @@ def test_load_stimuli_time_stamp_missing_should_fail(tmp_path):
     create_yaml(contents, file)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 def test_load_stimuli_options_and_time_stamp_missing_should_fail(tmp_path):
@@ -242,7 +242,7 @@ def test_load_stimuli_options_and_time_stamp_missing_should_fail(tmp_path):
     create_yaml(contents, file)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
 
 
 @pytest.mark.parametrize("new_time_stamp", [[1, 1], [(0, 1, 2), (0, 1, 2)]])
@@ -252,4 +252,4 @@ def test_load_stimuli_time_stamps_invalid_format_should_fail(tmp_path, new_time_
     file = create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path)
 
     with pytest.raises(Exception):
-        stimuli = load_stimuli(str(file))
+        stimuli = load_stimuli(file)
