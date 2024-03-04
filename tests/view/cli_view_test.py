@@ -29,7 +29,7 @@ def test_update_new_prompt():
     new_audio = get_mock_audio(1000, 100)
 
     new_stimulus = mockito.mock(CreatedStimulus)
-    new_stimulus.audio = new_audio
+    new_stimulus.array = new_audio
     new_stimulus.prompt = new_prompt
 
     outputted = __capture_console_output(lambda: cli_view.update(new_stimulus, EModelUpdateIdentifier.NEW_STIMULUS))

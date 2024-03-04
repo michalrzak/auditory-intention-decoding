@@ -6,7 +6,7 @@ def test_load_wav_as_numpy_array_valid_call():
 
     result = load_wav_as_numpy_array(path)
 
-    assert result.audio is not None
+    assert result.array is not None
     assert result.sampling_frequency is not None
-    assert len(result.audio) > 0
+    assert len(result.array) > 0
     assert result.sampling_frequency == 44100

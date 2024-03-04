@@ -67,7 +67,7 @@ def test_register_view_and_new_stimulus_should_get_updated():
     new_audio = get_mock_audio(1000, 100)
 
     new_stimulus = mockito.mock(CreatedStimulus)
-    new_stimulus.audio = new_audio
+    new_stimulus.array = new_audio
     new_stimulus.prompt = new_prompt
 
     mock_view = mockito.mock(AView)

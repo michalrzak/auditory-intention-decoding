@@ -9,7 +9,7 @@ from auditory_stimulation.view.sound_players import psychopy_player
 
 def mock_audio(array: npt.NDArray, sampling_frequency: int) -> Audio:
     audio = mockito.mock(Audio)
-    audio.audio = array
+    audio.array = array
     audio.sampling_frequency = sampling_frequency
     return audio
 

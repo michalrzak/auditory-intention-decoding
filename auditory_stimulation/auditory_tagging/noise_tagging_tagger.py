@@ -105,7 +105,7 @@ class NoiseTaggingTagger(AAudioTagger):
         """
         self.__generate_code()
 
-        audio_copy = np.copy(self._audio.audio)
+        audio_copy = np.copy(self._audio.array)
 
         for interval in self._stimuli_intervals:
             sample_range = (int(interval[0] * self._audio.sampling_frequency),

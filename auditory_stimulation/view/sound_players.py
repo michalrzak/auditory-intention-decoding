@@ -15,14 +15,14 @@ def psychopy_player(audio: Audio, play_audio: bool = True) -> None:
     :return:
     """
 
-    if audio.audio.shape[1] != 2:
+    if audio.array.shape[1] != 2:
         raise ValueError("The audio has to be stereo! I.e. in the shape Nx2")
 
-    if audio.audio.dtype != np.float32:
+    if audio.array.dtype != np.float32:
         raise ValueError("The audio has to be of the type np.float32!")
 
-    assert np.max(audio.audio) <= 1
-    assert np.min(audio.audio) >= -1
+    assert np.max(audio.array) <= 1
+    assert np.min(audio.array) >= -1
 
     if audio.sampling_frequency <= 0:
         raise ValueError("Sampling rate has to be > 0")
@@ -31,7 +31,7 @@ def psychopy_player(audio: Audio, play_audio: bool = True) -> None:
         return
 
     # use the pygame backend, as it allows to play sounds from arrays, not only from files
-    sound = SoundPygame(value=audio.audio)
+    sound = SoundPygame(value=audio.array)
     sound.play()
     duration = sound.getDuration()
     psychopy.core.wait(duration)
