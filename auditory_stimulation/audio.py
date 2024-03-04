@@ -17,6 +17,9 @@ class Audio:
         if self.sampling_frequency <= 0:
             raise ValueError("The sampling frequency must be a positive integer!")
 
+        if np.any(self.array > 1) or np.any(self.array < -1):
+            raise ValueError("The supplied audio must be in the range -1 and 1")
+
     def __copy__(self) -> "Audio":
         return Audio(np.copy(self.array), self.sampling_frequency)
 
