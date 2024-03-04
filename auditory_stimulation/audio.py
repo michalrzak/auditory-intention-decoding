@@ -7,6 +7,11 @@ import numpy.typing as npt
 
 @dataclass
 class Audio:
+    """A store of all audio related information.
+
+    :param array: An array storing the actual audio information. Needs to be between -1 and 1
+    :param sampling_frequency: The sampling frequency of the used audio. Needs to be a positive integer.
+    """
     array: npt.NDArray[np.float32]
     sampling_frequency: int
 
@@ -31,6 +36,11 @@ class Audio:
 
 
 def load_wav_as_numpy_array(wav_path: str) -> Audio:
+    """Opens the specified wav file and creates an Audio class. wav must be a PCM-wav file
+
+    :param wav_path: Path to the to be opened wav file
+    :return: An Audio object created from the wav file.
+    """
     with wave.open(wav_path) as f:
         buffer = f.readframes(f.getnframes())
         bit_depth = f.getsampwidth() * 8
@@ -42,6 +52,12 @@ def load_wav_as_numpy_array(wav_path: str) -> Audio:
 
 
 def save_audio_as_wav(audio: Audio, target_file_path: str) -> None:
+    """Saves the given audio as a 16 bit PCM wav file in the specified target location.
+
+    :param audio: The to be saved audio.
+    :param target_file_path: The target file, where the audio will be saved.
+    :return: None
+    """
     audio_bytes = (audio.array * (2 ** 15 - 1)).astype("<h")
 
     with wave.open(target_file_path, "w") as f:
