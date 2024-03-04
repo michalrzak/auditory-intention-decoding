@@ -12,3 +12,66 @@ pizzeria:
     - [ 5.6, 7 ]
 
 john-feeling:
+  file: "stimuli_sounds/john-feeling.wav"
+  prompt: "Hi, this is John, how are you feeling? Is it good, OK, or bad."
+  primer: "You are feeling good."
+  options:
+    - "good"
+    - "OK"
+    - "bad"
+  time-stamps:
+    - [ 3.7, 4.5 ]
+    - [ 4.8, 5.6 ]
+    - [ 5.7, 6.4 ]
+
+cafe-marie:
+  file: "stimuli_sounds/bob-cafe.wav"
+  prompt: "You have reached Cafe Marie, Bob speaking. Would you like to order something, reserve a table, or ask our opening hours?"
+  primer: "You want to find out the opening hours of Cafe Marie."
+  options:
+    - "order something"
+    - "reserve a table"
+    - "ask our opening hours"
+  time-stamps:
+    - [ 3.7, 5.3 ]
+    - [ 5.6, 6.7 ]
+    - [ 7, 8.9 ]
+
+taxi-service:
+  file: "stimuli_sounds/taxi-jones.wav"
+  prompt: "Thank you for calling Taxi service Jones, do you want to call a taxi, ask our fares, or file a complaint?"
+  primer: "You want to file a complaint to the taxi service."
+  options:
+    - "call a taxi"
+    - "ask our fares"
+    - "file a complaint"
+  time-stamps:
+    - [ 3.6, 5.4 ]
+    - [ 5.6, 7 ]
+    - [ 7.2, 9.2 ]
+
+doctor:
+  file: "stimuli_sounds/dr-garcia.wav"
+  prompt: "This is practice Dr. Garcia, are you having an emergency, do you want to book an appointment, or do you need a new prescription?"
+  primer: "You want to book a doctors appointment."
+  options:
+    - "are you having an emergency"
+    - "do you want to book an appointment"
+    - "do you need a new prescription"
+  time-stamps:
+    - [ 2.6, 4.6 ]
+    - [ 5, 6.8 ]
+    - [ 7.6, 9.75 ]
+
+adam:
+  file: "stimuli_sounds/adam-friend.wav"
+  prompt: "Hi, this is Adam, do you want to play some games, grab a drink, or go for a walk?"
+  primer: "You want to play some games with Adam."
+  options:
+    - "play some games"
+    - "grab a drink"
+    - "go for a walk"
+  time-stamps:
+    - [ 2.4, 4 ]
+    - [ 4.5, 5.6 ]
+    - [ 6.2, 7.7 ]
