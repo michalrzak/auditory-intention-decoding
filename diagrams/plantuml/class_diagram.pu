@@ -6,7 +6,7 @@ note as n
 end note
 
 class Audio {
-        +NDArray[float] audio
+        +NDArray[float] array
         +int sampling_frequency
     }
 
