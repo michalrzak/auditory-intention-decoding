@@ -18,7 +18,6 @@ EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.8, 0.5)
 
 CONFIRMATION_TEXT = "Please press 'space' to continue"
 CONFIRMATION_TEXT_BOX_POSITION = (0, -0.8)
-CONFIRMATION_TEXT_BOX_SIZE = (0.5, 0.2)
 
 
 class Drawable(Protocol):
@@ -67,7 +66,7 @@ class PsychopyView(AView):
         self.__try_to_quit()
 
         prompt = self.__create_text_box(stimulus.prompt, EXPERIMENT_STATE_TEXT_BOX_POSITION,
-                                        EXPERIMENT_STATE_TEXT_BOX_SIZE)
+                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[0], EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
         self.__draw(prompt, True)
 
         self._sound_player(stimulus.modified_audio)
@@ -75,20 +74,26 @@ class PsychopyView(AView):
     def _update_new_primer(self, primer: str) -> None:
         self.__try_to_quit()
 
-        prompt = self.__create_text_box(primer, EXPERIMENT_STATE_TEXT_BOX_POSITION, EXPERIMENT_STATE_TEXT_BOX_SIZE)
+        prompt = self.__create_text_box(primer, EXPERIMENT_STATE_TEXT_BOX_POSITION,
+                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[0], EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
         self.__draw(prompt, True)
 
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
         self.__try_to_quit()
 
+        # if the data was not provided, skip showing anything
+        assert data in self._experiment_texts
+        if data not in self._experiment_texts or self._experiment_texts[data] is None:
+            return
+
         text = self.__create_text_box(self._experiment_texts[data], EXPERIMENT_STATE_TEXT_BOX_POSITION,
-                                      EXPERIMENT_STATE_TEXT_BOX_SIZE)
+                                      EXPERIMENT_STATE_TEXT_BOX_SIZE[0], EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
         self.__draw(text, True)
 
     def get_confirmation(self) -> bool:
         self.__try_to_quit()
 
-        text = self.__create_text_box(CONFIRMATION_TEXT, CONFIRMATION_TEXT_BOX_POSITION, CONFIRMATION_TEXT_BOX_SIZE)
+        text = self.__create_text_box(CONFIRMATION_TEXT, CONFIRMATION_TEXT_BOX_POSITION)
         self.__draw(text, False)
 
         self.__keyboard.clearEvents()  # clear keys in case the key was already pressed before
@@ -102,14 +107,36 @@ class PsychopyView(AView):
 
         psychopy.core.wait(secs)
 
-    def __create_text_box(self, text: str, position: Tuple[float, float], size: Tuple[float, float]) -> Drawable:
-        return psychopy.visual.TextBox2(win=self.__window,
-                                        text=text,
-                                        letterHeight=LETTER_SIZE,
-                                        pos=position,
-                                        size=size,
-                                        color=1.,
-                                        colorSpace=TEXT_BOX_COLOR_SPACE)
+    def __create_text_box(self,
+                          text: str,
+                          position: Tuple[float, float],
+                          width: Optional[float] = None,
+                          height: Optional[float] = None) -> Drawable:
+        """Creates a drawable TextBox2 stimulus at the specified location and of the specified size.
+        Keep in mind that psychopy sets the (0, 0) location to the center of the screen. This function further uses
+        normalized units, hence your screen edges are located 1 and -1 each in both dimensions.
+
+        :param text: The drawn text inside the stimulus
+        :param position: The relative position on the screen.
+        :param width: The width of the created stimulus, if left empty the width is set to a default value by psychopy
+         and grows dynamically, with longer text. If specified, fixes a width for the TextBox
+        :param height: Same as width, if left empty the height grows dynamically with longer text, otherwise fix a
+         height.
+        :return: A drawable textbox.
+        """
+
+        size = (width, height)
+
+        text_box = psychopy.visual.TextBox2(win=self.__window,
+                                            text=text,
+                                            letterHeight=LETTER_SIZE,
+                                            alignment="center",
+                                            pos=position,
+                                            size=size,
+                                            color=1.,
+                                            colorSpace=TEXT_BOX_COLOR_SPACE)
+
+        return text_box
 
     def close_view(self):
         """Closes the view properly."""
