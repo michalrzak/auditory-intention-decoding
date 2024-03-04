@@ -81,6 +81,8 @@ class PsychopyView(AView):
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
         self.__try_to_quit()
 
+        # if the data was not provided, skip showing anything
+        
         text = self.__create_text_box(self._experiment_texts[data], EXPERIMENT_STATE_TEXT_BOX_POSITION,
                                       EXPERIMENT_STATE_TEXT_BOX_SIZE)
         self.__draw(text, True)
