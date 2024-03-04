@@ -1,5 +1,5 @@
 pizzeria:
-  file: "test_sounds/test.wav"
+  file: "stimuli_sounds/test.wav"
   prompt: "Hello, this is Pizzeria Romano, would you like to see the menu, do a reservation, or take an order."
   primer: "You want to reserve a table at a pizzeria."
   options:
@@ -10,3 +10,5 @@ pizzeria:
     - [ 2.25, 3.85 ]
     - [ 4, 5.3 ]
     - [ 5.6, 7 ]
+
+john-feeling:
