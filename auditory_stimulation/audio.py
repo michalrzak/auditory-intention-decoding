@@ -1,5 +1,6 @@
 import wave
 from dataclasses import dataclass
+from os import PathLike
 
 import numpy as np
 import numpy.typing as npt
@@ -35,13 +36,13 @@ class Audio:
         return f"Audio(audio-shape={self.array.shape}, sampling_frequency={self.sampling_frequency})"
 
 
-def load_wav_as_numpy_array(wav_path: str) -> Audio:
+def load_wav_as_numpy_array(wav_path: PathLike) -> Audio:
     """Opens the specified wav file and creates an Audio class. wav must be a PCM-wav file
 
     :param wav_path: Path to the to be opened wav file
     :return: An Audio object created from the wav file.
     """
-    with wave.open(wav_path) as f:
+    with wave.open(str(wav_path)) as f:
         buffer = f.readframes(f.getnframes())
         bit_depth = f.getsampwidth() * 8
         frequency = f.getframerate()
@@ -51,7 +52,7 @@ def load_wav_as_numpy_array(wav_path: str) -> Audio:
     return Audio(audio_data.astype(np.float32) / 2 ** (bit_depth - 1), frequency)
 
 
-def save_audio_as_wav(audio: Audio, target_file_path: str) -> None:
+def save_audio_as_wav(audio: Audio, target_file_path: PathLike) -> None:
     """Saves the given audio as a 16 bit PCM wav file in the specified target location.
 
     :param audio: The to be saved audio.
@@ -60,7 +61,7 @@ def save_audio_as_wav(audio: Audio, target_file_path: str) -> None:
     """
     audio_bytes = (audio.array * (2 ** 15 - 1)).astype("<h")
 
-    with wave.open(target_file_path, "w") as f:
+    with wave.open(str(target_file_path), "w") as f:
         f.setnchannels(2)
         f.setsampwidth(2)
         f.setframerate(audio.sampling_frequency)

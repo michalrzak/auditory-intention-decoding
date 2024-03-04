@@ -1,3 +1,5 @@
+import pathlib
+
 import numpy as np
 import pytest
 
@@ -51,7 +53,7 @@ def test_audio_array_sample_too_out_of_bounds(sample):
 
 
 def test_load_wav_as_numpy_array_valid_call():
-    path = "stimuli_sounds/test.wav"
+    path = pathlib.Path("stimuli_sounds/test.wav")
 
     result = load_wav_as_numpy_array(path)
 
@@ -69,10 +71,10 @@ def test_save_audio_as_wav_valid_call(tmp_path, shape, fs):
 
     file = tmp_path / "out.wav"
 
-    save_audio_as_wav(audio, str(file))
+    save_audio_as_wav(audio, file)
     assert file.exists()
 
-    loaded_audio = load_wav_as_numpy_array(str(file))
+    loaded_audio = load_wav_as_numpy_array(file)
     # cannot just do loaded_audio == audio as there may be slight differences between the audios
     allowed_delta = 0.001
     assert np.all(np.abs(loaded_audio.array - audio.array) <= allowed_delta)

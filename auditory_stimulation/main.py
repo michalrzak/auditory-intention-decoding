@@ -32,13 +32,13 @@ def main() -> None:
     logger = logging.getLogger("model-logger")
     model = Model(logger)
 
-    experiment_texts = load_experiment_texts("auditory_stimulation/experiment_texts.yaml")
+    experiment_texts = load_experiment_texts(pathlib.Path("auditory_stimulation/experiment_texts.yaml"))
     window = psychopy.visual.Window(fullscr=True)
     view = PsychopyView(psychopy_player, experiment_texts, window)
 
     model.register(view)
 
-    stimuli = load_stimuli("auditory_stimulation/stimuli.yaml")
+    stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
 
     experiment = Experiment(model, view, stimuli, [AMTaggerFactory(42, clicking_signal),
                                                    FMTaggerFactory(40),
