@@ -50,6 +50,7 @@ class PsychopyView(AView):
     def __try_to_quit(self) -> None:
         if len(self.__keyboard.getKeys(["escape"])) != 0:
             self.close_view()
+            quit()
 
     def __draw(self, item: Drawable, clear_buffer: bool):
         if clear_buffer:
