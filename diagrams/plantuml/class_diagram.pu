@@ -80,13 +80,19 @@ package model {
     Stimulus "1" *-- "1" Audio: audio
 
     class CreatedStimulus {
+        -Stimulus stimulus
         +Optional[str] used_tagger_label
-        +CreatedStimulus {static} from_stimulus(stimulus: Stimulus, modified_audio: Audio)
+
+        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio)
+        +str prompt()
+        +str primer()
+        +List[str] options()
+        +List[Tuple[float, float]] time_stamps()
     }
     CreatedStimulus "1" *-l- "1" Audio: modified_audio
 
 
-    CreatedStimulus --|> Stimulus
+    CreatedStimulus "*" *-- "1" Stimulus
 }
 
 Model "1" *-r- "*" CreatedStimulus: "stimulus_history"

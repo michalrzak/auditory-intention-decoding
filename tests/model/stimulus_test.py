@@ -48,22 +48,12 @@ def test_stimulus_valid_call():
     stimulus_checks(stimulus, audio, prompt, primer, options, time_stamps)
 
 
-def test_created_stimulus_valid_call():
-    audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
-    modified_audio = mockito.mock(Audio)
-
-    created_stimulus = CreatedStimulus(audio, prompt, primer, options, time_stamps, modified_audio, None)
-
-    stimulus_checks(created_stimulus, audio, prompt, primer, options, time_stamps)
-    assert created_stimulus.modified_audio == modified_audio
-
-
 def test_created_stimulus_from_stimulus_valid_call():
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     stimulus = Stimulus(audio, prompt, primer, options, time_stamps)
 
     modified_audio = mockito.mock(Audio)
-    created_stimulus = CreatedStimulus.from_stimulus(stimulus, modified_audio)
+    created_stimulus = CreatedStimulus(stimulus, modified_audio)
 
     stimulus_checks(created_stimulus, stimulus.audio, stimulus.prompt, stimulus.primer, stimulus.options,
                     stimulus.time_stamps)
