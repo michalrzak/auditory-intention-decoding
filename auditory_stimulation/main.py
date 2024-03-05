@@ -16,14 +16,9 @@ from auditory_stimulation.view.sound_players import psychopy_player
 LOGGING_DIRECTORY = pathlib.Path("logs/")
 
 
-def create_directory_if_not_exists(directory: pathlib.Path) -> None:
-    directory.mkdir(parents=True, exist_ok=True)
-
-
 def main() -> None:
-    create_directory_if_not_exists(LOGGING_DIRECTORY)
     model = Model()
-    
+
     logger = Logger(LOGGING_DIRECTORY)
     model.register(logger)
 
