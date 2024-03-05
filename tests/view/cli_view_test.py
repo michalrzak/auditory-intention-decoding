@@ -21,7 +21,7 @@ def __capture_console_output(func: Callable[[], None]) -> str:
     return target_output.getvalue()
 
 
-def test_update_new_prompt():
+def test_update_new_stimulus():
     # initialize object
     cli_view = CLIView(get_mock_audio_player(), {})
 

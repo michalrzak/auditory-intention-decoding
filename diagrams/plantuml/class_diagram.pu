@@ -33,17 +33,26 @@ package view {
 }
 
 package model {
+    abstract class AObserver {
+        +void update(data: Any, identifier: EModelUpdateIdentifier)
+    }
+
     class Model <<Observable>>{
         -List[str] primer_history
-        -Logger logger
 
-        -Model(logger)
+        -Model()
         -void notify(data: Any, identifier: EModelUpdateIdentifier)
-        +void register(view: View)
+        +void register(view: AObserver)
         +void new_stimulus(stimulus: CreatedStimulus)
         +void new_primer(stimulus: CreatedStimulus)
         +void change_experiment_state(new_state: EExperimentState)
     }
+
+    class Logger<<Observer>> {
+        -Path exports_directory
+        +Logger(logging_directory: PathLike)
+    }
+    Logger -u-|> AObserver
 
     package constants {
     enum EExperimentState {
@@ -71,19 +80,23 @@ package model {
     Stimulus "1" *-- "1" Audio: audio
 
     class CreatedStimulus {
-        CreatedStimulus from_stimulus(stimulus: Stimulus, modified_audio: Audio)
+        +Optional[str] used_tagger_label
+        +CreatedStimulus {static} from_stimulus(stimulus: Stimulus, modified_audio: Audio)
     }
     CreatedStimulus "1" *-l- "1" Audio: modified_audio
 
 
     CreatedStimulus --|> Stimulus
 }
-AView ..> constants: "uses"
 
 Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
 Model "*" o--- "1" EExperimentState: "experiment_state"
-Model "1" o-l-- "*" AView: views
+Model "1" o-l-- "*" AObserver
 Model ..> EModelUpdateIdentifier: "uses"
+
+AObserver .l.> constants: "uses"
+
+AView --|> AObserver
 
 
 package auditory_tagging {
@@ -190,7 +203,7 @@ class Experiment {
     +void run()
 }
 Experiment "1" *-d- "1" Model
-Experiment "1" *-r- "1" AView
+Experiment "1" *-l- "1" AView
 Experiment "1" *-u- "*" AAudioTaggerFactory
 Experiment "1" *-- "*" CreatedStimulus
 note on link: Created by calling  `create_stimuli()`

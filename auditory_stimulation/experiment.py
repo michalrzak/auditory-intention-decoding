@@ -1,6 +1,6 @@
 import copy
 import random
-from typing import List, Optional
+from typing import List, Optional, Collection
 
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
 from auditory_stimulation.model.experiment_state import EExperimentState
@@ -17,12 +17,20 @@ PRIMER_SECS = 5
 class Experiment:
     """A controller class of the MVC pattern, responsible for handling the experiment logic, updating the model and
     calling blocking operations (wait for keypress, wait) on the view.
+
+    Note: This class is not ideal. I think the stimuli should be saved and also possibly created in the model class.
+    Then the only thing needed would be calling something like "next stimulus" and this would do all the necessery
+    updates in the model by itself. Unfortunately, my rule, where I want to have all experiment logic in this class,
+    as it would require to delegate the decision to, for example, how long to wait after a primer to the view. I
+    specifically wanted to avoid that, as I feel that this fits better into the Experiment class.
+    Should this ever get implemented, the code would be a lot better decoupled as this would no longer depend on
+    stimulus.
     """
     __model: Model
     __view: AView
     __stimuli: List[Stimulus]
     __auditory_stimulus_factories: List[AAudioTaggerFactory]
-    __created_stimuli: Optional[List[CreatedStimulus]]
+    __created_stimuli: Optional[Collection[CreatedStimulus]]
 
     def __init__(self, model: Model, view: AView, stimuli: List[Stimulus],
                  auditory_stimulus_factories: List[AAudioTaggerFactory]) -> None:
@@ -72,7 +80,7 @@ class Experiment:
         for factory, stimulus in zip(applied_factories, self.__stimuli):
             auditory_stimulus = factory.create_auditory_stimulus(stimulus.audio, stimulus.time_stamps, )
             modified_audio = auditory_stimulus.create()
-            created_stimuli.append(CreatedStimulus.from_stimulus(stimulus, modified_audio))
+            created_stimuli.append(CreatedStimulus.from_stimulus(stimulus, modified_audio, type(factory).__name__))
 
         self.__created_stimuli = created_stimuli
 

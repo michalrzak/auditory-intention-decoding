@@ -2,22 +2,22 @@ import numbers
 import pathlib
 from dataclasses import dataclass
 from os import PathLike
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Collection, Optional
 
 import yaml
 
 from auditory_stimulation.audio import Audio, load_wav_as_numpy_array
 
 
-@dataclass
+@dataclass(frozen=True)
 class Stimulus:
     """Simple data class, used to store all information of a stimulus. Should contain the same information as the
     stimulus YAML file, but this is not explicitly checked."""
     audio: Audio
     prompt: str
     primer: str
-    options: List[str]
-    time_stamps: List[Tuple[float, float]]
+    options: Collection[str]
+    time_stamps: Collection[Tuple[float, float]]
 
     def __post_init__(self):
         if len(self.options) != len(self.time_stamps):
@@ -28,19 +28,29 @@ class Stimulus:
                 raise ValueError("The time-stamp needs to be a proper interval, having the lower interval index at "
                                  "pos. 0 and the higer interval index at pos. 1")
 
+    def __hash__(self):
+        return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps)))
 
-@dataclass
+
+@dataclass(frozen=True)
 class CreatedStimulus(Stimulus):
-    """Extends the Stimulus class with the modified audio field. To be used once an auditory stimulation technique
-     is applied"""
+    """Extends the Stimulus class with the modified audio field. To be used once an auditory tagging technique
+     is applied
+
+     The used tagger is sort of a bad solution and this should be done a bit differently
+     """
     modified_audio: Audio
+    used_tagger_label: Optional[str]
 
     @staticmethod
-    def from_stimulus(stimulus: Stimulus, modified_audio: Audio) -> "CreatedStimulus":
+    def from_stimulus(stimulus: Stimulus, modified_audio: Audio,
+                      used_tagger_label: Optional[str] = None) -> "CreatedStimulus":
         """Helps to construct a CreatedStimulus from a Stimulus + a modified audio
 
         :param stimulus: A stimulus instance, which fields will be copied.
         :param modified_audio: The modified_audio to be added to the class.
+        :param used_tagger_label: An optional parameter, which can be used to add a label denoting which tagger was used
+         to create an audio.
         :return: A new instance of CreatedStimulus with the specified fields in stimulus and the modified_audio
         """
         return CreatedStimulus(stimulus.audio,
@@ -48,7 +58,12 @@ class CreatedStimulus(Stimulus):
                                stimulus.primer,
                                stimulus.options,
                                stimulus.time_stamps,
-                               modified_audio)
+                               modified_audio,
+                               used_tagger_label)
+
+    def __hash__(self):
+        return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps),
+                     self.modified_audio))
 
 
 def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
