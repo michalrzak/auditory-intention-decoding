@@ -33,9 +33,9 @@ class Model:
         self.__logger = logger
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
-        for view in self.__observers:
-            view.update(data, identifier)
-            self.__logger.info(f"Notifying view {view} with data {data}")
+        for observer in self.__observers:
+            observer.update(data, identifier)
+            self.__logger.info(f"Notifying view {observer} with data {data}")
 
     def register(self, view: AObserver) -> None:
         """Observable. Register a view, which will get notified about changes in the model."""
