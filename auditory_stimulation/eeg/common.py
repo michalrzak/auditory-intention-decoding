@@ -1,4 +1,8 @@
 from enum import Enum
+from typing import Any
+
+from auditory_stimulation.model.experiment_state import EExperimentState
+from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 
 
 class ETrigger(Enum):
@@ -9,3 +13,24 @@ class ETrigger(Enum):
     RESTING_STATE_EYES_CLOSED = 3
     EXPERIMENT = 4
     INACTIVE = 200
+
+    @staticmethod
+    def get_trigger(data: Any, identifier: EModelUpdateIdentifier) -> "ETrigger":
+        if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
+            return ETrigger.NEW_STIMULUS
+        elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
+            return ETrigger.NEW_PROMPT
+        elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
+            assert isinstance(data, EExperimentState)
+            if data == EExperimentState.EXPERIMENT_INTRODUCTION:
+                return ETrigger.EXPERIMENT_INTRODUCTION
+            elif data == EExperimentState.RESTING_STATE_EYES_OPEN:
+                return ETrigger.RESTING_STATE_EYES_OPEN
+            elif data == EExperimentState.RESTING_STATE_EYES_CLOSED:
+                return ETrigger.RESTING_STATE_EYES_CLOSED
+            elif data == EExperimentState.EXPERIMENT:
+                return ETrigger.EXPERIMENT
+            elif data == EExperimentState.INACTIVE:
+                return ETrigger.INACTIVE
+
+        raise NotImplementedError(f"Could not resolve trigger for data: {data} and identifier: {identifier}")

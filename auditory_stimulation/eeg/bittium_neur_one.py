@@ -10,7 +10,6 @@ from typing import Any, Protocol, Dict
 from psychopy.parallel import ParallelPort
 
 from auditory_stimulation.eeg.common import ETrigger
-from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model import AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 
@@ -49,26 +48,7 @@ class BittiumTriggerSender(AObserver):
         self.__parallel_port.setData(0)
 
     def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
-        if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
-            self.__send_trigger(ETrigger.NEW_STIMULUS)
-        elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
-            self.__send_trigger(ETrigger.NEW_PROMPT)
-        elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
-            assert isinstance(data, EExperimentState)
-            if data == EExperimentState.EXPERIMENT_INTRODUCTION:
-                self.__send_trigger(ETrigger.EXPERIMENT_INTRODUCTION)
-            elif data == EExperimentState.RESTING_STATE_EYES_OPEN:
-                self.__send_trigger(ETrigger.RESTING_STATE_EYES_OPEN)
-            elif data == EExperimentState.RESTING_STATE_EYES_CLOSED:
-                self.__send_trigger(ETrigger.RESTING_STATE_EYES_CLOSED)
-            elif data == EExperimentState.EXPERIMENT:
-                self.__send_trigger(ETrigger.EXPERIMENT)
-            elif data == EExperimentState.INACTIVE:
-                self.__send_trigger(ETrigger.INACTIVE)
-            else:
-                assert False
-        else:
-            assert False
+        self.__send_trigger(ETrigger.get_trigger(data, identifier))
 
 
 __trigger_sender_cache: Dict[int, BittiumTriggerSender] = {}
