@@ -177,6 +177,20 @@ package auditory_tagging {
     }
 }
 
+package eeg {
+   enum ETrigger{}
+   note right of ETrigger: Contains tha mappings to\nthe actual trigger numbers\nsent sent
+
+   class BittiumTriggerSender<<Observer>> {
+     -IParallelPort parallel_port
+     -int trigger_duration_s
+     +BittiumTriggerSender(address: int, trigger_duration_s)
+   }
+}
+BittiumTriggerSender -u-|> AObserver
+BittiumTriggerSender ..> ETrigger: "uses"
+
+
 AAuditoryTagger <|-- RawTagger
 AAuditoryTagger <|-- NoiseTaggingTagger
 AAuditoryTagger <|-- AMTagger

@@ -25,6 +25,8 @@ class BittiumTriggerSender(AObserver):
 
     CAREFUL: This class is blocking whenever an update is received which triggers a trigger to be sent for the seconds
     specified in `trigger_duration_s`
+
+    TODO: This should maybe also be a singleton?
     """
 
     __parallel_port: IParallelPort
