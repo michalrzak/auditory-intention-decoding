@@ -113,7 +113,7 @@ package auditory_tagging {
       +Audio {abstract} create()
     }
 
-    AAuditoryTagger "1" *-- "1" Audio: audio
+    AAuditoryTagger "1" *-[norank]- "1" Audio: audio
 
 
     abstract class AAudioTaggerFactory {
@@ -224,7 +224,7 @@ class Experiment {
     +void create_stimuli()
     +void run()
 }
-Experiment "1" *-d- "1" Model
+Experiment "1" *-- "1" Model
 Experiment "1" *-- "1" AView
 
 Model "1" *-u- "*" AAudioTaggerFactory
