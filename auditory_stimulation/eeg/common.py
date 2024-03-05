@@ -1,0 +1,11 @@
+from enum import Enum
+
+
+class ETrigger(Enum):
+    NEW_STIMULUS = 100
+    NEW_PROMPT = 101
+    EXPERIMENT_INTRODUCTION = 1
+    RESTING_STATE_EYES_OPEN = 2
+    RESTING_STATE_EYES_CLOSED = 3
+    EXPERIMENT = 4
+    INACTIVE = 200
