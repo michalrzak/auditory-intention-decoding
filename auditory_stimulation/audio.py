@@ -6,7 +6,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-@dataclass
+@dataclass(frozen=True)
 class Audio:
     """A store of all audio related information.
 
@@ -31,6 +31,9 @@ class Audio:
 
     def __eq__(self, other: "Audio") -> bool:
         return np.all(self.array == other.array) and self.sampling_frequency == other.sampling_frequency
+
+    def __hash__(self):
+        return hash(str(self.array) + str(self.sampling_frequency))
 
     def __repr__(self) -> str:
         return f"Audio(audio-shape={self.array.shape}, sampling_frequency={self.sampling_frequency})"

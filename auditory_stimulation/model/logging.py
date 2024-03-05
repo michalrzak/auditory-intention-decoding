@@ -27,7 +27,10 @@ class Logger(AObserver):
 
         elif identifier == EModelUpdateIdentifier.NEW_STIMULUS:
             logging.info(f"Added new stimulus {data}")
-            # TODO: this should also write the stimulus into a file
+
 
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             logging.info(f"Changing experiment state to {data}")
+
+        else:
+            assert False, f"Unexpected identifier: {identifier}"

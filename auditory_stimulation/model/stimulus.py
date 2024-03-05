@@ -2,22 +2,22 @@ import numbers
 import pathlib
 from dataclasses import dataclass
 from os import PathLike
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Collection
 
 import yaml
 
 from auditory_stimulation.audio import Audio, load_wav_as_numpy_array
 
 
-@dataclass
+@dataclass(frozen=True)
 class Stimulus:
     """Simple data class, used to store all information of a stimulus. Should contain the same information as the
     stimulus YAML file, but this is not explicitly checked."""
     audio: Audio
     prompt: str
     primer: str
-    options: List[str]
-    time_stamps: List[Tuple[float, float]]
+    options: Collection[str]
+    time_stamps: Collection[Tuple[float, float]]
 
     def __post_init__(self):
         if len(self.options) != len(self.time_stamps):
@@ -29,7 +29,7 @@ class Stimulus:
                                  "pos. 0 and the higer interval index at pos. 1")
 
 
-@dataclass
+@dataclass(frozen=True)
 class CreatedStimulus(Stimulus):
     """Extends the Stimulus class with the modified audio field. To be used once an auditory stimulation technique
      is applied"""
