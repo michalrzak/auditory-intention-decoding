@@ -8,10 +8,11 @@ from auditory_stimulation.model.model_update_identifier import EModelUpdateIdent
 class ETrigger(Enum):
     NEW_STIMULUS = 100
     NEW_PROMPT = 101
-    EXPERIMENT_INTRODUCTION = 1
-    RESTING_STATE_EYES_OPEN = 2
-    RESTING_STATE_EYES_CLOSED = 3
-    EXPERIMENT = 4
+    INTRODUCTION = 1
+    EXPERIMENT_INTRODUCTION = 2
+    RESTING_STATE_EYES_OPEN = 3
+    RESTING_STATE_EYES_CLOSED = 4
+    EXPERIMENT = 5
     INACTIVE = 200
 
     @staticmethod
@@ -22,7 +23,9 @@ class ETrigger(Enum):
             return ETrigger.NEW_PROMPT
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             assert isinstance(data, EExperimentState)
-            if data == EExperimentState.EXPERIMENT_INTRODUCTION:
+            if data == EExperimentState.INTRODUCTION:
+                return ETrigger.INTRODUCTION
+            elif data == EExperimentState.EXPERIMENT_INTRODUCTION:
                 return ETrigger.EXPERIMENT_INTRODUCTION
             elif data == EExperimentState.RESTING_STATE_EYES_OPEN:
                 return ETrigger.RESTING_STATE_EYES_OPEN
