@@ -21,7 +21,7 @@ def __capture_console_output(func: Callable[[], None]) -> str:
     return target_output.getvalue()
 
 
-def test_update_new_prompt():
+def test_update_new_stimulus():
     # initialize object
     cli_view = CLIView(get_mock_audio_player(), {})
 
@@ -32,7 +32,8 @@ def test_update_new_prompt():
     new_stimulus.array = new_audio
     new_stimulus.prompt = new_prompt
 
-    outputted = __capture_console_output(lambda: cli_view.update(new_stimulus, EModelUpdateIdentifier.NEW_STIMULUS))
+    outputted = __capture_console_output(
+        lambda: cli_view.update((new_stimulus, None), EModelUpdateIdentifier.NEW_STIMULUS))
 
     assert outputted is not None
     assert len(outputted) != 0

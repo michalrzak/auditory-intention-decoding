@@ -25,7 +25,7 @@ class Model:
     def __init__(self) -> None:
         self.__stimulus_history = []
         self.__primer_history = []
-        self.__experiment_state = EExperimentState.INACTIVE  # TODO: This one should be passed in the constructor
+        self.__experiment_state = EExperimentState.INACTIVE
         self.__observers = []
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
@@ -36,14 +36,18 @@ class Model:
         """Observable. Register a view, which will get notified about changes in the model."""
         self.__observers.append(view)
 
-    def new_stimulus(self, stimulus: CreatedStimulus) -> None:
-        """ Add a new stimulus to the model.
+    def new_stimulus(self, stimulus: CreatedStimulus, label: Optional[str] = None) -> None:
+        """Add a new stimulus to the model.
+        TODO: The type is a patch-solution, to allow to log what type of stimulus was used. Ideally this would not work like
+         this and would be encoded in the stimulus somehow.
 
         :param stimulus: The to be added stimulus.
+        :param label: Optional parameter, allowing to pass what type of stimulus is added. Used only when notifying the
+         views
         :return: None
         """
         self.__stimulus_history.append(stimulus)
-        self.__notify(stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
+        self.__notify((stimulus, label), EModelUpdateIdentifier.NEW_STIMULUS)
 
     def new_primer(self, primer: str) -> None:
         """Adds a primer statement to the model.

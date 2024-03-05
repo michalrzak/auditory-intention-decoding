@@ -64,7 +64,7 @@ def test_register_view_and_new_stimulus_should_get_updated():
     model.register(mock_view)
     model.new_stimulus(new_stimulus)
 
-    verify(mock_view).update(new_stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
+    verify(mock_view).update((new_stimulus, None), EModelUpdateIdentifier.NEW_STIMULUS)
 
 
 def test_register_view_and_change_state_should_get_updated():

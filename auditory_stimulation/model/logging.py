@@ -26,8 +26,7 @@ class Logger(AObserver):
             logging.info(f"Added new primer {data}")
 
         elif identifier == EModelUpdateIdentifier.NEW_STIMULUS:
-            logging.info(f"Added new stimulus {data}")
-
+            logging.info(f"Added new stimulus {data[0]} of type {data[1]}")
 
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             logging.info(f"Changing experiment state to {data}")

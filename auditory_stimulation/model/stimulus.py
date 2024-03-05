@@ -28,6 +28,9 @@ class Stimulus:
                 raise ValueError("The time-stamp needs to be a proper interval, having the lower interval index at "
                                  "pos. 0 and the higer interval index at pos. 1")
 
+    def __hash__(self):
+        return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps)))
+
 
 @dataclass(frozen=True)
 class CreatedStimulus(Stimulus):
@@ -49,6 +52,10 @@ class CreatedStimulus(Stimulus):
                                stimulus.options,
                                stimulus.time_stamps,
                                modified_audio)
+
+    def __hash__(self):
+        return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps),
+                     self.modified_audio))
 
 
 def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
