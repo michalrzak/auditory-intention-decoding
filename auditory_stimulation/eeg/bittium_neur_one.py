@@ -5,7 +5,7 @@ also has to depend on psychopy.
 The regular `PyParallel` is in beta and had the last commit 5 years ago.
 """
 import time
-from typing import Any, Protocol
+from typing import Any, Protocol, Dict
 
 from psychopy.parallel import ParallelPort
 
@@ -26,22 +26,23 @@ class BittiumTriggerSender(AObserver):
     CAREFUL: This class is blocking whenever an update is received which triggers a trigger to be sent for the seconds
     specified in `trigger_duration_s`
 
-    TODO: This should maybe also be a singleton?
+    You should always use `getBittiumTriggerSender(...)` to initialize this class and never the constructor!
     """
 
     __parallel_port: IParallelPort
     __trigger_duration_s: float
 
-    def __init__(self, address: int, trigger_duration_s: float = 0.001):
+    def __init__(self, parallel_port: IParallelPort, trigger_duration_s: float) -> None:
         """Constructs a BittiumTriggerSender object.
+        You should always use `getBittiumTriggerSender(...)` to initialize this class and never the constructor!
 
-        :param address: The address of the parallel port where triggers will be sent
+        :param parallel_port: An object allowing to setData to a parallel port
         :param trigger_duration_s: How long the trigger pins are set to high when sending a trigger.
         """
-        self.__parallel_port = ParallelPort(address=address)
+        self.__parallel_port = parallel_port
         self.__trigger_duration_s = trigger_duration_s
 
-    def __send_trigger(self, trigger: ETrigger):
+    def __send_trigger(self, trigger: ETrigger) -> None:
         assert isinstance(trigger.value, int)
         self.__parallel_port.setData(trigger.value)
         time.sleep(self.__trigger_duration_s)
@@ -68,3 +69,22 @@ class BittiumTriggerSender(AObserver):
                 assert False
         else:
             assert False
+
+
+__trigger_sender_cache: Dict[int, BittiumTriggerSender] = {}
+TRIGGER_DURATION_S = 0.001
+
+
+def getBittiumTriggerSender(address: int) -> BittiumTriggerSender:
+    """Gets an instance of the BittiumTriggerSender. Each address is treated as a singleton (if this function is called
+    twice, with the same address, the same object is returned. This is to avoid having two object which can write onto
+    the same address of the parallel port).
+
+    :param address: The address of the parallel port where triggers will be sent
+    :return: A BittiumTriggerSender instance
+    """
+    if address not in __trigger_sender_cache:
+        parallel_port = ParallelPort(address=address)
+        __trigger_sender_cache[address] = BittiumTriggerSender(parallel_port, TRIGGER_DURATION_S)
+
+    return __trigger_sender_cache[address]

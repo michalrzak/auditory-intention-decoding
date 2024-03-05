@@ -184,7 +184,7 @@ package eeg {
    class BittiumTriggerSender<<Observer>> {
      -IParallelPort parallel_port
      -int trigger_duration_s
-     +BittiumTriggerSender(address: int, trigger_duration_s)
+     +BittiumTriggerSender(parallel_port, trigger_duration_s)
    }
 }
 BittiumTriggerSender -u-|> AObserver
