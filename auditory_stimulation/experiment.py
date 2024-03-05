@@ -1,6 +1,6 @@
 import copy
 import random
-from typing import List, Optional, Dict
+from typing import List, Optional, Collection
 
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
 from auditory_stimulation.model.experiment_state import EExperimentState
@@ -30,7 +30,7 @@ class Experiment:
     __view: AView
     __stimuli: List[Stimulus]
     __auditory_stimulus_factories: List[AAudioTaggerFactory]
-    __created_stimuli: Optional[Dict[CreatedStimulus, str]]
+    __created_stimuli: Optional[Collection[CreatedStimulus]]
 
     def __init__(self, model: Model, view: AView, stimuli: List[Stimulus],
                  auditory_stimulus_factories: List[AAudioTaggerFactory]) -> None:
@@ -76,11 +76,11 @@ class Experiment:
 
         random.shuffle(applied_factories)
 
-        created_stimuli = {}
+        created_stimuli = []
         for factory, stimulus in zip(applied_factories, self.__stimuli):
             auditory_stimulus = factory.create_auditory_stimulus(stimulus.audio, stimulus.time_stamps, )
             modified_audio = auditory_stimulus.create()
-            created_stimuli[CreatedStimulus.from_stimulus(stimulus, modified_audio)] = type(factory).__name__
+            created_stimuli.append(CreatedStimulus.from_stimulus(stimulus, modified_audio, type(factory).__name__))
 
         self.__created_stimuli = created_stimuli
 
@@ -108,7 +108,7 @@ class Experiment:
             self.__view.wait(PRIMER_SECS)
 
             for i in range(STIMULUS_REPEAT):
-                self.__model.new_stimulus(stimulus, self.__created_stimuli[stimulus])
+                self.__model.new_stimulus(stimulus)
 
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_OPEN)
         self.__view.wait(RESTING_STATE_SECS)

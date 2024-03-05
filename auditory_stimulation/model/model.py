@@ -38,8 +38,6 @@ class Model:
 
     def new_stimulus(self, stimulus: CreatedStimulus, label: Optional[str] = None) -> None:
         """Add a new stimulus to the model.
-        TODO: The type is a patch-solution, to allow to log what type of stimulus was used. Ideally this would not work like
-         this and would be encoded in the stimulus somehow.
 
         :param stimulus: The to be added stimulus.
         :param label: Optional parameter, allowing to pass what type of stimulus is added. Used only when notifying the
@@ -47,7 +45,7 @@ class Model:
         :return: None
         """
         self.__stimulus_history.append(stimulus)
-        self.__notify((stimulus, label), EModelUpdateIdentifier.NEW_STIMULUS)
+        self.__notify(stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
 
     def new_primer(self, primer: str) -> None:
         """Adds a primer statement to the model.

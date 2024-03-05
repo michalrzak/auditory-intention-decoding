@@ -42,7 +42,7 @@ class AView(AObserver):
         """
         if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
             # TODO: assert type is correct
-            self._update_new_stimulus(data[0])
+            self._update_new_stimulus(data)
         elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
             # TODO: assert type is correct
             self._update_new_primer(data)

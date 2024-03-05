@@ -2,7 +2,7 @@ import numbers
 import pathlib
 from dataclasses import dataclass
 from os import PathLike
-from typing import List, Dict, Any, Tuple, Collection
+from typing import List, Dict, Any, Tuple, Collection, Optional
 
 import yaml
 
@@ -34,16 +34,23 @@ class Stimulus:
 
 @dataclass(frozen=True)
 class CreatedStimulus(Stimulus):
-    """Extends the Stimulus class with the modified audio field. To be used once an auditory stimulation technique
-     is applied"""
+    """Extends the Stimulus class with the modified audio field. To be used once an auditory tagging technique
+     is applied
+
+     The used tagger is sort of a bad solution and this should be done a bit differently
+     """
     modified_audio: Audio
+    used_tagger_label: Optional[str]
 
     @staticmethod
-    def from_stimulus(stimulus: Stimulus, modified_audio: Audio) -> "CreatedStimulus":
+    def from_stimulus(stimulus: Stimulus, modified_audio: Audio,
+                      used_tagger_label: Optional[str] = None) -> "CreatedStimulus":
         """Helps to construct a CreatedStimulus from a Stimulus + a modified audio
 
         :param stimulus: A stimulus instance, which fields will be copied.
         :param modified_audio: The modified_audio to be added to the class.
+        :param used_tagger_label: An optional parameter, which can be used to add a label denoting which tagger was used
+         to create an audio.
         :return: A new instance of CreatedStimulus with the specified fields in stimulus and the modified_audio
         """
         return CreatedStimulus(stimulus.audio,
@@ -51,7 +58,8 @@ class CreatedStimulus(Stimulus):
                                stimulus.primer,
                                stimulus.options,
                                stimulus.time_stamps,
-                               modified_audio)
+                               modified_audio,
+                               used_tagger_label)
 
     def __hash__(self):
         return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps),

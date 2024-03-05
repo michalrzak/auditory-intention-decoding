@@ -43,10 +43,10 @@ class Logger(AObserver):
             logging.info(f"Added new primer {data}")
 
         elif identifier == EModelUpdateIdentifier.NEW_STIMULUS:
-            logging.info(f"Added new stimulus {data[0]} using {data[1]}")
+            logging.info(f"Added new stimulus {data}")
 
-            assert isinstance(data[0], CreatedStimulus)
-            stimulus: CreatedStimulus = data[0]
+            assert isinstance(data, CreatedStimulus)
+            stimulus: CreatedStimulus = data
 
             if stimulus not in self.__exported_stimuli:
                 export_file_name = self.__exports_directory / f"stim_audio_{len(self.__exported_stimuli)}.wav"
