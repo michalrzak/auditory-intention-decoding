@@ -36,12 +36,10 @@ class Model:
         """Observable. Register a view, which will get notified about changes in the model."""
         self.__observers.append(view)
 
-    def new_stimulus(self, stimulus: CreatedStimulus, label: Optional[str] = None) -> None:
+    def new_stimulus(self, stimulus: CreatedStimulus) -> None:
         """Add a new stimulus to the model.
 
         :param stimulus: The to be added stimulus.
-        :param label: Optional parameter, allowing to pass what type of stimulus is added. Used only when notifying the
-         views
         :return: None
         """
         self.__stimulus_history.append(stimulus)
