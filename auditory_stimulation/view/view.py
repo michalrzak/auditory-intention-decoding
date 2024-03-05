@@ -1,13 +1,14 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import Callable, Any, Dict, Optional
 
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
+from auditory_stimulation.model.model import AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.model.stimulus import CreatedStimulus
 
 
-class AView(ABC):
+class AView(AObserver):
     """Abstract class, to be implemented by new Views of the MVC pattern.
     Implements the Observer pattern.
     """

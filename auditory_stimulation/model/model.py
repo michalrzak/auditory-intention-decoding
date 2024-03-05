@@ -1,11 +1,17 @@
 import logging
+from abc import ABC, abstractmethod
 from typing import List, Any, Optional
 
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.model.stimulus import CreatedStimulus
-from auditory_stimulation.view.view import AView
+
+
+class AObserver(ABC):
+    @abstractmethod
+    def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
+        ...
 
 
 class Model:
@@ -15,7 +21,7 @@ class Model:
     __primer_history: List[str]
     __experiment_state: EExperimentState
 
-    __views: List[AView]
+    __observers: List[AObserver]
 
     __logger: logging.Logger
 
@@ -23,17 +29,17 @@ class Model:
         self.__stimulus_history = []
         self.__primer_history = []
         self.__experiment_state = EExperimentState.INACTIVE  # TODO: This one should be passed in the constructor
-        self.__views = []
+        self.__observers = []
         self.__logger = logger
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
-        for view in self.__views:
+        for view in self.__observers:
             view.update(data, identifier)
             self.__logger.info(f"Notifying view {view} with data {data}")
 
-    def register(self, view: AView) -> None:
+    def register(self, view: AObserver) -> None:
         """Observable. Register a view, which will get notified about changes in the model."""
-        self.__views.append(view)
+        self.__observers.append(view)
         self.__logger.info(f"Registered view {view}")
 
     def new_stimulus(self, stimulus: CreatedStimulus) -> None:
