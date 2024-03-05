@@ -17,7 +17,10 @@ LOGGING_DIRECTORY = pathlib.Path("logs/")
 
 
 def main() -> None:
-    model = Model()
+    stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
+    model = Model(stimuli, [AMTaggerFactory(42, clicking_signal),
+                            FMTaggerFactory(40),
+                            NoiseTaggingTaggerFactory(126, 256)])
 
     logger = Logger(LOGGING_DIRECTORY)
     model.register(logger)
@@ -28,12 +31,7 @@ def main() -> None:
 
     model.register(view)
 
-    stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
-
-    experiment = Experiment(model, view, stimuli, [AMTaggerFactory(42, clicking_signal),
-                                                   FMTaggerFactory(40),
-                                                   NoiseTaggingTaggerFactory(126, 256)])
-    experiment.create_stimuli()
+    experiment = Experiment(model, view)
     experiment.run()
 
 

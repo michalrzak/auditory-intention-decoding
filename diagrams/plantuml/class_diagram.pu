@@ -40,7 +40,7 @@ package model {
     class Model <<Observable>>{
         -List[str] primer_history
 
-        -Model()
+        -Model(raw_stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
         -void notify(data: Any, identifier: EModelUpdateIdentifier)
         +void register(view: AObserver)
         +void new_stimulus(stimulus: CreatedStimulus)
@@ -80,13 +80,19 @@ package model {
     Stimulus "1" *-- "1" Audio: audio
 
     class CreatedStimulus {
+        -Stimulus stimulus
         +Optional[str] used_tagger_label
-        +CreatedStimulus {static} from_stimulus(stimulus: Stimulus, modified_audio: Audio)
+
+        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio)
+        +str prompt()
+        +str primer()
+        +List[str] options()
+        +List[Tuple[float, float]] time_stamps()
     }
     CreatedStimulus "1" *-l- "1" Audio: modified_audio
 
 
-    CreatedStimulus --|> Stimulus
+    CreatedStimulus "*" *-- "1" Stimulus
 }
 
 Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
@@ -219,11 +225,12 @@ class Experiment {
     +void run()
 }
 Experiment "1" *-d- "1" Model
-Experiment "1" *-l- "1" AView
-Experiment "1" *-u- "*" AAudioTaggerFactory
-Experiment "1" *-- "*" CreatedStimulus
+Experiment "1" *-- "1" AView
+
+Model "1" *-u- "*" AAudioTaggerFactory
+Model "1" *-- "*" Stimulus: raw_stimuli
+Model "1" *-- "*" CreatedStimulus: created_stimuli
 note on link: Created by calling  `create_stimuli()`
 
-
-
+Experiment -[hidden] auditory_tagging
 @enduml
