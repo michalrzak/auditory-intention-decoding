@@ -1,4 +1,3 @@
-import logging
 from abc import ABC, abstractmethod
 from typing import List, Any, Optional
 
@@ -23,24 +22,19 @@ class Model:
 
     __observers: List[AObserver]
 
-    __logger: logging.Logger
-
-    def __init__(self, logger: logging.Logger) -> None:
+    def __init__(self) -> None:
         self.__stimulus_history = []
         self.__primer_history = []
         self.__experiment_state = EExperimentState.INACTIVE  # TODO: This one should be passed in the constructor
         self.__observers = []
-        self.__logger = logger
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
         for observer in self.__observers:
             observer.update(data, identifier)
-            self.__logger.info(f"Notifying view {observer} with data {data}")
 
     def register(self, view: AObserver) -> None:
         """Observable. Register a view, which will get notified about changes in the model."""
         self.__observers.append(view)
-        self.__logger.info(f"Registered view {view}")
 
     def new_stimulus(self, stimulus: CreatedStimulus) -> None:
         """ Add a new stimulus to the model.
@@ -48,8 +42,6 @@ class Model:
         :param stimulus: The to be added stimulus.
         :return: None
         """
-        self.__logger.info(f"Added new stimulus {stimulus}")
-
         self.__stimulus_history.append(stimulus)
         self.__notify(stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
 
@@ -59,8 +51,6 @@ class Model:
         :param primer: The to be added primer statement.
         :return: None
         """
-        self.__logger.info(f"Added new primer {primer}")
-
         self.__primer_history.append(primer)
         self.__notify(primer, EModelUpdateIdentifier.NEW_PRIMER)
 
@@ -70,11 +60,7 @@ class Model:
         :param new_state: The to be changed to experiment state.
         :return: None
         """
-        self.__logger.info(f"Changing experiment state to {new_state}")
         assert new_state != self.__experiment_state
-        if new_state == self.__experiment_state:
-            self.__logger.warning("The state was already at the changed value.")
-
         self.__experiment_state = new_state
         self.__notify(self.__experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
 
