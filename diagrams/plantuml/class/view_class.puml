@@ -1,0 +1,35 @@
+@startuml
+
+package model {
+    abstract class AObserver {
+        +void update(data: Any, identifier: EModelUpdateIdentifier)
+    }
+}
+
+package view {
+    abstract class AView<<Observer>> {
+        #Callable[[Audio], None] sound_player
+        #Dict[EExperimentState, Optional[str]] experiment_texts
+
+        +AView(sound_player, experiment_texts)
+        #void {abstract} update_new_stimulus(stimulus: CreatedStimulus)
+        #void {abstract} updated_new_primer(primer: str)
+        #void {abstract} update_experiment_state_changed(data: EExperimentState)
+        +void update(data: Any, identifier: EModelUpdateIdentifier
+        +bool {abstract} get_confirmation()
+        +void {abstract} wait(secs: int)
+    }
+
+    class PsychopyView {
+    }
+
+    class CLIView {
+    }
+}
+
+AView <|-- PsychopyView
+AView <|-- CLIView
+
+AView -r-|> AObserver
+
+@enduml

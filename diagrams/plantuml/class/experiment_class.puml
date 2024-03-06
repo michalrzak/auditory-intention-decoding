@@ -1,0 +1,41 @@
+@startuml
+
+package model {
+    class Model <<Observable>>{
+        -List[str] primer_history
+
+        -Model(raw_stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
+        -void notify(data: Any, identifier: EModelUpdateIdentifier)
+        +void register(view: AObserver)
+        +void new_stimulus(stimulus: CreatedStimulus)
+        +void new_primer(stimulus: CreatedStimulus)
+        +void change_experiment_state(new_state: EExperimentState)
+    }
+
+}
+
+package view {
+    abstract class AView<<Observer>> {
+        #Callable[[Audio], None] sound_player
+        #Dict[EExperimentState, Optional[str]] experiment_texts
+
+        +AView(sound_player, experiment_texts)
+        #void {abstract} update_new_stimulus(stimulus: CreatedStimulus)
+        #void {abstract} updated_new_primer(primer: str)
+        #void {abstract} update_experiment_state_changed(data: EExperimentState)
+        +void update(data: Any, identifier: EModelUpdateIdentifier
+        +bool {abstract} get_confirmation()
+        +void {abstract} wait(secs: int)
+    }
+}
+
+class Experiment {
+    +Experiment(model: Model, view: AView, stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
+    +void create_stimuli()
+    +void run()
+}
+Experiment "1" *-- "1" Model
+Experiment "1" *-- "1" AView
+
+Model .r.> AView: notifies
+@enduml

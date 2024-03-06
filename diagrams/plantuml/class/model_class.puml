@@ -1,0 +1,88 @@
+@startuml
+
+class Audio {
+    +NDArray[float] array
+    +int sampling_frequency
+}
+package auditory_tagging {
+   abstract class AAudioTaggerFactory {
+      +AAudioTagger {abstract} create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+}
+
+package model {
+    abstract class AObserver {
+        +void update(data: Any, identifier: EModelUpdateIdentifier)
+    }
+
+    class Model <<Observable>>{
+        -List[str] primer_history
+
+        -Model(raw_stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
+        -void notify(data: Any, identifier: EModelUpdateIdentifier)
+        +void register(view: AObserver)
+        +void new_stimulus(stimulus: CreatedStimulus)
+        +void new_primer(stimulus: CreatedStimulus)
+        +void change_experiment_state(new_state: EExperimentState)
+    }
+
+    class Logger<<Observer>> {
+        -Path exports_directory
+        +Logger(logging_directory: PathLike)
+    }
+    Logger -u-|> AObserver
+
+    package constants {
+    enum EExperimentState {
+        INACTIVE
+        INTRODUCTION
+        RESTING_STATE_EYES_OPEN
+        RESTING_STATE_EYES_CLOSED
+        EXPERIMENT_INTRODUCTION
+        EXPERIMENT
+    }
+
+    enum EModelUpdateIdentifier {
+        NEW_STIMULUS
+        NEW_PRIMER
+        EXPERIMENT_STATE_CHANGED
+    }
+    }
+
+    class Stimulus {
+        +str prompt
+        +str primer
+        +List[str] options
+        +List[Tuple[float, float]] time_stamps
+    }
+    Stimulus "1" *-- "1" Audio: audio
+
+    class CreatedStimulus {
+        -Stimulus stimulus
+        +Optional[str] used_tagger_label
+
+        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio)
+        +str prompt()
+        +str primer()
+        +List[str] options()
+        +List[Tuple[float, float]] time_stamps()
+    }
+    CreatedStimulus "1" *-l- "1" Audio: modified_audio
+
+
+    CreatedStimulus "*" *-- "1" Stimulus
+}
+
+Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
+Model "*" o--- "1" EExperimentState: "experiment_state"
+Model "1" o-l-- "*" AObserver
+Model ..> EModelUpdateIdentifier: "uses"
+
+AObserver .l.> constants: "uses"
+
+Model "1" *-u- "*" AAudioTaggerFactory
+Model "1" *-- "*" Stimulus: raw_stimuli
+Model "1" *-- "*" CreatedStimulus: created_stimuli
+note on link: Created by calling  `create_stimuli()`
+
+@enduml
