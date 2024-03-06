@@ -16,12 +16,13 @@ poetry install
 This should automatically create a virtual environment of the required Python version and install all dependencies.
 
 **Note 1:** The project requires a `Python 3.8` installation on your system.
-**Note 2:** I prefer to have my virtual environment saved in the repository folder, which is not the default behavior of Poetry. To change this, follow the instructions on the following page: <https://python-poetry.org/docs/configuration/#virtualenvsin-project>
+
+**Note 2:** I prefer to have my virtual environment saved in the repository folder, which is not the default behavior of Poetry. To change this, follow the instructions outlined in: <https://python-poetry.org/docs/configuration/#virtualenvsin-project>
 
 ## Linux:
 
 ### wxPython
-Unfortunately, `Psychopy`, a project dependency, requires `wxPython`, which is relatively annoying to install on Linux, as pre-build Linux wheels are **not** provided in `PyPi`. This means that running `poetry install` will most likely fail, as there probably will be some build dependencies missing.
+Unfortunately, `Psychopy` requires `wxPython`, which is relatively annoying to install on Linux as pre-build Linux wheels are **not** provided in `PyPi`. This means that running `poetry install` will most likely fail, as there probably will be some build dependencies missing.
 
 #### Building wxPython:
 One solution is to build `wxPython` yourself. For this install all [required build-dependencies](https://wxpython.org/blog/2017-08-17-builds-for-linux-with-pip/index.html) (different for each distro) and then run 
@@ -82,4 +83,38 @@ The application either quits automatically once the experiment is over, or you c
 
 **Note:** Pressing `ESC` quits the application after the current stimulus is finished presenting, so be a little patient.
 
+# Adding stimuli:
+To add new stimuli or change the existing stimuli simply edit the file [stimuli.yaml](auditory_stimulation/stimuli.yaml). For the structure of the file, best look at the existing entries. A formal definition is outlined below:
+```yaml
+<name of stimulus>:
+  file: <path to wav file>
+  prompt: <text, containing the transcription of the wav file>
+  primer: <Text which is shown before the stimulus is played, priming the subject for one of the options>
+  options:
+    - <option A>
+    - <option B>
+    - <option C>
+    - <etc.>
+  time-stamps:
+    - [ <left A>, <right A> ]
+    - [ <left B>, <right B> ]
+    - [ <left C>, <right C> ]
+    - [ <left etc.>, <right etc.> ]
+```
+Note that even though you can specify an arbitrary amount of options and time-stamps, the amount of options must match the amount of time-stamps.
 
+The time-stamps highlight when the given option was said inside of the wav file and are used to apply a tagger to that portion of the audio.
+
+#  Changing the shown experiment text
+The text shown during the experiment is defined inside of [experiment_texts.yaml](auditory_stimulation/experiment_texts.yaml). It defines what text is shown for each entry of [EExperimentState](auditory_stimulation/model/experiment_state.py). The order of the shown `EExperimentState` is defined inside of the [Experiment](auditory_stimulation/experiment.py). Leaving the option empty indicates that no-update should happen when this option is presented.
+```yaml
+inactive: <text or empty>
+introduction: <text or empty>
+resting-state-eyes-open: <text or empty>
+resting-state-eyes-closed: <text or empty>
+experiment-introduction: <text or empty>
+experiment: <text or empty>
+```
+
+# Changing the experiment flow
+To change the experiment flow, edit [Experiment](auditory_stimulation/experiment.py). This class acts as the `Controller` of the `MVC` pattern and guards when what happens during the experiment. Note that updates to the model are propagated to the view using the Observer pattern, hence it is not necessary to update the view manually from the `Experiment`
