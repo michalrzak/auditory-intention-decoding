@@ -1,0 +1,26 @@
+@startuml
+
+package model {
+    abstract class AObserver {
+        +void update(data: Any, identifier: EModelUpdateIdentifier)
+    }
+}
+
+
+package eeg {
+   enum ETrigger{
+     +ETrigger {static} get_trigger(data: Any, identifier: EModelUpdateIdentifier
+   }
+   note bottom of ETrigger: Contains tha mappings to\nthe actual trigger numbers\nsent
+
+   class BittiumTriggerSender<<Observer>> {
+     -IParallelPort parallel_port
+     -int trigger_duration_s
+     +BittiumTriggerSender(parallel_port, trigger_duration_s)
+   }
+}
+BittiumTriggerSender -[norank]r-|> AObserver
+BittiumTriggerSender ..> ETrigger: "uses"
+
+
+@enduml

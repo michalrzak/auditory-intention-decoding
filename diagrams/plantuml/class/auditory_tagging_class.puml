@@ -1,0 +1,102 @@
+@startuml
+
+class Audio {
+    +NDArray[float] array
+    +int sampling_frequency
+}
+
+package auditory_tagging {
+    abstract class AAuditoryTagger {
+      #list[ [float, float] ] stimuli_intervals
+
+      +AAuditoryTagger(audio, stimuli)
+      +Audio {abstract} create()
+    }
+
+    AAuditoryTagger "1" *-[norank]- "1" Audio: audio
+
+
+    abstract class AAudioTaggerFactory {
+      +AAudioTagger {abstract} create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+
+    package assr_tagger {
+        class AMTagger {
+          -int frequency
+          -Callable[[int, int, int], NDArray[float] tag_generator
+
+          +ASSRTagger(audio, stimuli_intervals, frequency, tag_generator)
+          +Audio create()
+        }
+
+        class FMTagger {
+          -int frequency
+
+          +FMTagger(audio, stimuli_intervals, frequency)
+          +Audio create()
+
+        }
+
+        class AMTaggerFactory {
+          -int frequency
+          -Callable[[int, int, int], NDArray[float]] tag_generator
+
+          +AMTaggerFactory(frequency, tag_generator)
+          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+        }
+
+        class FMTaggerFactory {
+          -int frequency
+
+          +FMTaggerFactory(frequency)
+          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+        }
+    }
+
+    class NoiseTaggingTagger {
+      -Optional[int] seed
+      -int bit_width
+      -int length_bit
+      +Optional[Code] code
+
+      +NoiseTaggingTagger(audio, stimuli_intervals, bits_per_second: int, length_bit, seed)
+      +Audio create()
+      -void __generate_code()
+      -void __get_code(length: int)
+    }
+
+    class NoiseTaggingTaggerFactory {
+      -int bits_per_second
+      -int length_bit
+      -Optional[int] seed
+
+      +NoiseTaggingTaggerFactory(bits_per_second, length_bit, seed)
+      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+
+    class RawTagger {
+      +Audio create()
+    }
+
+    class RawTaggerFactory {
+      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+}
+
+AAuditoryTagger <|-- RawTagger
+AAuditoryTagger <|-- NoiseTaggingTagger
+AAuditoryTagger <|-- AMTagger
+AAuditoryTagger <|-- FMTagger
+
+AAudioTaggerFactory <|-u- AMTaggerFactory
+AAudioTaggerFactory <|-u- FMTaggerFactory
+AAudioTaggerFactory <|-u- NoiseTaggingTaggerFactory
+AAudioTaggerFactory <|-u- RawTaggerFactory
+
+AMTagger <.. AMTaggerFactory: "creates"
+FMTagger <.. FMTaggerFactory: "creates"
+NoiseTaggingTagger <.. NoiseTaggingTaggerFactory: "creates"
+RawTagger <.. RawTaggerFactory: "creates"
+
+
+@enduml
