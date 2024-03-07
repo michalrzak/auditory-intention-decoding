@@ -1,6 +1,9 @@
 inactive:
 introduction: "Welcome to my experiment. This is a temporary introduction screen which will explain all details of the experiment in the future."
+resting-state-eyes-open-introduction: "We will now measure your resting state brain waves. Please keep your eyes open and try to blink as little as possible until the next section is over."
 resting-state-eyes-open: "Measuring eyes open resting state. Please relax and try to blink as little as possible."
+resting-state-eyes-closed-introduction: "Nicely done! In the next section, please keep your eyes closed until you hear a beep."
 resting-state-eyes-closed: "Measuring eyes closed resting state. If you can read this you are doing it wrong."
 experiment-introduction: "Now the real experiment starts. You will be presented with a primer statement followed by the stimulus..."
 experiment:
+break: "Take a short break and press space when you are ready."
