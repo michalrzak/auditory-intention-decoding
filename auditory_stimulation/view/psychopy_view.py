@@ -1,5 +1,6 @@
 from typing import Callable, Protocol, Dict, Optional, Tuple, List
 
+import numpy as np
 import psychopy
 import psychopy.visual
 from psychopy.hardware import keyboard
@@ -19,6 +20,11 @@ EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.8, 0.5)
 CONFIRMATION_TEXT = "Please press 'space' to continue"
 CONFIRMATION_TEXT_BOX_POSITION = (0, -0.8)
 
+BEEP_FS = 44100
+BEEP_LENGTH_SECS = 0.5
+BEEP_NOTE = 440  # A4
+BEEP_VOLUME = 0.5
+
 
 class Drawable(Protocol):
     def draw(self) -> None:
@@ -31,6 +37,8 @@ class PsychopyView(AView):
     __window: psychopy.visual.Window
     __keyboard: psychopy.hardware.keyboard.Keyboard
     __draw_buffer: List[Drawable]
+    __previous_state: Optional[EExperimentState]
+    __beep_audio: Audio
 
     def __init__(self,
                  sound_player: Callable[[Audio], None],
@@ -46,6 +54,13 @@ class PsychopyView(AView):
         self.__window = window
         self.__keyboard = keyboard.Keyboard()
         self.__draw_buffer = []
+        self.__previous_state = None
+
+        sample_count = BEEP_FS * BEEP_LENGTH_SECS
+        samples = 2 * np.pi / BEEP_NOTE * np.arange(sample_count)
+        signal = np.sin(samples, dtype=np.float32) * BEEP_VOLUME
+        signal_shaped = np.ascontiguousarray(np.array([signal, signal]).T)
+        self.__beep_audio = Audio(signal_shaped, BEEP_FS)
 
     def __try_to_quit(self) -> None:
         if len(self.__keyboard.getKeys(["escape"])) != 0:
@@ -62,6 +77,9 @@ class PsychopyView(AView):
             buffered_item.draw()
 
         self.__window.flip()
+
+    def __beep(self):
+        self._sound_player(self.__beep_audio)
 
     def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
         self.__try_to_quit()
@@ -85,7 +103,13 @@ class PsychopyView(AView):
         # if the data was not provided, skip showing anything
         assert data in self._experiment_texts
         if data not in self._experiment_texts or self._experiment_texts[data] is None:
-            return
+            self._experiment_texts[data] = ""
+
+        # if the experiment state changed from resting state eyes closed, need to beep to notify the user to open their
+        #  eyes
+        if self.__previous_state == EExperimentState.RESTING_STATE_EYES_CLOSED:
+            self.__beep()
+        self.__previous_state = data
 
         text = self.__create_text_box(self._experiment_texts[data], EXPERIMENT_STATE_TEXT_BOX_POSITION,
                                       EXPERIMENT_STATE_TEXT_BOX_SIZE[0], EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
@@ -99,7 +123,7 @@ class PsychopyView(AView):
 
         self.__keyboard.clearEvents()  # clear keys in case the key was already pressed before
         while len(self.__keyboard.getKeys(["space"])) == 0:
-            ...
+            self.__try_to_quit()
 
         return True
 

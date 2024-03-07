@@ -8,7 +8,9 @@ import yaml
 class EExperimentState(Enum):
     INACTIVE = "inactive"
     INTRODUCTION = "introduction"
+    RESTING_STATE_EYES_OPEN_INTRODUCTION = "resting-state-eyes-open-introduction"
     RESTING_STATE_EYES_OPEN = "resting-state-eyes-open"
+    RESTING_STATE_EYES_CLOSED_INTRODUCTION = "resting-state-eyes-closed-introduction"
     RESTING_STATE_EYES_CLOSED = "resting-state-eyes-closed"
     EXPERIMENT_INTRODUCTION = "experiment-introduction"
     EXPERIMENT = "experiment"

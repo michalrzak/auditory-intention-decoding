@@ -44,9 +44,13 @@ class Experiment:
         self.__model.change_experiment_state(EExperimentState.INTRODUCTION)
         self.__view.get_confirmation()
 
+        self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_OPEN_INTRODUCTION)
+        self.__view.get_confirmation()
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_OPEN)
         self.__view.wait(RESTING_STATE_SECS)
 
+        self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_CLOSED_INTRODUCTION)
+        self.__view.get_confirmation()
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_CLOSED)
         self.__view.wait(RESTING_STATE_SECS)
 
