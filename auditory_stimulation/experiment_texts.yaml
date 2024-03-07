@@ -4,3 +4,4 @@ resting-state-eyes-open: "Measuring eyes open resting state. Please relax and tr
 resting-state-eyes-closed: "Measuring eyes closed resting state. If you can read this you are doing it wrong."
 experiment-introduction: "Now the real experiment starts. You will be presented with a primer statement followed by the stimulus..."
 experiment:
+break: "Take a short break and press space when you are ready."

@@ -12,6 +12,7 @@ class EExperimentState(Enum):
     RESTING_STATE_EYES_CLOSED = "resting-state-eyes-closed"
     EXPERIMENT_INTRODUCTION = "experiment-introduction"
     EXPERIMENT = "experiment"
+    BREAK = "break"
 
 
 def __experiment_text_validate(experiment_texts_raw: Dict[str, Any]) -> None:
