@@ -55,7 +55,7 @@ __trigger_sender_cache: Dict[int, BittiumTriggerSender] = {}
 TRIGGER_DURATION_S = 0.001
 
 
-def getBittiumTriggerSender(address: int) -> BittiumTriggerSender:
+def get_bittium_trigger_sender(address: int) -> BittiumTriggerSender:
     """Gets an instance of the BittiumTriggerSender. Each address is treated as a singleton (if this function is called
     twice, with the same address, the same object is returned. This is to avoid having two object which can write onto
     the same address of the parallel port).
