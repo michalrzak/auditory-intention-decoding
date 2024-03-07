@@ -26,6 +26,10 @@ class Audio:
         if np.any(self.array > 1) or np.any(self.array < -1):
             raise ValueError("The supplied audio must be in the range -1 and 1")
 
+    @property
+    def secs(self) -> float:
+        return self.array.shape[0] / self.sampling_frequency
+
     def __copy__(self) -> "Audio":
         return Audio(np.copy(self.array), self.sampling_frequency)
 

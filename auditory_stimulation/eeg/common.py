@@ -6,8 +6,11 @@ from auditory_stimulation.model.model_update_identifier import EModelUpdateIdent
 
 
 class ETrigger(Enum):
-    NEW_STIMULUS = 100
-    NEW_PROMPT = 101
+    NEW_PROMPT = 100
+    NEW_STIMULUS = 101
+    END_STIMULUS = 102
+    OPTION_START = 111
+    OPTION_END = 112
     INTRODUCTION = 1
     EXPERIMENT_INTRODUCTION = 2
     RESTING_STATE_EYES_OPEN = 3
