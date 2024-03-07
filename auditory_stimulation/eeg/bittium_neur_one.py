@@ -4,16 +4,13 @@ also has to depend on psychopy.
 
 The regular `PyParallel` is in beta and had the last commit 5 years ago.
 """
-import threading
 import time
-from typing import Any, Protocol, Dict
+from typing import Protocol, Dict
 
 from psychopy.parallel import ParallelPort
 
 from auditory_stimulation.eeg.common import ETrigger
-from auditory_stimulation.model.model import AObserver
-from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.eeg.trigger_sender import ATriggerSender
 
 
 class IParallelPort(Protocol):
@@ -21,13 +18,10 @@ class IParallelPort(Protocol):
         ...
 
 
-class BittiumTriggerSender(AObserver):
+class BittiumTriggerSender(ATriggerSender):
     """Can be used to observe the model and send relevant triggers to the data for analysis. Requires a parallel port.
 
-    CAREFUL: This class is blocking whenever an update is received which triggers a trigger to be sent for the seconds
-    specified in `trigger_duration_s`
-
-    You should always use `getBittiumTriggerSender(...)` to initialize this class and never the constructor!
+    You should always use `get_bittium_trigger_sender(...)` to initialize this class and never the constructor!
     """
 
     __parallel_port: IParallelPort
@@ -35,7 +29,7 @@ class BittiumTriggerSender(AObserver):
 
     def __init__(self, parallel_port: IParallelPort, trigger_duration_s: float) -> None:
         """Constructs a BittiumTriggerSender object.
-        You should always use `getBittiumTriggerSender(...)` to initialize this class and never the constructor!
+        You should always use `get_bittium_trigger_sender(...)` to initialize this class and never the constructor!
 
         :param parallel_port: An object allowing to setData to a parallel port
         :param trigger_duration_s: How long the trigger pins are set to high when sending a trigger.
@@ -43,31 +37,11 @@ class BittiumTriggerSender(AObserver):
         self.__parallel_port = parallel_port
         self.__trigger_duration_s = trigger_duration_s
 
-    def __send_trigger(self, trigger: ETrigger) -> None:
+    def _send_trigger(self, trigger: ETrigger) -> None:
         assert isinstance(trigger.value, int)
         self.__parallel_port.setData(trigger.value)
         time.sleep(self.__trigger_duration_s)
         self.__parallel_port.setData(0)
-
-    def __queue_trigger(self, trigger: ETrigger, secs: float) -> None:
-        def wait_and_send():
-            time.sleep(secs)
-            self.__send_trigger(trigger)
-
-        threading.Thread(target=wait_and_send)
-
-    def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
-        self.__send_trigger(ETrigger.get_trigger(data, identifier))
-
-        # in case a new stimulus is received, also queue sending trigger after it finishes playing and at the beginning
-        #  of each option
-        if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
-            assert isinstance(data, CreatedStimulus)
-            for time_stamp in data.time_stamps:
-                self.__queue_trigger(ETrigger.OPTION_START, time_stamp[0])
-                self.__queue_trigger(ETrigger.OPTION_END, time_stamp[1])
-
-            self.__queue_trigger(ETrigger.END_STIMULUS, data.audio.secs)
 
 
 __trigger_sender_cache: Dict[int, BittiumTriggerSender] = {}

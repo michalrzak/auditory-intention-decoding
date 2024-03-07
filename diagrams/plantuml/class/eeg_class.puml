@@ -13,13 +13,19 @@ package eeg {
    }
    note bottom of ETrigger: Contains tha mappings to\nthe actual trigger numbers\nsent
 
+    abstract class TriggerSender {
+        #void {abstract} send_trigger(trigger: ETrigger)
+    }
+
    class BittiumTriggerSender<<Observer>> {
      -IParallelPort parallel_port
      -int trigger_duration_s
      +BittiumTriggerSender(parallel_port, trigger_duration_s)
+     #void send_trigger(trigger: ETrigger)
    }
 }
-BittiumTriggerSender -[norank]r-|> AObserver
+TriggerSender -u-|> AObserver
+BittiumTriggerSender -r-|> TriggerSender
 BittiumTriggerSender ..> ETrigger: "uses"
 
 
