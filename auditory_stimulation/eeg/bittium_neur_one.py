@@ -4,6 +4,7 @@ also has to depend on psychopy.
 
 The regular `PyParallel` is in beta and had the last commit 5 years ago.
 """
+import threading
 import time
 from typing import Any, Protocol, Dict
 
@@ -12,6 +13,7 @@ from psychopy.parallel import ParallelPort
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.model import AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
+from auditory_stimulation.model.stimulus import CreatedStimulus
 
 
 class IParallelPort(Protocol):
@@ -47,8 +49,25 @@ class BittiumTriggerSender(AObserver):
         time.sleep(self.__trigger_duration_s)
         self.__parallel_port.setData(0)
 
+    def __queue_trigger(self, trigger: ETrigger, secs: float) -> None:
+        def wait_and_send():
+            time.sleep(secs)
+            self.__send_trigger(trigger)
+
+        threading.Thread(target=wait_and_send)
+
     def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
         self.__send_trigger(ETrigger.get_trigger(data, identifier))
+
+        # in case a new stimulus is received, also queue sending trigger after it finishes playing and at the beginning
+        #  of each option
+        if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
+            assert isinstance(data, CreatedStimulus)
+            for time_stamp in data.time_stamps:
+                self.__queue_trigger(ETrigger.OPTION_START, time_stamp[0])
+                self.__queue_trigger(ETrigger.OPTION_END, time_stamp[1])
+
+            self.__queue_trigger(ETrigger.END_STIMULUS, data.audio.secs)
 
 
 __trigger_sender_cache: Dict[int, BittiumTriggerSender] = {}
