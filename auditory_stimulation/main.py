@@ -29,7 +29,7 @@ def main() -> None:
     window = psychopy.visual.Window(fullscr=True)
     view = PsychopyView(psychopy_player, experiment_texts, window)
 
-    model.register(view)
+    model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
     experiment = Experiment(model, view)
     experiment.run()
