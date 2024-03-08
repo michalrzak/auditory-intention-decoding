@@ -1,7 +1,8 @@
 import copy
 import random
 from abc import ABC, abstractmethod
-from typing import List, Any, Optional, Collection
+from bisect import bisect_right
+from typing import List, Any, Optional, Collection, Tuple
 
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
@@ -27,7 +28,7 @@ class Model:
     __primer_history: List[str]
     __experiment_state: EExperimentState
 
-    __observers: List[AObserver]
+    __observers: List[Tuple[AObserver, int]]
 
     def __init__(self,
                  raw_stimuli: Collection[Stimulus],
@@ -82,12 +83,29 @@ class Model:
         self.__created_stimuli = created_stimuli
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
-        for observer in self.__observers:
+        for observer, _ in self.__observers:
             observer.update(data, identifier)
 
-    def register(self, view: AObserver) -> None:
-        """Observable. Register a view, which will get notified about changes in the model."""
-        self.__observers.append(view)
+    def register(self, observer: AObserver, priority: int = 99) -> None:
+        """Observable. Register a view, which will get notified about changes in the model.
+
+        :param observer: The to be registered observer.
+        :param priority: Positive integer in the range [1; 99]. The smaller the number the higher priority an observer
+         has. Observers are executed in the order of their priority. This parameter is to be used if some
+         observers are time sensitive (set a high priority, i.e. close to 1) or if some observers are blocking,
+         and should be executed last (set a low priority, i.e. close to 2). Can be also used to define the order in
+         which the observers get updated
+        """
+
+        if not (1 <= priority <= 99):
+            raise ValueError("Priority needs to be in the range 1 to 99")
+
+        # insert the new observer into the observer list, while keeping the list sorted by the priority
+        keys = [x[1] for x in self.__observers]
+        # finds the insertion to the right of the last key; where key <= priority
+        insertion_point = bisect_right(keys, priority)
+        # insert the observer and priority based on the computed key
+        self.__observers.insert(insertion_point, (observer, priority))
 
     def present_stimulus(self, stimulus: CreatedStimulus) -> None:
         """Mark the given stimulus as presented.

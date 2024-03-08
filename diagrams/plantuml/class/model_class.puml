@@ -20,7 +20,7 @@ package model {
 
         -Model(raw_stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
         -void notify(data: Any, identifier: EModelUpdateIdentifier)
-        +void register(view: AObserver)
+        +void register(view: AObserver, priority: int)
         +void new_stimulus(stimulus: CreatedStimulus)
         +void new_primer(stimulus: CreatedStimulus)
         +void change_experiment_state(new_state: EExperimentState)
