@@ -1,9 +1,10 @@
 import mockito
+import pytest
 from mockito import verify, when, ANY
 
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.model.model import Model
+from auditory_stimulation.model.model import Model, AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.model.stimulus import CreatedStimulus, Stimulus
 from auditory_stimulation.view.view import AView
@@ -14,6 +15,12 @@ def create_model() -> Model:
     raw_stimuli = [mockito.mock(Stimulus)]
     auditory_tagger_factories = [mockito.mock(AAudioTaggerFactory)]
     return Model(raw_stimuli, auditory_tagger_factories)
+
+
+def mock_observer() -> AObserver:
+    observer = mockito.mock(AObserver)
+    when(observer).update(ANY, ANY).thenReturn(None)
+    return observer
 
 
 def test_new_stimulus():
@@ -74,15 +81,54 @@ def test_register_view_and_new_stimulus_should_get_updated():
     verify(mock_view).update(new_stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
 
 
-def test_register_view_and_change_state_should_get_updated():
+@pytest.mark.parametrize("experiment_state", EExperimentState)
+def test_register_observer_and_change_state_should_get_updated(experiment_state: EExperimentState):
     model = create_model()
-    new_experiment_state = EExperimentState.RESTING_STATE_EYES_CLOSED
 
-    mock_view = mockito.mock(AView)
-    when(mock_view).update(ANY, ANY).thenReturn(None)
+    # make sure the experiment state can actually change (is not what it was before changing it)
+    if model.experiment_state == experiment_state:
+        assert experiment_state != EExperimentState.EXPERIMENT
+        model.change_experiment_state(EExperimentState.EXPERIMENT)
 
-    model.register(mock_view)
+    observer = mock_observer()
+    model.register(observer)
 
-    model.change_experiment_state(new_experiment_state)
+    model.change_experiment_state(experiment_state)
 
-    verify(mock_view).update(new_experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
+    verify(observer).update(experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
+
+
+def test_register_observer_new_stimulus_twice_should_get_updated():
+    model = create_model()
+    stimulus = mockito.mock(CreatedStimulus)
+
+    observer = mock_observer()
+    model.register(observer)
+    model.present_stimulus(stimulus)
+
+    verify(observer, times=1).update(stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
+
+    model.present_stimulus(stimulus)
+    verify(observer, times=2).update(stimulus, EModelUpdateIdentifier.NEW_STIMULUS)
+
+
+def test_register_observers_with_different_priorities_should_be_called_in_correct_order():
+    model = create_model()
+
+    execution_order = []
+
+    observer1 = mock_observer()
+    when(observer1).update(ANY, ANY).thenAnswer(lambda _, __: execution_order.append("observer1"))
+    observer2 = mock_observer()
+    when(observer2).update(ANY, ANY).thenAnswer(lambda _, __: execution_order.append("observer2"))
+
+    model.register(observer1, priority=1)
+    model.register(observer2, priority=2)
+
+    experiment_state = EExperimentState.EXPERIMENT_INTRODUCTION
+    model.change_experiment_state(experiment_state)
+
+    assert execution_order[0] == "observer1" and execution_order[1] == "observer2"
+
+    verify(observer1, times=1).update(experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
+    verify(observer2, times=1).update(experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
