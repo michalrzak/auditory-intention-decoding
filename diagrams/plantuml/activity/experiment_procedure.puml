@@ -1,0 +1,75 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|Experiment|
+start
+
+floating note
+    LightBlue -> operations on Model
+    LightGreen -> operations on View
+end note
+
+#LightBlue:create_stimuli();
+#LightBlue:INTRODUCTION;
+
+|User|
+#LightGreen:get_confirmation();
+
+|Experiment|
+#LightBlue:RESTING_STATE_EYES_OPEN_INTRODUCTION;
+|User|
+#LightGreen:get_confirmation();
+
+|Experiment|
+#LightBlue:RESTING_STATE_EYES_OPEN;
+#LightGreen:wait(RESTING_STATE_SECS);
+
+#LightBlue:RESTING_STATE_EYES_CLOSED_INTRODUCTION;
+|User|
+#LightGreen:get_confirmation();
+
+|Experiment|
+#LightBlue:RESTING_STATE_EYES_CLOSED;
+#LightGreen:wait(RESTING_STATE_SECS);
+
+#LightBlue:EXPERIMENT_INTRODUCTION;
+|User|
+#LightGreen:get_confirmation();
+
+|Experiment|
+repeat
+    :stimulus = next_stimulus();
+    #LightBlue:EXPERIMENT;
+    #LightBlue:presente_primer(stimulus.primer);
+    #LightGreen:wait(PRIMER_SECS);
+
+    repeat
+        #LightBlue:present_stimulus(stimulus);
+    repeat while (next repetition?) is (yes)
+    -> no;
+
+    #LightBlue:BREAK;
+    #LightGreen:wait(BREAK_SECS);
+    |User|
+    #LightGreen:get_confirmation();
+
+    |Experiment|
+repeat while (next stimulus?) is (yes)
+-> no;
+
+|Experiment|
+#LightBlue:RESTING_STATE_EYES_OPEN_INTRODUCTION;
+|User|
+#LightGreen:get_confirmation();
+
+|Experiment|
+#LightBlue:RESTING_STATE_EYES_OPEN;
+#LightGreen:wait(RESTING_STATE_SECS);
+
+#LightBlue:RESTING_STATE_EYES_CLOSED_INTRODUCTION;
+|User|
+#LightGreen:get_confirmation();
+
+stop
+
+@enduml
