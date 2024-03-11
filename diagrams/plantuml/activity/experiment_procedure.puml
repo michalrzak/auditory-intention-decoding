@@ -70,6 +70,9 @@ repeat while (next stimulus?) is (yes)
 |User|
 #LightGreen:get_confirmation();
 
+|Experiment|
+#LightBlue:RESTING_STATE_EYES_CLOSED;
+#LightGreen:wait(RESTING_STATE_SECS);
 stop
 
 @enduml
