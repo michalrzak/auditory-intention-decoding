@@ -1,0 +1,40 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|Main|
+start
+:Construct AMTagger();
+note right
+    audio,
+    stimuli_intervals
+    frequency
+    tag_generator
+end note
+
+:AMTagger.create();
+
+repeat
+    |AMTagger|
+    :get next stimulus interval;
+
+    |tag_generator|
+    :generate tag of stimulus interval length;
+    note right
+        sine signal/
+        click signal
+    end note
+
+    |AMTagger|
+    :audio_chunk = audio[stimulus interval];
+    :modulated_chunk = audio_chunk * tag;
+    :insert modulated_chunk into audio;
+repeat while(next stimulus interval?) is (yes)
+->no;
+:return audio;
+
+|Main|
+:Further processing;
+stop
+
+
+@enduml

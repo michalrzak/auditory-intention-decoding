@@ -1,0 +1,34 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|Main|
+start
+:Construct FMTagger();
+note right
+    audio,
+    stimuli_intervals
+    frequency
+end note
+
+:FMTagger.create();
+
+repeat
+    |FMTagger|
+    :get next stimulus interval;
+
+    :audio_chunk = audio[stimulus interval];
+    :samples =
+      f_carrier / f_sampling * np.arange(audio.shape[0]);
+    :modulated_chunk =
+      np.sin(2 * np.pi * (samples + audio);
+    :insert modulated_chunk into audio;
+repeat while(next stimulus interval?) is (yes)
+->no;
+:return audio;
+
+|Main|
+:Further processing;
+stop
+
+
+@enduml
