@@ -37,7 +37,7 @@ class Experiment:
         assert self.__model.experiment_state == EExperimentState.INACTIVE
 
     def run(self) -> None:
-        """Runs the experiment. Before running the experiment `create_stimuli()` has to be executed first
+        """Runs the experiment.
         """
         self.__model.create_stimuli()
 
