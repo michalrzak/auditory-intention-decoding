@@ -1,0 +1,48 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|Main|
+start
+:Construct NosieTaggingTagger();
+note right
+    audio,
+    stimuli_intervals
+    bits_per_second
+    length_bit
+end note
+
+:NosieTaggingTagger.create();
+
+|NosieTaggingTagger|
+:generate code;
+
+|Generate code|
+:code_raw = random sequence of -1/1;
+:code = np.repeat(code_raw, bit_width);
+:return code;
+
+repeat
+    |NosieTaggingTagger|
+
+
+    :get next stimulus interval;
+
+    :audio_chunk = audio[stimulus interval];
+    :applied_code = get_code(code, stimulus interval);
+    note right
+        Cuts/extends the code
+        depending on the length
+        of the interval
+    end note
+    :modulated_chunk = audio_chunk * applied_code;
+    :insert modulated_chunk into audio;
+repeat while(next stimulus interval?) is (yes)
+->no;
+:return audio;
+
+|Main|
+:Further processing;
+stop
+
+
+@enduml
