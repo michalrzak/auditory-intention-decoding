@@ -19,6 +19,10 @@ repeat
 
     |tag_generator|
     :generate tag of stimulus interval length;
+    note right
+        sine signal/
+        click signal
+    end note
 
     |AMTagger|
     :audio_chunk = audio[stimulus interval];
