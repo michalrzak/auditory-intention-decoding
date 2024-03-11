@@ -12,14 +12,6 @@ BREAK_SECS = 5
 class Experiment:
     """A controller class of the MVC pattern, responsible for handling the experiment logic, updating the model and
     calling blocking operations (wait for keypress, wait) on the view.
-
-    Note: This class is not ideal. I think the stimuli should be saved and also possibly created in the model class.
-    Then the only thing needed would be calling something like "next stimulus" and this would do all the necessery
-    updates in the model by itself. Unfortunately, my rule, where I want to have all experiment logic in this class,
-    as it would require to delegate the decision to, for example, how long to wait after a primer to the view. I
-    specifically wanted to avoid that, as I feel that this fits better into the Experiment class.
-    Should this ever get implemented, the code would be a lot better decoupled as this would no longer depend on
-    stimulus.
     """
     __model: Model
     __view: AView
