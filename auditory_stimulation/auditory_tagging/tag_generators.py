@@ -27,10 +27,13 @@ def __common_stimulus_generation_tests(length: int,
 
 def __shape_signal(signal: npt.NDArray[np.float32], signal_interval: Tuple[float, float]) -> npt.NDArray[np.float32]:
     """Expects a signal in the range -1 to 1"""
+    if signal_interval[0] == -1 and signal_interval[1] == 1:
+        return signal
+
     # the following is just an assert statement as checking it could potentially take a very long time
     assert all(-1 <= signal) and all(signal <= 1)
 
-    shaped_signal = abs(signal_interval[1] - signal_interval[0]) * (signal + 1) - signal_interval[0]
+    shaped_signal = abs(signal_interval[1] - signal_interval[0]) / 2 * (signal + 1) + signal_interval[0]
     assert shaped_signal.shape[0] == signal.shape[0]
     assert len(shaped_signal.shape) == 1
 
@@ -53,7 +56,7 @@ def sine_signal(length: int,
      boundary, the second value of the upper boundary.
     :return: The modulating ASSR sine wave.
     """
-    __common_stimulus_generation_tests(length, frequency, sampling_frequency)
+    __common_stimulus_generation_tests(length, frequency, sampling_frequency, signal_interval)
 
     signal = np.sin(frequency / sampling_frequency * 2 * np.pi * np.arange(length))
     assert signal.shape[0] == length
@@ -65,7 +68,7 @@ def sine_signal(length: int,
 def clicking_signal(length: int,
                     frequency: int,
                     sampling_frequency: int,
-                    signal_interval: Tuple[float, float] = (1, -1)) -> npt.NDArray[np.float32]:
+                    signal_interval: Tuple[float, float] = (-1, 1)) -> npt.NDArray[np.float32]:
     """ Used to generate the modulating ASSR signal of the given length.
 
     :param length: The length in samples of the modulating ASSR signal.
@@ -76,7 +79,7 @@ def clicking_signal(length: int,
 
     :return: The modulating ASSR clicking signal.
     """
-    __common_stimulus_generation_tests(length, frequency, sampling_frequency)
+    __common_stimulus_generation_tests(length, frequency, sampling_frequency, signal_interval)
 
     # in order to be able to generate the altering signal properly, the 2 x frequency needs to divide the
     #  sampling rate of the original audio signal. if this is not the case, one of the saw-teeth will be longer

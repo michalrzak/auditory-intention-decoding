@@ -1,13 +1,15 @@
+from typing import Tuple
+
 import numpy as np
 import pytest
 
 from auditory_stimulation.auditory_tagging.tag_generators import clicking_signal, sine_signal
 
-STIMULUS_GENERATORS = [clicking_signal, sine_signal]
+TAG_GENERATORS = [clicking_signal, sine_signal]
 
 
-@pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_tagGeneration_validCall_shouldHaveCorrectFrequency(stimulus_generation):
+@pytest.mark.parametrize("tag_generation", TAG_GENERATORS)
+def test_tagGeneration_validCall_shouldHaveCorrectFrequency(tag_generation):
     epsilon = 0.1
 
     sampling_frequencies = [12, 20, 24, 60]
@@ -16,7 +18,7 @@ def test_tagGeneration_validCall_shouldHaveCorrectFrequency(stimulus_generation)
     length = 1000
 
     for sampling_frequency, stimulus_frequency in zip(sampling_frequencies, stimulus_frequencies):
-        modulating_stimulus = stimulus_generation(length, stimulus_frequency, sampling_frequency)
+        modulating_stimulus = tag_generation(length, stimulus_frequency, sampling_frequency)
 
         modulating_stimulus_spectrum = np.abs(np.real(np.fft.fftshift(np.fft.fft(modulating_stimulus))))
         # cut of the irrelevant half of the spectrum
@@ -28,62 +30,77 @@ def test_tagGeneration_validCall_shouldHaveCorrectFrequency(stimulus_generation)
         assert peak_frequency - epsilon <= stimulus_frequency <= peak_frequency + epsilon
 
 
-@pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_tagGeneration_invalidFrequency_negative_shouldThrow(stimulus_generation):
+@pytest.mark.parametrize("tag_generation", TAG_GENERATORS)
+def test_tagGeneration_invalidFrequency_negative_shouldThrow(tag_generation):
     length = 1000
     sampling_frequency = 20
 
     frequency = -5
 
     with pytest.raises(ValueError):
-        stimulus_generation(length, frequency, sampling_frequency)
+        tag_generation(length, frequency, sampling_frequency)
 
 
-@pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_tagGeneration_invalidFrequency_0_shouldThrow(stimulus_generation):
+@pytest.mark.parametrize("tag_generation", TAG_GENERATORS)
+def test_tagGeneration_invalidFrequency_0_shouldThrow(tag_generation):
     length = 1000
     sampling_frequency = 20
 
     frequency = 0
 
     with pytest.raises(ValueError):
-        stimulus_generation(length, frequency, sampling_frequency)
+        tag_generation(length, frequency, sampling_frequency)
 
 
-@pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_tagGeneration_invalidSamplingFrequency_negative_shouldThrow(stimulus_generation):
+@pytest.mark.parametrize("tag_generation", TAG_GENERATORS)
+def test_tagGeneration_invalidSamplingFrequency_negative_shouldThrow(tag_generation):
     length = 1000
     sampling_frequency = -20
 
     frequency = 5
 
     with pytest.raises(ValueError):
-        stimulus_generation(length, frequency, sampling_frequency)
+        tag_generation(length, frequency, sampling_frequency)
 
 
-@pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_tagGeneration_invalidSamplingFrequency_0_shouldThrow(stimulus_generation):
+@pytest.mark.parametrize("tag_generation", TAG_GENERATORS)
+def test_tagGeneration_invalidSamplingFrequency_0_shouldThrow(tag_generation):
     length = 1000
     sampling_frequency = 0
 
     frequency = 5
 
     with pytest.raises(ValueError):
-        stimulus_generation(length, frequency, sampling_frequency)
+        tag_generation(length, frequency, sampling_frequency)
 
 
-@pytest.mark.parametrize("stimulus_generation", STIMULUS_GENERATORS)
-def test_tagGeneration_invalidSamplingFrequency_and_invalidFrequency_bellowZero_shouldThrow(stimulus_generation):
+@pytest.mark.parametrize("tag_generation", TAG_GENERATORS)
+def test_tagGeneration_invalidSamplingFrequency_and_invalidFrequency_bellowZero_shouldThrow(tag_generation):
     length = 1000
     sampling_frequency = -20
 
     frequency = -5
 
     with pytest.raises(ValueError):
-        stimulus_generation(length, frequency, sampling_frequency)
+        tag_generation(length, frequency, sampling_frequency)
 
 
-def test_tagGeneration_invalidFrequency_doesNotDivide_shouldThrow():
+@pytest.mark.parametrize("tag_generation", TAG_GENERATORS)
+@pytest.mark.parametrize("signal_interval", [(-1, 1), (-2, 2), (-3, -1), (1, 3), (0.5, 1.7)])
+def test_tag_generators_signal_interval_valid_call(tag_generation, signal_interval: Tuple[float, float]):
+    length = 1000
+    sampling_frequency = 20
+    frequency = 5
+
+    signal = tag_generation(length, frequency, sampling_frequency, signal_interval)
+
+    assert signal.shape[0] == length
+    assert len(signal.shape) == 1
+    assert np.max(signal) == signal_interval[1]
+    assert np.min(signal) == signal_interval[0]
+
+
+def test_clicking_signal_invalidFrequency_doesNotDivide_shouldThrow():
     length = 1000
     sampling_frequency = 17
 
