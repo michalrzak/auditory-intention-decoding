@@ -51,10 +51,11 @@ class Experiment:
 
         for stimulus in self.__model.created_stimuli:
             self.__model.change_experiment_state(EExperimentState.EXPERIMENT)
-            self.__model.present_primer(stimulus.primer)
-            self.__view.wait(PRIMER_SECS)
 
             for i in range(STIMULUS_REPEAT):
+                self.__model.present_primer(stimulus.primer)
+                self.__view.wait(PRIMER_SECS)
+
                 self.__model.present_stimulus(stimulus)
 
             self.__model.change_experiment_state(EExperimentState.BREAK)
