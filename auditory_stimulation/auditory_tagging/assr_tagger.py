@@ -6,6 +6,7 @@ import numpy.typing as npt
 
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory
+from auditory_stimulation.auditory_tagging.tag_generators import TagGenerator
 
 
 def __duplicate_signal(signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
@@ -22,6 +23,22 @@ def __duplicate_signal(signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
     assert output.shape[0] == signal.shape[0]
 
     return output
+
+
+def __scale_down_signal(signal: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+    """Given a signal in an arbitrary range, if any element is > 1 or < -1, scales the signal so that the highest
+    element is equal 1/-1.
+
+    :param signal: An arbitrary signal.
+    :return: The scaled down signal
+    """
+    max_value = np.max(np.abs(signal))
+    if max_value <= 1:
+        return signal
+
+    return_signal = signal / max_value
+    assert np.max(np.abs(return_signal))
+    return return_signal
 
 
 def amplitude_modulation(signal: npt.NDArray[np.float32],
@@ -48,7 +65,8 @@ def amplitude_modulation(signal: npt.NDArray[np.float32],
     output = signal * duplicate_code
     assert output.shape == signal.shape
 
-    return output
+    output_scaled = __scale_down_signal(output)
+    return output_scaled
 
 
 def frequency_modulation(signal: npt.NDArray[np.float32],
@@ -56,7 +74,7 @@ def frequency_modulation(signal: npt.NDArray[np.float32],
                          f_carrier: int,
                          modulation_factor: float = 1) -> npt.NDArray[np.float32]:
     """Applies frequency modulation to the provided signal. Done by FM the a sine wave with f = carrier_frequency with
-    the signal. (Cannot be done other way arround, or with an arbitrary carrier signal, as FM requires an underlying
+    the signal. (Cannot be done other way around, or with an arbitrary carrier signal, as FM requires an underlying
     periodic signal)
 
     :param signal: The encoded signal.
@@ -80,13 +98,13 @@ class AMTagger(AAudioTagger):
     """Creates an AM modulated ASSR stimulus.
     """
     __frequency: int
-    __tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]]
+    __tag_generator: TagGenerator
 
     def __init__(self,
                  audio: Audio,
                  stimuli_intervals: List[Tuple[float, float]],
                  frequency: int,
-                 tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]]) -> None:
+                 tag_generator: TagGenerator) -> None:
         """Constructs the AMStimulus object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
