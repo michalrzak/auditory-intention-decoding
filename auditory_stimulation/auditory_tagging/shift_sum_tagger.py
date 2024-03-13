@@ -3,7 +3,8 @@ from typing import List, Tuple
 import numpy as np
 
 from auditory_stimulation.audio import Audio
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, _duplicate_signal, _scale_down_signal
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, _duplicate_signal, _scale_down_signal, \
+    AAudioTaggerFactory
 
 
 class ShiftSumTagger(AAudioTagger):
@@ -41,3 +42,13 @@ class ShiftSumTagger(AAudioTagger):
         audio_combined = Audio(audio_array_combined_scaled, self._audio.sampling_frequency)
 
         return audio_combined
+
+
+class ShiftSumTaggerFactory(AAudioTaggerFactory):
+    __shift_by: int
+
+    def __init__(self, shift_by: int):
+        self.__shift_by = shift_by
+
+    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+        return ShiftSumTagger(audio, stimuli_intervals, self.__shift_by)
