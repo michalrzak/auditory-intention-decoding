@@ -42,14 +42,12 @@ package auditory_tagging {
           -Callable[[int, int, int], NDArray[float]] tag_generator
 
           +AMTaggerFactory(frequency, tag_generator)
-          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
         }
 
         class FMTaggerFactory {
           -int frequency
 
           +FMTaggerFactory(frequency)
-          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
         }
     }
 
@@ -71,7 +69,6 @@ package auditory_tagging {
       -Optional[int] seed
 
       +NoiseTaggingTaggerFactory(bits_per_second, length_bit, seed)
-      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
     }
 
     class RawTagger {
@@ -79,20 +76,34 @@ package auditory_tagging {
     }
 
     class RawTaggerFactory {
-      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+
+    class ShiftSumTagger {
+      -int shift_by
+
+      +ShiftSumTagger(audio, stimuli_intervals, shift_by)
+      +Audio create()
+    }
+
+    class ShiftSumTaggerFactory {
+      -int shift_by
+      +ShiftSumTaggerFactory(shift_by)
     }
 }
 
+AAuditoryTagger <|-- ShiftSumTagger
 AAuditoryTagger <|-- RawTagger
 AAuditoryTagger <|-- NoiseTaggingTagger
 AAuditoryTagger <|-- AMTagger
 AAuditoryTagger <|-- FMTagger
 
+AAudioTaggerFactory <|-u- ShiftSumTaggerFactory
 AAudioTaggerFactory <|-u- AMTaggerFactory
 AAudioTaggerFactory <|-u- FMTaggerFactory
 AAudioTaggerFactory <|-u- NoiseTaggingTaggerFactory
 AAudioTaggerFactory <|-u- RawTaggerFactory
 
+ShiftSumTagger <.. ShiftSumTaggerFactory: "creates"
 AMTagger <.. AMTaggerFactory: "creates"
 FMTagger <.. FMTaggerFactory: "creates"
 NoiseTaggingTagger <.. NoiseTaggingTaggerFactory: "creates"
