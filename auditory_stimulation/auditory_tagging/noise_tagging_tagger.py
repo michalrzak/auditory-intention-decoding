@@ -23,7 +23,7 @@ class NoiseTaggingTagger(AAudioTagger):
                  bits_per_second: int,
                  length_bit: int,
                  seed: Optional[int] = None) -> None:
-        """Constructs the NoiseTaggingStimulus object
+        """Constructs the NoiseTaggingTagger object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The

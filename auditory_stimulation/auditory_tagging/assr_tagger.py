@@ -5,40 +5,9 @@ import numpy as np
 import numpy.typing as npt
 
 from auditory_stimulation.audio import Audio
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory, _duplicate_signal, \
+    _scale_down_signal
 from auditory_stimulation.auditory_tagging.tag_generators import TagGenerator
-
-
-def __duplicate_signal(signal: npt.NDArray[Number]) -> npt.NDArray[Number]:
-    """Given a one dimensional signal (N/Nx1) returns the signal duplicated to two dimensions (Nx2).
-
-    :param signal: The to be duplicated signal.
-    :return: The duplicated signal.
-    """
-    if len(signal.shape) > 1 or (len(signal.shape) == 2 and signal.shape[1] == 1):
-        raise ValueError("The passed signal needs to be one dimensional!")
-
-    output = np.array([np.copy(signal), np.copy(signal)]).T
-    assert output.shape[1] == 2
-    assert output.shape[0] == signal.shape[0]
-
-    return output
-
-
-def __scale_down_signal(signal: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
-    """Given a signal in an arbitrary range, if any element is > 1 or < -1, scales the signal so that the highest
-    element is equal 1/-1.
-
-    :param signal: An arbitrary signal.
-    :return: The scaled down signal
-    """
-    max_value = np.max(np.abs(signal))
-    if max_value <= 1:
-        return signal
-
-    return_signal = signal / max_value
-    assert np.max(np.abs(return_signal))
-    return return_signal
 
 
 def amplitude_modulation(signal: npt.NDArray[np.float32],
@@ -60,12 +29,12 @@ def amplitude_modulation(signal: npt.NDArray[np.float32],
     if signal.shape[0] != modulation_code.shape[0]:
         raise ValueError("Signal and modulation_code must match in their first dimension!")
 
-    duplicate_code = __duplicate_signal(modulation_code)
+    duplicate_code = _duplicate_signal(modulation_code)
 
     output = signal * duplicate_code
     assert output.shape == signal.shape
 
-    output_scaled = __scale_down_signal(output)
+    output_scaled = _scale_down_signal(output)
     return output_scaled
 
 
@@ -86,7 +55,7 @@ def frequency_modulation(signal: npt.NDArray[np.float32],
     if len(signal.shape) != 2 or signal.shape[1] != 2:
         raise ValueError("Signal must have dimensions Nx2!")
 
-    samples = __duplicate_signal(f_carrier / f_sampling * np.arange(signal.shape[0]))
+    samples = _duplicate_signal(f_carrier / f_sampling * np.arange(signal.shape[0]))
 
     combined_signal = np.sin(2 * np.pi * (samples + signal * modulation_factor), dtype=np.float32)
     assert combined_signal.shape == signal.shape
