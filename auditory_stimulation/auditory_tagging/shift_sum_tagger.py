@@ -31,15 +31,26 @@ class ShiftSumTagger(AAudioTagger):
         self.__shift_by = shift_by
 
     def create(self) -> Audio:
-        n = np.arange(self._audio.array.shape[0])
-        multiplier = np.e ** ((1j * 2 * np.pi * self.__shift_by * n) / self._audio.sampling_frequency)
-        multiplier_duplicated = _duplicate_signal(multiplier)
 
-        audio_array_shifted = np.array(np.real(self._audio.array * multiplier_duplicated), dtype=np.float32)
-        audio_array_combined = audio_array_shifted + self._audio.array
-        audio_array_combined_scaled = _scale_down_signal(audio_array_combined)
+        audio_copy = np.copy(self._audio.array)
 
-        audio_combined = Audio(audio_array_combined_scaled, self._audio.sampling_frequency)
+        for interval in self._stimuli_intervals:
+            sample_range = (int(interval[0] * self._audio.sampling_frequency),
+                            int(interval[1] * self._audio.sampling_frequency))
+
+            audio_chunk = audio_copy[sample_range[0]:sample_range[1]]
+
+            n = np.arange(audio_chunk.shape[0])
+            multiplier = np.e ** ((1j * 2 * np.pi * self.__shift_by * n) / self._audio.sampling_frequency)
+            multiplier_duplicated = _duplicate_signal(multiplier)
+
+            audio_array_shifted = np.array(np.real(audio_chunk * multiplier_duplicated), dtype=np.float32)
+            audio_array_combined = audio_array_shifted + audio_chunk
+            audio_array_combined_scaled = _scale_down_signal(audio_array_combined)
+
+            audio_copy[sample_range[0]:sample_range[1]] = audio_array_combined_scaled
+
+        audio_combined = Audio(audio_copy, self._audio.sampling_frequency)
 
         return audio_combined
 
