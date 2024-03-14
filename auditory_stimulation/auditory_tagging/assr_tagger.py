@@ -186,7 +186,7 @@ class FMTagger(AAudioTagger):
         reconstructed_shifted = self.__get_complex_number(amplitude, phase_shifted)
         assert reconstructed_shifted.shape == signal.shape
 
-        return reconstructed_shifted
+        return np.real(reconstructed_shifted)
 
     def create(self) -> Audio:
         audio_copy = np.copy(self._audio.array)
