@@ -8,7 +8,7 @@ from scipy.signal import hilbert
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory, _duplicate_signal, \
     _scale_down_signal
-from auditory_stimulation.auditory_tagging.tag_generators import TagGenerator
+from auditory_stimulation.auditory_tagging.tag_generators import TagGenerator, sine_signal
 
 
 def amplitude_modulation(signal: npt.NDArray[np.float32],
@@ -120,14 +120,20 @@ class FMTagger(AAudioTagger):
      is computed via the hilbert transform (instantaneous frequency). In essence, this only shifts the entire audio
      spectrum up by the specified frequency (imagine a simple sine wave to see why)."""
     __frequency: int
+    __modulation_factor: float
 
-    def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int):
+    def __init__(self,
+                 audio: Audio,
+                 stimuli_intervals: List[Tuple[float, float]],
+                 frequency: int,
+                 modulation_factor: float) -> None:
         """Constructs the FMTagger object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
          intervals must be contained within the audio.
         :param frequency: The modulating frequency.
+        :param modulation_factor: The factor by which the added modulating signal is scaled.
         """
 
         super().__init__(audio, stimuli_intervals)
@@ -135,6 +141,7 @@ class FMTagger(AAudioTagger):
         if frequency <= 0:
             raise ValueError("The frequency has to be a positive number")
         self.__frequency = frequency
+        self.__modulation_factor = modulation_factor
 
     @staticmethod
     def __extract_amplitudes_phases(numbers: npt.NDArray[Complex]) -> Tuple[npt.NDArray[Real], npt.NDArray[Real]]:
@@ -191,8 +198,12 @@ class FMTagger(AAudioTagger):
 
         inst_freq = self.__phases_to_instantaneous_frequencies(phase)
 
-        added_freq = np.ones_like(inst_freq) * self.__frequency
-        shifted_inst_freq = inst_freq + added_freq
+        # generate a sine wave of the appropriate frequency and of the appropriate shape
+        modulating_sine = sine_signal(inst_freq.shape[0], self.__frequency, self._audio.sampling_frequency)
+        modulating_sine_doubled = _duplicate_signal(modulating_sine)
+
+        # modulate the signal frequency with the generated sine wave
+        shifted_inst_freq = inst_freq + self.__modulation_factor * modulating_sine_doubled
 
         phase_shifted = self.__instantaneous_frequencies_to_phases(shifted_inst_freq, phase[0, :])
 
@@ -211,7 +222,7 @@ class FMTagger(AAudioTagger):
             modulated_chunk = self.__modulate(audio_copy[sample_range[0]:sample_range[1]])
             audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
 
-        return Audio(audio_copy, self._audio.sampling_frequency)
+        return Audio(_scale_down_signal(audio_copy), self._audio.sampling_frequency)
 
 
 class FlippedFMTagger(AAudioTagger):
@@ -279,14 +290,17 @@ class AMTaggerFactory(AAudioTaggerFactory):
 
 class FMTaggerFactory(AAudioTaggerFactory):
     _frequency: int
+    _modulation_factor: float
 
-    def __init__(self, frequency: int) -> None:
+    def __init__(self, frequency: int, modulation_factor: float) -> None:
         self._frequency = frequency
+        self._modulation_factor = modulation_factor
 
     def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return FMTagger(audio,
                         stimuli_intervals,
-                        self._frequency)
+                        self._frequency,
+                        self._modulation_factor)
 
 
 class FlippedFMTaggerFactory(AAudioTaggerFactory):
