@@ -31,8 +31,9 @@ package auditory_tagging {
 
         class FMTagger {
           -int frequency
+          -float modulation_factor
 
-          +FMTagger(audio, stimuli_intervals, frequency)
+          +FMTagger(audio, stimuli_intervals, frequency, modulation_factor)
           +Audio create()
           -(NDArray[Real], NDArray[Real]) {static} extract_amplitudes_phases(numbers: NDArray[Complex])
           -NDArray[Complex] {static} get_complex_number(amplitudes: NDArray[Real], phases: NDArray[Real])

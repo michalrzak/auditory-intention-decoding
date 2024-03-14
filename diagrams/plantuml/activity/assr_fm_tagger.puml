@@ -33,10 +33,23 @@ repeat
     :inst_freq =
        phases_to_instantaneous_frequencies(phase);
     note right
-        np.diff(phase) / (2 * np.pi) * fs
+        np.diff(phase) / (2 * pi) * fs
     end note
+
+    |tagger_getter|
+    :modulating_sine =
+      sine_signal(inst_freq.shape[0], frequency, audio.fs);
+
+    |FMTagger|
     :shifted_inst_freq =
-      [f + self.__frequency for f in inst_freq];
+      inst_freq + modulation_factor * modulating_sine;
+
+    :phase_shifted =
+      instantaneous_frequencies_to_phases(shifted_inst_freq, phase[0, :]);
+    note right
+        shifted_inst_freq * (2 * pi) / fs
+    end note
+
     :reconstructed_shifted =
       get_complex_number(amplitude, phase_shifted);
     note right
