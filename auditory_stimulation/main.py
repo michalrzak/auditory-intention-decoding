@@ -2,7 +2,7 @@ import pathlib
 
 import psychopy.visual
 
-from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory, FMTaggerFactory
+from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory, FlippedFMTaggerFactory
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTaggerFactory
 from auditory_stimulation.auditory_tagging.tag_generators import get_sine_signal_tag_generator
 from auditory_stimulation.experiment import Experiment
@@ -19,7 +19,7 @@ LOGGING_DIRECTORY = pathlib.Path("logs/")
 def main() -> None:
     stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
     model = Model(stimuli, [AMTaggerFactory(42, get_sine_signal_tag_generator()),
-                            FMTaggerFactory(40),
+                            FlippedFMTaggerFactory(40),
                             NoiseTaggingTaggerFactory(126, 256)])
 
     logger = Logger(LOGGING_DIRECTORY)

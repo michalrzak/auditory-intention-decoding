@@ -2,7 +2,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory, FMTaggerFactory
+from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory, FlippedFMTaggerFactory
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTaggerFactory
 from auditory_stimulation.auditory_tagging.shift_sum_tagger import ShiftSumTaggerFactory
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
@@ -17,7 +17,7 @@ def mock_tag_generation(length: int, frequency: int, sampling_frequency: int) ->
 
 AUDIO_TAGGER_FACTORIES = [
     AMTaggerFactory(1, mock_tag_generation),
-    FMTaggerFactory(42),
+    FlippedFMTaggerFactory(42),
     NoiseTaggingTaggerFactory(2, 10),
     ShiftSumTaggerFactory(3)
 ]

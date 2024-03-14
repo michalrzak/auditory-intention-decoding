@@ -114,7 +114,10 @@ class AMTagger(AAudioTagger):
         return Audio(audio_copy, self._audio.sampling_frequency)
 
 
-class FMTagger(AAudioTagger):
+class FlippedFMTagger(AAudioTagger):
+    """This tagger tags the given audio signal with the tagging frequency, by interpreting the tagging frequency as the
+    carrier frequency of FM and the audio signal as the modulating signal. This hence flips the interpretation of the
+    FM, as the taggers attempt to tag the audio (carrier) with a frequency (modulator)."""
     __frequency: int
 
     def __init__(self,
@@ -174,13 +177,13 @@ class AMTaggerFactory(AAudioTaggerFactory):
                         self._stimulus_generator)
 
 
-class FMTaggerFactory(AAudioTaggerFactory):
+class FlippedFMTaggerFactory(AAudioTaggerFactory):
     _frequency: int
 
     def __init__(self, frequency: int) -> None:
         self._frequency = frequency
 
     def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
-        return FMTagger(audio,
-                        stimuli_intervals,
-                        self._frequency)
+        return FlippedFMTagger(audio,
+                               stimuli_intervals,
+                               self._frequency)

@@ -3,17 +3,17 @@
 
 |Main|
 start
-:Construct FMTagger();
+:Construct FlippedFMTagger();
 note right
     audio,
     stimuli_intervals
     frequency
 end note
 
-:FMTagger.create();
+:FlippedFMTagger.create();
 
 repeat
-    |FMTagger|
+    |FlippedFMTagger|
     :get next stimulus interval;
 
     :audio_chunk = audio[stimulus interval];
