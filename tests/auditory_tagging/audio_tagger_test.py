@@ -17,7 +17,7 @@ def mock_tag_generation(length: int, frequency: int, sampling_frequency: int) ->
 
 AUDIO_TAGGER_FACTORIES = [
     AMTaggerFactory(1, mock_tag_generation),
-    FMTaggerFactory(42),
+    FMTaggerFactory(42, 100),
     FlippedFMTaggerFactory(42),
     NoiseTaggingTaggerFactory(2, 10),
     ShiftSumTaggerFactory(3)
