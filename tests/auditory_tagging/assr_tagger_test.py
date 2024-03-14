@@ -26,7 +26,7 @@ def get_flipped_fm_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, flo
 
 
 def get_fm_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int) -> AAudioTagger:
-    return FMTagger(audio, stimuli_intervals, frequency)
+    return FMTagger(audio, stimuli_intervals, frequency, 100)
 
 
 TAGGER_GETTERS: List[Callable[[Audio, List[Tuple[float, float]], int], AAudioTagger]] = [get_am_tagger,
