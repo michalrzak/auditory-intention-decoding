@@ -1,8 +1,9 @@
-from numbers import Number
+from numbers import Number, Complex, Real
 from typing import List, Tuple, Callable
 
 import numpy as np
 import numpy.typing as npt
+from scipy.signal import hilbert
 
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory, _duplicate_signal, \
@@ -114,6 +115,92 @@ class AMTagger(AAudioTagger):
         return Audio(audio_copy, self._audio.sampling_frequency)
 
 
+class FMTagger(AAudioTagger):
+    __frequency: int
+
+    def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int):
+        """Constructs the FlippedFMTagger object
+
+        :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
+        :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
+         intervals must be contained within the audio.
+        :param frequency: The modulating frequency.
+        """
+
+        super().__init__(audio, stimuli_intervals)
+
+        if frequency <= 0:
+            raise ValueError("The frequency has to be a positive number")
+        self.__frequency = frequency
+
+    @staticmethod
+    def __extract_amplitudes_phases(numbers: npt.NDArray[Complex]) -> Tuple[npt.NDArray[Real], npt.NDArray[Real]]:
+        """Extracts the amplitude and the phase from the (complex) numbers provided.
+
+        :param numbers: A collection of complex numbers.
+        :return: (collection of amplitudes, collection  of phases)
+        """
+        amplitude = np.abs(numbers)
+        phase = np.unwrap(np.angle(numbers))
+
+        assert amplitude.shape == numbers.shape
+        assert phase.shape == numbers.shape
+
+        return amplitude, phase
+
+    @staticmethod
+    def __get_complex_number(amplitudes: npt.NDArray[Real], phases: npt.NDArray[Real]) -> npt.NDArray[Complex]:
+        """Given a list of amplitudes and a list of phases, combines them to represent one complex number."""
+
+        output = np.array([amplitude * np.e ** (1j * phase) for amplitude, phase in zip(amplitudes, phases)])
+        assert output.shape == amplitudes.shape
+        assert output.shape == phases.shape
+
+        return output
+
+    def __phases_to_instantaneous_frequencies(self, phases: npt.NDArray[Real]) -> npt.NDArray[Real]:
+        inst_freq = np.diff(phases) / (2 * np.pi) * self._audio.sampling_frequency
+        assert inst_freq.shape == phases.shape - 1
+
+        return inst_freq
+
+    def __instantaneous_frequencies_to_phases(self,
+                                              instantaneous_frequencies: npt.NDArray[Real],
+                                              first_phase: Real) -> npt.NDArray[Real]:
+        corrected_inst_freq = instantaneous_frequencies * (2 * np.pi) / self._audio.sampling_frequency
+        phases = np.hstack((first_phase, corrected_inst_freq)).cumsum()
+        assert phases.shape == instantaneous_frequencies.shape + 1
+
+        return phases
+
+    def __modulate(self, signal: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
+        assert signal.shape[1] == 2
+
+        analytic = hilbert(signal)
+        amplitude, phase = self.__extract_amplitudes_phases(analytic)
+
+        inst_freq = self.__phases_to_instantaneous_frequencies(phase)
+        shifted_inst_freq = np.array([f + self.__frequency for f in inst_freq])
+        phase_shifted = self.__instantaneous_frequencies_to_phases(shifted_inst_freq, phase[0])
+
+        reconstructed_shifted = self.__get_complex_number(amplitude, phase_shifted)
+        assert reconstructed_shifted.shape == signal.shape
+
+        return reconstructed_shifted
+
+    def create(self) -> Audio:
+        audio_copy = np.copy(self._audio.array)
+
+        for interval in self._stimuli_intervals:
+            sample_range = (int(interval[0] * self._audio.sampling_frequency),
+                            int(interval[1] * self._audio.sampling_frequency))
+
+            modulated_chunk = self.__modulate(audio_copy[sample_range[0]:sample_range[1]])
+            audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
+
+        return Audio(audio_copy, self._audio.sampling_frequency)
+
+
 class FlippedFMTagger(AAudioTagger):
     """This tagger tags the given audio signal with the tagging frequency, by interpreting the tagging frequency as the
     carrier frequency of FM and the audio signal as the modulating signal. This hence flips the interpretation of the
@@ -129,7 +216,7 @@ class FlippedFMTagger(AAudioTagger):
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
          intervals must be contained within the audio.
-        :param frequency: The frequency of the FM tag
+        :param frequency: The FM carrier frequency, modulated by the audio
         """
 
         super().__init__(audio, stimuli_intervals)
@@ -175,6 +262,18 @@ class AMTaggerFactory(AAudioTaggerFactory):
                         stimuli_intervals,
                         self._frequency,
                         self._stimulus_generator)
+
+
+class FMTaggerFactory(AAudioTaggerFactory):
+    _frequency: int
+
+    def __init__(self, frequency: int) -> None:
+        self._frequency = frequency
+
+    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+        return FMTagger(audio,
+                        stimuli_intervals,
+                        self._frequency)
 
 
 class FlippedFMTaggerFactory(AAudioTaggerFactory):
