@@ -13,7 +13,7 @@ package auditory_tagging {
       +Audio {abstract} create()
     }
 
-    AAuditoryTagger "1" *-[norank]- "1" Audio: audio
+    AAuditoryTagger "1" *-u- "1" Audio: audio
 
 
     abstract class AAudioTaggerFactory {
@@ -34,6 +34,19 @@ package auditory_tagging {
 
           +FMTagger(audio, stimuli_intervals, frequency)
           +Audio create()
+          -(NDArray[Real], NDArray[Real]) {static} extract_amplitudes_phases(numbers: NDArray[Complex])
+          -NDArray[Complex] {static} get_complex_number(amplitudes: NDArray[Real], phases: NDArray[Real])
+          -NDArray[Real] phases_to_instantaneous_frequencies(phases: NDArray[Real])
+          -NDArray[Real] instantaneous_frequencies_to_phases(instantaneous_frequencies: NDArray[Real], first_phase: Real)
+          -NDArray[float32] modulate(signal: NDArray[float32])
+
+        }
+
+        class FlippedFMTagger {
+          -int frequency
+
+          +FlippedFMTagger(audio, stimuli_intervals, frequency)
+          +Audio create()
 
         }
 
@@ -42,14 +55,18 @@ package auditory_tagging {
           -Callable[[int, int, int], NDArray[float]] tag_generator
 
           +AMTaggerFactory(frequency, tag_generator)
-          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+        }
+
+        class FlippedFMTaggerFactory {
+          -int frequency
+
+          +FlippedFMTaggerFactory(frequency)
         }
 
         class FMTaggerFactory {
           -int frequency
 
           +FMTaggerFactory(frequency)
-          +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
         }
     }
 
@@ -71,7 +88,6 @@ package auditory_tagging {
       -Optional[int] seed
 
       +NoiseTaggingTaggerFactory(bits_per_second, length_bit, seed)
-      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
     }
 
     class RawTagger {
@@ -79,22 +95,39 @@ package auditory_tagging {
     }
 
     class RawTaggerFactory {
-      +AAudioTagger create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    }
+
+    class ShiftSumTagger {
+      -int shift_by
+
+      +ShiftSumTagger(audio, stimuli_intervals, shift_by)
+      +Audio create()
+    }
+
+    class ShiftSumTaggerFactory {
+      -int shift_by
+      +ShiftSumTaggerFactory(shift_by)
     }
 }
 
+AAuditoryTagger <|-- ShiftSumTagger
 AAuditoryTagger <|-- RawTagger
 AAuditoryTagger <|-- NoiseTaggingTagger
 AAuditoryTagger <|-- AMTagger
 AAuditoryTagger <|-- FMTagger
+AAuditoryTagger <|-- FlippedFMTagger
 
+AAudioTaggerFactory <|-u- ShiftSumTaggerFactory
 AAudioTaggerFactory <|-u- AMTaggerFactory
 AAudioTaggerFactory <|-u- FMTaggerFactory
+AAudioTaggerFactory <|-u- FlippedFMTaggerFactory
 AAudioTaggerFactory <|-u- NoiseTaggingTaggerFactory
 AAudioTaggerFactory <|-u- RawTaggerFactory
 
+ShiftSumTagger <.. ShiftSumTaggerFactory: "creates"
 AMTagger <.. AMTaggerFactory: "creates"
 FMTagger <.. FMTaggerFactory: "creates"
+FlippedFMTagger <.. FlippedFMTaggerFactory: "creates"
 NoiseTaggingTagger <.. NoiseTaggingTaggerFactory: "creates"
 RawTagger <.. RawTaggerFactory: "creates"
 

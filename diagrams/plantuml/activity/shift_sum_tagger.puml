@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/activity-diagram-beta
+
+|Main|
+start
+:Construct ShiftSum();
+note right
+    audio,
+    stimuli_intervals
+    shift_by
+end note
+
+:ShiftSumTagger.create();
+
+repeat
+    |ShiftSumTagger|
+    :get next stimulus interval;
+
+    :audio_chunk = audio[stimulus interval];
+    :multiplier = e ^ ((2 PI j * shift_by * n) / audio.fs);
+    :audio_shifted = real(audio_chunk * multiplier_duplicated);
+    :audio_combined = audio_shifted + audio_chunk;
+    :insert audio_combined into audio;
+repeat while(next stimulus interval?) is (yes)
+->no;
+:return audio;
+
+|Main|
+:Further processing;
+stop
+
+
+@enduml

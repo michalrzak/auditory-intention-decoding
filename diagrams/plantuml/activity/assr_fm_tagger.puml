@@ -15,12 +15,35 @@ end note
 repeat
     |FMTagger|
     :get next stimulus interval;
-
     :audio_chunk = audio[stimulus interval];
-    :samples =
-      f_carrier / f_sampling * np.arange(audio.shape[0]);
-    :modulated_chunk =
-      np.sin(2 * np.pi * (samples + audio);
+
+    :analytic = hilbert(signal);
+    note right
+        Hilbert transform
+        implementation from
+        scipy
+    end note
+    :amplitude, phase =
+      extract_amplitudes_phases(analytic);
+    note right
+        amplitude = np.abs(numbers)
+        phase = np.unwrap(np.angle(numbers))
+    end note
+
+    :inst_freq =
+       phases_to_instantaneous_frequencies(phase);
+    note right
+        np.diff(phase) / (2 * np.pi) * fs
+    end note
+    :shifted_inst_freq =
+      [f + self.__frequency for f in inst_freq];
+    :reconstructed_shifted =
+      get_complex_number(amplitude, phase_shifted);
+    note right
+        amplitude * np.e ** (1j * phase)
+    end note
+
+    :modulated_chunk = np.real(reconstructed_shifted);
     :insert modulated_chunk into audio;
 repeat while(next stimulus interval?) is (yes)
 ->no;
