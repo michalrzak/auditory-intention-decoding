@@ -74,7 +74,7 @@ class AMTagger(AAudioTagger):
                  stimuli_intervals: List[Tuple[float, float]],
                  frequency: int,
                  tag_generator: TagGenerator) -> None:
-        """Constructs the AMStimulus object
+        """Constructs the AMTagger object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
@@ -124,7 +124,7 @@ class FlippedFMTagger(AAudioTagger):
                  audio: Audio,
                  stimuli_intervals: List[Tuple[float, float]],
                  frequency: int) -> None:
-        """Constructs the ASSRStimulus object
+        """Constructs the FlippedFMTagger object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
