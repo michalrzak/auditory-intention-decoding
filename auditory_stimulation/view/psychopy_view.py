@@ -56,6 +56,7 @@ class PsychopyView(AView):
         self.__draw_buffer = []
         self.__previous_state = None
 
+        # generate a 440 Hz beep; used to notify the user that they can open their eyes after eyes closed resting state
         sample_count = BEEP_FS * BEEP_LENGTH_SECS
         samples = 2 * np.pi / (BEEP_FS / BEEP_NOTE) * np.arange(sample_count)
         signal = np.sin(samples, dtype=np.float32) * BEEP_VOLUME
