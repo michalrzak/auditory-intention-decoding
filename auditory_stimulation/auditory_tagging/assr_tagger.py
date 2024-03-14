@@ -116,10 +116,13 @@ class AMTagger(AAudioTagger):
 
 
 class FMTagger(AAudioTagger):
+    """Uses the audio signal as the carrier and modulates it by specified frequency. The frequency of the audio signal
+     is computed via the hilbert transform (instantaneous frequency). In essence, this only shifts the entire audio
+     spectrum up by the specified frequency (imagine a simple sine wave to see why)."""
     __frequency: int
 
     def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int):
-        """Constructs the FlippedFMTagger object
+        """Constructs the FMTagger object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
