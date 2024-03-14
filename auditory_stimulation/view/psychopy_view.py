@@ -57,7 +57,7 @@ class PsychopyView(AView):
         self.__previous_state = None
 
         sample_count = BEEP_FS * BEEP_LENGTH_SECS
-        samples = 2 * np.pi / BEEP_NOTE * np.arange(sample_count)
+        samples = 2 * np.pi / (BEEP_FS / BEEP_NOTE) * np.arange(sample_count)
         signal = np.sin(samples, dtype=np.float32) * BEEP_VOLUME
         signal_shaped = np.ascontiguousarray(np.array([signal, signal]).T)
         self.__beep_audio = Audio(signal_shaped, BEEP_FS)

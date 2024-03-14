@@ -175,7 +175,6 @@ class FMTagger(AAudioTagger):
         corrected_inst_freq = instantaneous_frequencies * (2 * np.pi) / self._audio.sampling_frequency
         phases = np.append(first_phase_reshaped, corrected_inst_freq, axis=0).cumsum(axis=0)
 
-        print(phases.shape, instantaneous_frequencies.shape)
         assert phases.shape[0] == instantaneous_frequencies.shape[0] + 1
         assert phases.shape[1] == instantaneous_frequencies.shape[1] == 2
 
@@ -184,7 +183,7 @@ class FMTagger(AAudioTagger):
     def __modulate(self, signal: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
         assert signal.shape[1] == 2
 
-        analytic = hilbert(signal)
+        analytic = hilbert(signal, axis=0)
         amplitude, phase = self.__extract_amplitudes_phases(analytic)
 
         inst_freq = self.__phases_to_instantaneous_frequencies(phase)
