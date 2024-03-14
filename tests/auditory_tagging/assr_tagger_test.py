@@ -5,7 +5,7 @@ import numpy.typing as npt
 import pytest
 
 from auditory_stimulation.audio import Audio
-from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger
+from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger, FMTagger
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
@@ -21,11 +21,17 @@ def get_am_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], fr
     return AMTagger(audio, stimuli_intervals, frequency, mock_stimulus_generation)
 
 
-def get_fm_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int) -> AAudioTagger:
+def get_flipped_fm_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int) -> AAudioTagger:
     return FlippedFMTagger(audio, stimuli_intervals, frequency)
 
 
-TAGGER_GETTERS: List[Callable[[Audio, List[Tuple[float, float]], int], AAudioTagger]] = [get_am_tagger, get_fm_tagger]
+def get_fm_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int) -> AAudioTagger:
+    return FMTagger(audio, stimuli_intervals, frequency)
+
+
+TAGGER_GETTERS: List[Callable[[Audio, List[Tuple[float, float]], int], AAudioTagger]] = [get_am_tagger,
+                                                                                         get_flipped_fm_tagger,
+                                                                                         get_fm_tagger]
 
 
 @pytest.mark.parametrize("tagger_getter", TAGGER_GETTERS)

@@ -159,17 +159,25 @@ class FMTagger(AAudioTagger):
         return output
 
     def __phases_to_instantaneous_frequencies(self, phases: npt.NDArray[Real]) -> npt.NDArray[Real]:
-        inst_freq = np.diff(phases) / (2 * np.pi) * self._audio.sampling_frequency
-        assert inst_freq.shape == phases.shape - 1
+        inst_freq = np.diff(phases, axis=0) / (2 * np.pi) * self._audio.sampling_frequency
+        assert inst_freq.shape[0] == phases.shape[0] - 1, f"Was {inst_freq.shape} vs {phases.shape} - 1"
+        assert inst_freq.shape[1] == phases.shape[1] == 2
 
         return inst_freq
 
     def __instantaneous_frequencies_to_phases(self,
                                               instantaneous_frequencies: npt.NDArray[Real],
-                                              first_phase: Real) -> npt.NDArray[Real]:
+                                              first_phase: npt.NDArray[Real]) -> npt.NDArray[Real]:
+        first_phase_reshaped = np.reshape(first_phase, (1, 2))
+        assert first_phase_reshaped.shape[0] == 1
+        assert first_phase_reshaped.shape[1] == 2
+
         corrected_inst_freq = instantaneous_frequencies * (2 * np.pi) / self._audio.sampling_frequency
-        phases = np.hstack((first_phase, corrected_inst_freq)).cumsum()
-        assert phases.shape == instantaneous_frequencies.shape + 1
+        phases = np.append(first_phase_reshaped, corrected_inst_freq, axis=0).cumsum(axis=0)
+
+        print(phases.shape, instantaneous_frequencies.shape)
+        assert phases.shape[0] == instantaneous_frequencies.shape[0] + 1
+        assert phases.shape[1] == instantaneous_frequencies.shape[1] == 2
 
         return phases
 
@@ -180,8 +188,11 @@ class FMTagger(AAudioTagger):
         amplitude, phase = self.__extract_amplitudes_phases(analytic)
 
         inst_freq = self.__phases_to_instantaneous_frequencies(phase)
-        shifted_inst_freq = np.array([f + self.__frequency for f in inst_freq])
-        phase_shifted = self.__instantaneous_frequencies_to_phases(shifted_inst_freq, phase[0])
+
+        added_freq = np.ones_like(inst_freq) * self.__frequency
+        shifted_inst_freq = inst_freq + added_freq
+
+        phase_shifted = self.__instantaneous_frequencies_to_phases(shifted_inst_freq, phase[0, :])
 
         reconstructed_shifted = self.__get_complex_number(amplitude, phase_shifted)
         assert reconstructed_shifted.shape == signal.shape
