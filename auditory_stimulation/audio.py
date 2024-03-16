@@ -43,7 +43,7 @@ class Audio:
         return f"Audio(audio-shape={self.array.shape}, sampling_frequency={self.sampling_frequency})"
 
 
-def load_wav_as_numpy_array(wav_path: PathLike) -> Audio:
+def load_wav_as_audio(wav_path: PathLike) -> Audio:
     """Opens the specified wav file and creates an Audio class. wav must be a PCM-wav file
 
     :param wav_path: Path to the to be opened wav file

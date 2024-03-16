@@ -3,7 +3,7 @@ import pathlib
 import numpy as np
 import pytest
 
-from auditory_stimulation.audio import Audio, load_wav_as_numpy_array, save_audio_as_wav
+from auditory_stimulation.audio import Audio, load_wav_as_audio, save_audio_as_wav
 
 rng = np.random.default_rng(123)
 
@@ -55,7 +55,7 @@ def test_audio_array_sample_too_out_of_bounds(sample):
 def test_load_wav_as_numpy_array_valid_call():
     path = pathlib.Path("stimuli_sounds/legacy/test.wav")
 
-    result = load_wav_as_numpy_array(path)
+    result = load_wav_as_audio(path)
 
     assert result.array is not None
     assert result.sampling_frequency is not None
@@ -74,7 +74,7 @@ def test_save_audio_as_wav_valid_call(tmp_path, shape, fs):
     save_audio_as_wav(audio, file)
     assert file.exists()
 
-    loaded_audio = load_wav_as_numpy_array(file)
+    loaded_audio = load_wav_as_audio(file)
     # cannot just do loaded_audio == audio as there may be slight differences between the audios
     allowed_delta = 0.001
     assert np.all(np.abs(loaded_audio.array - audio.array) <= allowed_delta)

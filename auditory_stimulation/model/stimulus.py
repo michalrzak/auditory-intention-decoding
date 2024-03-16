@@ -2,11 +2,13 @@ import numbers
 import pathlib
 from dataclasses import dataclass
 from os import PathLike
+from random import randint
 from typing import List, Dict, Any, Tuple, Collection, Optional, Final
 
+import numpy as np
 import yaml
 
-from auditory_stimulation.audio import Audio, load_wav_as_numpy_array
+from auditory_stimulation.audio import Audio, load_wav_as_audio
 
 
 @dataclass(frozen=True)
@@ -18,6 +20,7 @@ class Stimulus:
     primer: str
     options: Collection[str]
     time_stamps: Collection[Tuple[float, float]]
+    target: int
 
     def __post_init__(self):
         if len(self.options) != len(self.time_stamps):
@@ -27,6 +30,12 @@ class Stimulus:
             if ts[0] > ts[1]:
                 raise ValueError("The time-stamp needs to be a proper interval, having the lower interval index at "
                                  "pos. 0 and the higher interval index at pos. 1")
+
+        if self.target < 0:
+            raise ValueError("The target has to be a non-negative integer.")
+
+        if self.target >= len(self.options):
+            raise ValueError("The target is not contained within the options.")
 
     def __hash__(self):
         return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps)))
@@ -76,6 +85,10 @@ class CreatedStimulus:
     def time_stamps(self) -> Collection[Tuple[float, float]]:
         return self.__stimulus.time_stamps
 
+    @property
+    def target(self) -> int:
+        return self.__stimulus.target
+
     def __hash__(self):
         return hash((hash(self.__stimulus), self.modified_audio))
 
@@ -107,6 +120,9 @@ def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
         if not isinstance(time_stamp[0], numbers.Number) or not isinstance(time_stamp[1], numbers.Number):
             raise TypeError("The time-stamp needs to consist of two numbers")
 
+    if not isinstance(stimulus_raw["target"], int):
+        raise TypeError("The target needs to be an integer")
+
 
 def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
     """Function, which loads all stimuli contained in the provided YAML file. For the syntax of the YAML file, please
@@ -128,14 +144,92 @@ def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
         stimulus_raw = stimuli_raw[stimulus_index]
         __validate_stimulus_raw(stimulus_raw)
 
-        audio = load_wav_as_numpy_array(pathlib.Path(stimulus_raw["file"]))
+        audio = load_wav_as_audio(pathlib.Path(stimulus_raw["file"]))
         time_stamps = [(time_stamp[0], time_stamp[1]) for time_stamp in stimulus_raw["time-stamps"]]
 
         stimulus = Stimulus(audio,
                             stimulus_raw["prompt"],
                             stimulus_raw["primer"],
                             stimulus_raw["options"],
-                            time_stamps)
+                            time_stamps,
+                            stimulus_raw["target"])
         stimuli.append(stimulus)
 
     return stimuli
+
+
+def __combine_parts(intro: Audio, numbers: List[Audio], break_length: float = 0.5) -> Audio:
+    audio_break = np.zeros((break_length * intro.sampling_frequency, 2))
+
+    stimulus_array = intro
+    first = True
+    for num in numbers:
+        if not first:
+            stimulus_array = np.append(stimulus_array, audio_break, axis=0)
+
+        stimulus_array = np.append(stimulus_array, num, axis=0)
+        first = False
+
+    return Audio(stimulus_array, intro.sampling_frequency)
+
+
+def __extract_time_stamps(intro: Audio, numbers: List[Audio], break_length: float = 0.5) -> List[Tuple[float, float]]:
+    previous = intro.secs
+    time_stamps = []
+    for audio in numbers:
+        time_stamps.append((previous, audio.secs + previous))
+        previous = time_stamps[-1][1] + break_length
+
+    return time_stamps
+
+
+def __look_up_intro_text(n_intro: int, input_text_dict: Dict[str, str]) -> str:
+    return input_text_dict[f"intro-{n_intro}"]
+
+
+def __generate_prompt(input_text: str, numbers: List[str], ) -> str:
+    prompt = input_text
+    for num in numbers:
+        prompt += num
+    prompt += "."
+    return prompt
+
+
+def generate_stimuli(n: int, n_number_stimuli: int = 3) -> List[Stimulus]:
+    """
+    TODO: This function is very dirty. Probably should be remade, such that adding more voice lines, etc. dynamically
+     scales.
+
+    :param n:
+    :param n_number_stimuli:
+    :return:
+    """
+
+    with open("stimuli_sounds/intro-transcriptions.yaml", 'r') as file:
+        input_text_dict = yaml.safe_load(file)
+
+    stimuli: List[Stimulus] = []
+    for i in range(n):
+        number_stimuli = [str(randint(100, 1000)) for _ in range(n_number_stimuli)]
+        n_intro = randint(0, 9)
+
+        is_eric = bool(randint(0, 1))
+        folder = "eric" if is_eric else "natasha"
+
+        loaded_intro = load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/intro-{n_intro}.wav"))
+        loaded_numbers = [load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{0}.wav"))
+                          for _ in range(n_number_stimuli)]
+        assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
+
+        audio = __combine_parts(loaded_intro, loaded_numbers, 0.5)
+        time_stamps = __extract_time_stamps(loaded_intro, loaded_numbers, 0.5)
+
+        prompt = __generate_prompt(__look_up_intro_text(n_intro, input_text_dict), number_stimuli)
+        target = randint(0, n_number_stimuli - 1)
+        stimulus = Stimulus(audio=audio,
+                            prompt=prompt,
+                            primer=f"Remember your number: {number_stimuli[target]}",
+                            options=number_stimuli,
+                            time_stamps=time_stamps,
+                            target=target)
+        stimuli.append(stimulus)
