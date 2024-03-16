@@ -12,7 +12,7 @@ The code in this repository contains all the necessary files to reproduce and re
 # Installation
 
 The repository uses Poetry as its dependency management system. The code should work on Windows, Linux, and MacOS,
-however, Linux and MacOS may require additional steps. `Python 3.8` is used as it is the recommended distribution
+however, Linux and macOS may require additional steps. `Python 3.8` is used as it is the recommended distribution
 for `Psychopy`.
 
 To install Poetry follow the instructions at <https://python-poetry.org/docs/#installation>.
@@ -52,7 +52,7 @@ poetry install
 
 If you are using a popular distro, chances are `wxPython` provides pre-built wheels for it which can be used instead of
 the `PyPi` wheels. For this check whether <https://extras.wxpython.org/wxPython4/extras/linux/gtk3/> contains your
-distro. If yes you can run the following commands from the root of the repository to install `wxPython`:
+distro. If yes, you can run the following commands from the root of the repository to install `wxPython`:
 
 ```
 source .venv/bin/activate
@@ -66,14 +66,14 @@ deactivate
 poetry install
 ```
 
-**Note:** This requires that your virtual environment folder is located inside of the repository. If it isn't, navigate
+**Note:** This requires that your virtual environment folder is located inside the repository. If it isn't, navigate
 to its location and activate the environment there, before navigating to the root of the repository.
 
 **TODO: test if this actually works**
 
 ### Psychopy
 
-After successfully installing all dependencies, you have to allow psyhopy access to the keyboard, to properly run the
+After successfully installing all dependencies, you have to allow Psychopy access to the keyboard, to be able to run the
 experiment. You can do this via the following commands on any Linux distribution using `system.d`:
 
 ```
@@ -93,9 +93,9 @@ And paste the following into the opened file:
 
 After saving the file, restart the computer
 
-## MacOS
+## macOS
 
-MacOS is technically untested, but running this repository should be largely without problems. Note, however, that you
+macOS is technically untested, but running this repository should be largely without problems. Note, however, that you
 cannot use the `BittiumNeurOneTrigger`, as this class requires a parallel port interface, which isn't present on any
 Macs.
 
@@ -157,7 +157,7 @@ portion of the audio.
 The text shown during the experiment is defined inside
 of [experiment_texts.yaml](auditory_stimulation/experiment_texts.yaml). It defines what text is shown for each entry
 of [EExperimentState](auditory_stimulation/model/experiment_state.py). The order of the shown `EExperimentState` is
-defined inside of the [Experiment](auditory_stimulation/experiment.py). Leaving the option empty indicates that
+defined inside the [Experiment](auditory_stimulation/experiment.py). Leaving the option empty indicates that
 no-update should happen when this option is presented.
 
 ```yaml
