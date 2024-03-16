@@ -188,7 +188,7 @@ def __look_up_intro_text(n_intro: int, input_text_dict: Dict[str, str]) -> str:
     return input_text_dict[f"intro-{n_intro}"]
 
 
-def __generate_prompt(input_text: str, prompted_numbers: List[str], ) -> str:
+def __generate_prompt(input_text: str, prompted_numbers: List[str]) -> str:
     prompt = input_text
     assert isinstance(prompt, str)
 
@@ -198,7 +198,7 @@ def __generate_prompt(input_text: str, prompted_numbers: List[str], ) -> str:
             prompt += " "
         prompt += num
         first = False
-        
+
     prompt += "."
 
     assert isinstance(prompt, str)
