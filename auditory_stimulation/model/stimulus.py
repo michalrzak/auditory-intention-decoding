@@ -1,8 +1,8 @@
 import numbers
 import pathlib
+import random
 from dataclasses import dataclass
 from os import PathLike
-from random import randint
 from typing import List, Dict, Any, Tuple, Collection, Optional, Final
 
 import numpy as np
@@ -127,7 +127,6 @@ def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
 def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
     """Function, which loads all stimuli contained in the provided YAML file. For the syntax of the YAML file, please
     refer to the examples.
-    TODO: Probably need to make the syntax explicit somewhere
 
     :param path_to_yaml: A system path to a valid yaml file containing the stimuli.
     :return: A list of the loaded stimuli, from the provided file.
@@ -158,12 +157,12 @@ def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
     return stimuli
 
 
-def __combine_parts(intro: Audio, numbers: List[Audio], break_length: float = 0.5) -> Audio:
+def __combine_parts(intro: Audio, number_audios: List[Audio], break_length: float = 0.5) -> Audio:
     audio_break = np.zeros((break_length * intro.sampling_frequency, 2))
 
     stimulus_array = intro
     first = True
-    for num in numbers:
+    for num in number_audios:
         if not first:
             stimulus_array = np.append(stimulus_array, audio_break, axis=0)
 
@@ -173,10 +172,11 @@ def __combine_parts(intro: Audio, numbers: List[Audio], break_length: float = 0.
     return Audio(stimulus_array, intro.sampling_frequency)
 
 
-def __extract_time_stamps(intro: Audio, numbers: List[Audio], break_length: float = 0.5) -> List[Tuple[float, float]]:
+def __extract_time_stamps(intro: Audio, number_audios: List[Audio], break_length: float = 0.5) -> List[
+    Tuple[float, float]]:
     previous = intro.secs
     time_stamps = []
-    for audio in numbers:
+    for audio in number_audios:
         time_stamps.append((previous, audio.secs + previous))
         previous = time_stamps[-1][1] + break_length
 
@@ -187,49 +187,81 @@ def __look_up_intro_text(n_intro: int, input_text_dict: Dict[str, str]) -> str:
     return input_text_dict[f"intro-{n_intro}"]
 
 
-def __generate_prompt(input_text: str, numbers: List[str], ) -> str:
+def __generate_prompt(input_text: str, prompted_numbers: List[str], ) -> str:
     prompt = input_text
-    for num in numbers:
+    for num in prompted_numbers:
         prompt += num
     prompt += "."
     return prompt
 
 
-def generate_stimuli(n: int, n_number_stimuli: int = 3) -> List[Stimulus]:
-    """
-    TODO: This function is very dirty. Probably should be remade, such that adding more voice lines, etc. dynamically
-     scales.
+def __generate_stimulus(n_number_stimuli: int, input_text_dict: Dict[str, str]) -> Stimulus:
+    """Constructs a stimulus instance.
+    TODO: The current implementation is not testable. Potentially could be reworked later."""
+    # randomly draw what numbers will be contained within the stimulus
+    number_stimuli = [str(random.randint(100, 1000)) for _ in range(n_number_stimuli)]
 
-    :param n:
-    :param n_number_stimuli:
-    :return:
-    """
+    # randomly draw which of the intros will be used
+    intro = random.choice(list(input_text_dict.keys()))
 
-    with open("stimuli_sounds/intro-transcriptions.yaml", 'r') as file:
-        input_text_dict = yaml.safe_load(file)
+    # randomly draw, whether eric, or natasha voice is used
+    is_eric = bool(random.randint(0, 1))
+    folder = "eric" if is_eric else "natasha"
 
-    stimuli: List[Stimulus] = []
-    for i in range(n):
-        number_stimuli = [str(randint(100, 1000)) for _ in range(n_number_stimuli)]
-        n_intro = randint(0, 9)
-
-        is_eric = bool(randint(0, 1))
-        folder = "eric" if is_eric else "natasha"
-
-        loaded_intro = load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/intro-{n_intro}.wav"))
+    # load the necessary audios to construct the stimulus
+    try:
+        loaded_intro = load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{intro}.wav"))
         loaded_numbers = [load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{0}.wav"))
                           for _ in range(n_number_stimuli)]
         assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
 
-        audio = __combine_parts(loaded_intro, loaded_numbers, 0.5)
-        time_stamps = __extract_time_stamps(loaded_intro, loaded_numbers, 0.5)
+    except FileNotFoundError as e:
+        raise FileNotFoundError(str(e) + f"\nAre you sure you downloaded and extracted the stimuli correctly?"
+                                         f" Please check the installation section of the README!")
 
-        prompt = __generate_prompt(__look_up_intro_text(n_intro, input_text_dict), number_stimuli)
-        target = randint(0, n_number_stimuli - 1)
-        stimulus = Stimulus(audio=audio,
-                            prompt=prompt,
-                            primer=f"Remember your number: {number_stimuli[target]}",
-                            options=number_stimuli,
-                            time_stamps=time_stamps,
-                            target=target)
-        stimuli.append(stimulus)
+    # combine all the audio parts to a complete stimulus audio
+    audio = __combine_parts(loaded_intro, loaded_numbers, 0.5)
+
+    # get the time_stamps of the stimuli in the generated audio
+    time_stamps = __extract_time_stamps(loaded_intro, loaded_numbers, 0.5)
+
+    # create the text of the generated stimulus audio
+    prompt = __generate_prompt(input_text_dict[intro], number_stimuli)
+
+    # choose one of the numbers as the target
+    target = random.randint(0, n_number_stimuli - 1)
+
+    # given the target, creates a primer sentence
+    primer = f"Remember your number: {number_stimuli[target]}"
+
+    # construct the generated stimulus object
+    stimulus = Stimulus(audio=audio,
+                        prompt=prompt,
+                        primer=primer,
+                        options=number_stimuli,
+                        time_stamps=time_stamps,
+                        target=target)
+    return stimulus
+
+
+def generate_stimuli(n: int, n_number_stimuli: int = 3) -> List[Stimulus]:
+    """Generates n stimuli, consisting of n_number_stimuli options.
+
+    :param n: The amount of stimuli to be generated
+    :param n_number_stimuli: The amount of options generated in each stimulus.
+    :return: A list of the generated stimuli.
+    """
+
+    if n <= 0:
+        raise ValueError("n must be a positive integer!")
+
+    if n_number_stimuli <= 0:
+        raise ValueError("n_number_stimuli must be a positive integer!")
+
+    with open("stimuli_sounds/intro-transcriptions.yaml", 'r') as file:
+        input_text_dict = yaml.safe_load(file)
+
+    stimuli = [__generate_stimulus(n_number_stimuli, input_text_dict) for i in range(n)]
+    assert len(stimuli) == n
+
+    return stimuli
