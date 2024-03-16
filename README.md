@@ -164,6 +164,7 @@ To add new stimuli or change the existing stimuli simply edit the file [stimuli.
     - [ <left B>, <right B> ]
     - [ <left C>, <right C> ]
     - [ <left etc.>, <right etc.> ]
+  target: <int, index of the targeted option>
 ```
 
 Note that even though you can specify an arbitrary amount of options and time-stamps, the amount of options must match
