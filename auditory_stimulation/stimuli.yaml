@@ -1,5 +1,5 @@
 pizzeria:
-  file: "stimuli_sounds/test.wav"
+  file: "stimuli_sounds/legacy/test.wav"
   prompt: "Hello, this is Pizzeria Romano, would you like to see the menu, do a reservation, or take an order."
   primer: "You want to reserve a table at a pizzeria."
   options:
@@ -12,7 +12,7 @@ pizzeria:
     - [ 5.6, 7 ]
 
 john-feeling:
-  file: "stimuli_sounds/john-feeling.wav"
+  file: "stimuli_sounds/legacy/john-feeling.wav"
   prompt: "Hi, this is John, how are you feeling? Is it good, OK, or bad."
   primer: "You are feeling good."
   options:
@@ -25,7 +25,7 @@ john-feeling:
     - [ 5.7, 6.4 ]
 
 cafe-marie:
-  file: "stimuli_sounds/bob-cafe.wav"
+  file: "stimuli_sounds/legacy/bob-cafe.wav"
   prompt: "You have reached Cafe Marie, Bob speaking. Would you like to order something, reserve a table, or ask our opening hours?"
   primer: "You want to find out the opening hours of Cafe Marie."
   options:
@@ -38,7 +38,7 @@ cafe-marie:
     - [ 7, 8.9 ]
 
 taxi-service:
-  file: "stimuli_sounds/taxi-jones.wav"
+  file: "stimuli_sounds/legacy/taxi-jones.wav"
   prompt: "Thank you for calling Taxi service Jones, do you want to call a taxi, ask our fares, or file a complaint?"
   primer: "You want to file a complaint to the taxi service."
   options:
@@ -51,7 +51,7 @@ taxi-service:
     - [ 7.2, 9.2 ]
 
 doctor:
-  file: "stimuli_sounds/dr-garcia.wav"
+  file: "stimuli_sounds/legacy/dr-garcia.wav"
   prompt: "This is practice Dr. Garcia, are you having an emergency, do you want to book an appointment, or do you need a new prescription?"
   primer: "You want to book a doctors appointment."
   options:
@@ -64,7 +64,7 @@ doctor:
     - [ 7.6, 9.75 ]
 
 adam:
-  file: "stimuli_sounds/adam-friend.wav"
+  file: "stimuli_sounds/legacy/adam-friend.wav"
   prompt: "Hi, this is Adam, do you want to play some games, grab a drink, or go for a walk?"
   primer: "You want to play some games with Adam."
   options:

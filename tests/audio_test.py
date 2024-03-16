@@ -53,7 +53,7 @@ def test_audio_array_sample_too_out_of_bounds(sample):
 
 
 def test_load_wav_as_numpy_array_valid_call():
-    path = pathlib.Path("stimuli_sounds/test.wav")
+    path = pathlib.Path("stimuli_sounds/legacy/test.wav")
 
     result = load_wav_as_numpy_array(path)
 

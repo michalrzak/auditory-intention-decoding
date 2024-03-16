@@ -31,7 +31,7 @@ def create_yaml(contents, file):
 
 def create_test_stimulus_file(prompt, primer, options, time_stamps, tmp_path):
     contents = {"test": {
-        "file": "stimuli_sounds/test.wav",  # unfortunately cannot use a temporary audio here
+        "file": "stimuli_sounds/legacy/test.wav",  # unfortunately cannot use a temporary audio here
         "prompt": prompt,
         "primer": primer,
         "options": options,
@@ -142,7 +142,7 @@ def test_load_stimuli_options_and_time_stamps_none_should_fail(tmp_path):
 def test_load_stimuli_file_missing_should_fail(tmp_path):
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     contents = {"test": {
-        # "file": "stimuli_sounds/test.wav",  # unfortunately cannot use a temporary audio here
+        # "file": "stimuli_sounds/legacy/test.wav",  # unfortunately cannot use a temporary audio here
         "prompt": prompt,
         "primer": primer,
         "options": options,
@@ -158,7 +158,7 @@ def test_load_stimuli_file_missing_should_fail(tmp_path):
 def test_load_stimuli_prompt_missing_should_fail(tmp_path):
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     contents = {"test": {
-        "file": "stimuli_sounds/test.wav",  # unfortunately cannot use a temporary audio here
+        "file": "stimuli_sounds/legacy/test.wav",  # unfortunately cannot use a temporary audio here
         # "prompt": prompt,
         "primer": primer,
         "options": options,
@@ -174,7 +174,7 @@ def test_load_stimuli_prompt_missing_should_fail(tmp_path):
 def test_load_stimuli_primer_missing_should_fail(tmp_path):
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     contents = {"test": {
-        "file": "stimuli_sounds/test.wav",  # unfortunately cannot use a temporary audio here
+        "file": "stimuli_sounds/legacy/test.wav",  # unfortunately cannot use a temporary audio here
         "prompt": prompt,
         # "primer": primer,
         "options": options,
@@ -190,7 +190,7 @@ def test_load_stimuli_primer_missing_should_fail(tmp_path):
 def test_load_stimuli_options_missing_should_fail(tmp_path):
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     contents = {"test": {
-        "file": "stimuli_sounds/test.wav",  # unfortunately cannot use a temporary audio here
+        "file": "stimuli_sounds/legacy/test.wav",  # unfortunately cannot use a temporary audio here
         "prompt": prompt,
         "primer": primer,
         # "options": options,
@@ -206,7 +206,7 @@ def test_load_stimuli_options_missing_should_fail(tmp_path):
 def test_load_stimuli_time_stamp_missing_should_fail(tmp_path):
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     contents = {"test": {
-        "file": "stimuli_sounds/test.wav",  # unfortunately cannot use a temporary audio here
+        "file": "stimuli_sounds/legacy/test.wav",  # unfortunately cannot use a temporary audio here
         "prompt": prompt,
         "primer": primer,
         "options": options,
@@ -222,7 +222,7 @@ def test_load_stimuli_time_stamp_missing_should_fail(tmp_path):
 def test_load_stimuli_options_and_time_stamp_missing_should_fail(tmp_path):
     audio, prompt, primer, options, time_stamps = get_stimulus_parameters()
     contents = {"test": {
-        "file": "stimuli_sounds/test.wav",  # unfortunately cannot use a temporary audio here
+        "file": "stimuli_sounds/legacy/test.wav",  # unfortunately cannot use a temporary audio here
         "prompt": prompt,
         "primer": primer,
         # "options": options,
