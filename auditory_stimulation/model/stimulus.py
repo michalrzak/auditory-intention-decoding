@@ -18,7 +18,7 @@ class Stimulus:
     audio: Audio
     prompt: str
     primer: str
-    options: Collection[str]
+    options: [str]
     time_stamps: Collection[Tuple[float, float]]
     target: int
 
@@ -38,7 +38,7 @@ class Stimulus:
             raise ValueError("The target is not contained within the options.")
 
     def __hash__(self):
-        return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps)))
+        return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps), self.target))
 
 
 class CreatedStimulus:
@@ -158,22 +158,23 @@ def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
 
 
 def __combine_parts(intro: Audio, number_audios: List[Audio], break_length: float = 0.5) -> Audio:
-    audio_break = np.zeros((break_length * intro.sampling_frequency, 2))
+    audio_break = np.zeros((int(break_length * intro.sampling_frequency), 2), dtype=np.float32)
 
-    stimulus_array = intro
+    stimulus_array = intro.array
     first = True
     for num in number_audios:
         if not first:
             stimulus_array = np.append(stimulus_array, audio_break, axis=0)
 
-        stimulus_array = np.append(stimulus_array, num, axis=0)
+        stimulus_array = np.append(stimulus_array, num.array, axis=0)
         first = False
 
     return Audio(stimulus_array, intro.sampling_frequency)
 
 
-def __extract_time_stamps(intro: Audio, number_audios: List[Audio], break_length: float = 0.5) -> List[
-    Tuple[float, float]]:
+def __extract_time_stamps(intro: Audio,
+                          number_audios: List[Audio],
+                          break_length: float = 0.5) -> List[Tuple[float, float]]:
     previous = intro.secs
     time_stamps = []
     for audio in number_audios:
@@ -189,9 +190,18 @@ def __look_up_intro_text(n_intro: int, input_text_dict: Dict[str, str]) -> str:
 
 def __generate_prompt(input_text: str, prompted_numbers: List[str], ) -> str:
     prompt = input_text
+    assert isinstance(prompt, str)
+
+    first = True
     for num in prompted_numbers:
+        if not first:
+            prompt += " "
         prompt += num
+        first = False
+        
     prompt += "."
+
+    assert isinstance(prompt, str)
     return prompt
 
 
@@ -211,8 +221,8 @@ def __generate_stimulus(n_number_stimuli: int, input_text_dict: Dict[str, str]) 
     # load the necessary audios to construct the stimulus
     try:
         loaded_intro = load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{intro}.wav"))
-        loaded_numbers = [load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{0}.wav"))
-                          for _ in range(n_number_stimuli)]
+        loaded_numbers = [load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{num}.wav"))
+                          for num in number_stimuli]
         assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
 
     except FileNotFoundError as e:
@@ -232,7 +242,7 @@ def __generate_stimulus(n_number_stimuli: int, input_text_dict: Dict[str, str]) 
     target = random.randint(0, n_number_stimuli - 1)
 
     # given the target, creates a primer sentence
-    primer = f"Remember your number: {number_stimuli[target]}"
+    primer = number_stimuli[target]
 
     # construct the generated stimulus object
     stimulus = Stimulus(audio=audio,
@@ -259,7 +269,8 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3) -> List[Stimulus]:
         raise ValueError("n_number_stimuli must be a positive integer!")
 
     with open("stimuli_sounds/intro-transcriptions.yaml", 'r') as file:
-        input_text_dict = yaml.safe_load(file)
+        input_text_dict_raw = yaml.safe_load(file)
+    input_text_dict = {key: input_text_dict_raw[key][0] for key in input_text_dict_raw}
 
     stimuli = [__generate_stimulus(n_number_stimuli, input_text_dict) for i in range(n)]
     assert len(stimuli) == n

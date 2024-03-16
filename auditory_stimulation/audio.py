@@ -20,6 +20,9 @@ class Audio:
         if len(self.array.shape) != 2 or self.array.shape[1] != 2:
             raise ValueError("The supplied audio must be of shape Nx2!")
 
+        if self.array.dtype != np.float32:
+            raise TypeError("The provided audio must be a numpy array of type np.float32!")
+
         if self.sampling_frequency <= 0:
             raise ValueError("The sampling frequency must be a positive integer!")
 
