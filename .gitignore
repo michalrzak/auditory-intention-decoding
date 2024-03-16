@@ -6,4 +6,3 @@ logs
 # ignore files which needs to be downloaded additionally
 stimuli_sounds/eric
 stimuli_sounds/natasha
-stimuli_sounds/intro-transcriptions.yaml
