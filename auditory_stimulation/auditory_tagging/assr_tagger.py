@@ -146,8 +146,8 @@ class AMTagger(AAudioTagger):
         return Audio(audio_copy, self._audio.sampling_frequency)
 
     def __repr__(self) -> str:
-        return f"AMTagger({super().__repr__()}, frequency={self.__frequency}, " \
-               f"tag_generator={self.__tag_generator.__name__}, signal_interval={self.__signal_interval})"
+        return self._get_repr("AMTagger", frequency=str(self.__frequency), tag_generator=self.__tag_generator.__name__,
+                              signal_interval=str(self.__signal_interval))
 
 
 class FMTagger(AAudioTagger):
@@ -260,8 +260,8 @@ class FMTagger(AAudioTagger):
         return Audio(_scale_down_signal(audio_copy), self._audio.sampling_frequency)
 
     def __repr__(self) -> str:
-        return f"FMTagger({super().__repr__()}, frequency={self.__frequency}, " \
-               f"modulation_factor={self.__modulation_factor})"
+        return self._get_repr("FMTagger", frequency=str(self.__frequency),
+                              modulation_factor=str(self.__modulation_factor))
 
 
 class FlippedFMTagger(AAudioTagger):
@@ -309,7 +309,7 @@ class FlippedFMTagger(AAudioTagger):
         return Audio(audio_copy, self._audio.sampling_frequency)
 
     def __repr__(self) -> str:
-        return f"FlippedFMTagger({super().__repr__()}, frequency={self.__frequency})"
+        return self._get_repr("FlippedFMTagger", frequency=str(self.__frequency))
 
 
 class AMTaggerFactory(AAudioTaggerFactory):

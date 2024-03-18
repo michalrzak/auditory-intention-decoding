@@ -130,8 +130,8 @@ class NoiseTaggingTagger(AAudioTagger):
             code_print += str(c)
         code_print += "]"
 
-        return f"NoiseTaggingTagger({super().__repr__()},  bit_width={self.__bit_width}, " \
-               f"length_bit={self.__length_bit}, code={code_print},)"
+        return self._get_repr("NoiseTaggingTagger", bit_width=str(self.__bit_width), length_bit=str(self.__length_bit),
+                              code=code_print)
 
 
 class NoiseTaggingTaggerFactory(AAudioTaggerFactory):

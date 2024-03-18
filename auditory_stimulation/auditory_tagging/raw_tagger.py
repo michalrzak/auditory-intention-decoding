@@ -11,7 +11,7 @@ class RawTagger(AAudioTagger):
         return self._audio
 
     def __repr__(self) -> str:
-        return f"RawTagger({super().__repr__()})"
+        return self._get_repr("RawTagger")
 
 
 class RawTaggerFactory(AAudioTaggerFactory):

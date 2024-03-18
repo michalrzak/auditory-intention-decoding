@@ -82,8 +82,12 @@ class AAudioTagger(ABC):
         """Constructs the modified audio."""
         ...
 
-    def __repr__(self) -> str:
-        return f"{repr(self._audio)}, stimuli_intervals={self._stimuli_intervals}"
+    def _get_repr(self, class_name: str, **kwargs) -> str:
+        args = ""
+        for key in kwargs:
+            args += f", {key}={kwargs[key]}"
+
+        return f"{class_name}(audio={repr(self._audio)}, stimuli_intervals={self._stimuli_intervals}{args}"
 
 
 class AAudioTaggerFactory(ABC):
