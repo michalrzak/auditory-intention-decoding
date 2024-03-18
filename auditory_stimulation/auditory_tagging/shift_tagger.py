@@ -72,14 +72,16 @@ class ShiftSumTagger(AAudioTagger):
 
 
 class SpectrumShiftTagger(AAudioTagger):
+    """A tagger, which works  by simply shifting the audio by the desired frequency. This does not add anything to the
+    signal, but simply shifts the spectrum of the desired parts by the desired value."""
+
     def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]], shift_by: int) -> None:
         """Constructs the SpectrumShiftTagger object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
         :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
          intervals must be contained within the audio.
-        :param shift_by: The amount by which original audio will be shifted, before being added to the signal again.
-         This can also be interpreted as the tagging frequency.
+        :param shift_by: The amount by which original audio will be shifted.
         """
         super().__init__(audio, stimuli_intervals)
         if shift_by < 0:
