@@ -76,9 +76,9 @@ class Model:
 
         created_stimuli = []
         for factory, stimulus in zip(applied_factories, self.__raw_stimuli):
-            auditory_stimulus = factory.create_auditory_tagger(stimulus.audio, stimulus.time_stamps, )
-            modified_audio = auditory_stimulus.create()
-            created_stimuli.append(CreatedStimulus(stimulus, modified_audio, type(factory).__name__))
+            auditory_tagger = factory.create_auditory_tagger(stimulus.audio, stimulus.time_stamps)
+            modified_audio = auditory_tagger.create()
+            created_stimuli.append(CreatedStimulus(stimulus, modified_audio, auditory_tagger))
 
         self.__created_stimuli = created_stimuli
 
