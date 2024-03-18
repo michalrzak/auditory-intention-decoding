@@ -83,7 +83,6 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
         stimuli.append(stimulus)
 
     assert len(stimuli) == n
-
     return stimuli
 
 
