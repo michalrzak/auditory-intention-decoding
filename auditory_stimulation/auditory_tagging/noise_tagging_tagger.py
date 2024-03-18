@@ -122,6 +122,17 @@ class NoiseTaggingTagger(AAudioTagger):
 
         return np.copy(self.__code)
 
+    def __repr__(self) -> str:
+        code_print = "["
+        for c in self.code[:, 0][::self.__bit_width]:
+            if len(code_print) != 1:
+                code_print += ", "
+            code_print += str(c)
+        code_print += "]"
+
+        return f"NoiseTaggingTagger({super().__repr__()},  bit_width={self.__bit_width}, " \
+               f"length_bit={self.__length_bit}, code={code_print},)"
+
 
 class NoiseTaggingTaggerFactory(AAudioTaggerFactory):
     _bits_per_second: int

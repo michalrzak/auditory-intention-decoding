@@ -37,8 +37,12 @@ class Stimulus:
         if self.target >= len(self.options):
             raise ValueError("The target is not contained within the options.")
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps), self.target))
+
+    def __repr__(self) -> str:
+        return f"Stimulus({repr(self.audio)}, prompt={self.prompt}, primer={self.primer}, options={self.options}, " \
+               f"time_stamps={self.time_stamps}, target={self.target})"
 
 
 class CreatedStimulus:
@@ -87,8 +91,11 @@ class CreatedStimulus:
     def target(self) -> int:
         return self.__stimulus.target
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((hash(self.__stimulus), self.modified_audio))
+
+    def __repr__(self) -> str:
+        return f"CreatedStimulus({repr(self.__stimulus)}, {repr(self.modified_audio)}, {repr(self.used_tagger)})"
 
 
 def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:

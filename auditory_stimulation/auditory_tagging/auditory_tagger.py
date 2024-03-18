@@ -82,6 +82,9 @@ class AAudioTagger(ABC):
         """Constructs the modified audio."""
         ...
 
+    def __repr__(self) -> str:
+        return f"{repr(self._audio)}, stimuli_intervals={self._stimuli_intervals}"
+
 
 class AAudioTaggerFactory(ABC):
     """Class, used to construct AuditoryStimuli."""

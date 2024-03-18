@@ -54,6 +54,9 @@ class ShiftSumTagger(AAudioTagger):
 
         return audio_combined
 
+    def __repr__(self) -> str:
+        return f"ShiftSumTagger({super().__repr__()}, shift_by={self.__shift_by})"
+
 
 class ShiftSumTaggerFactory(AAudioTaggerFactory):
     __shift_by: int

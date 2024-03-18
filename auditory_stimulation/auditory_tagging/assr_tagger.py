@@ -93,6 +93,10 @@ class AMTagger(AAudioTagger):
         self.__frequency = frequency
         self.__tag_generator = tag_generator
 
+    def __repr__(self) -> str:
+        return f"AMTagger({super().__repr__()}, frequency={self.__frequency}, " \
+               f"tag_generator={self.__tag_generator.__name__})"
+
     def create(self) -> Audio:
         """This method is implemented from the abstract super class. When called, it generates the AM tagged audio.
 
@@ -224,6 +228,10 @@ class FMTagger(AAudioTagger):
 
         return Audio(_scale_down_signal(audio_copy), self._audio.sampling_frequency)
 
+    def __repr__(self) -> str:
+        return f"FMTagger({super().__repr__()}, frequency={self.__frequency}, " \
+               f"modulation_factor={self.__modulation_factor})"
+
 
 class FlippedFMTagger(AAudioTagger):
     """This tagger tags the given audio signal with the tagging frequency, by interpreting the tagging frequency as the
@@ -268,6 +276,9 @@ class FlippedFMTagger(AAudioTagger):
             audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
 
         return Audio(audio_copy, self._audio.sampling_frequency)
+
+    def __repr__(self) -> str:
+        return f"FlippedFMTagger({super().__repr__()}, frequency={self.__frequency})"
 
 
 class AMTaggerFactory(AAudioTaggerFactory):

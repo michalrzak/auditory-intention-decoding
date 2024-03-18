@@ -124,3 +124,25 @@ def test_create_shouldThrow_bitsPerSecondBellowZero():
                                       bits_per_second,
                                       length,
                                       SEED)
+
+
+def test_code_should_have_expected_shape():
+    n_input = 100
+    sampling_frequency = 10
+    audio = get_mock_audio(n_input, sampling_frequency)
+
+    labeled_interval = (0, 2)  # 2 seconds labeled
+    bits_per_second = 5
+    length = bits_per_second * 2
+
+    stimulus = NoiseTaggingTagger(audio,
+                                  [labeled_interval],
+                                  bits_per_second,
+                                  length,
+                                  SEED)
+    stimulus.create()
+
+    code = stimulus.code
+
+    assert code.shape[1] == 2
+    assert code.shape[0] == length * (sampling_frequency / bits_per_second)
