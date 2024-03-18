@@ -108,6 +108,9 @@ class SpectrumShiftTagger(AAudioTagger):
 
         return audio_combined
 
+    def __repr__(self) -> str:
+        return self._get_repr("SpectrumShiftTagger", shift_by=str(self.__shift_by))
+
 
 class ShiftSumTaggerFactory(AAudioTaggerFactory):
     __shift_by: int
