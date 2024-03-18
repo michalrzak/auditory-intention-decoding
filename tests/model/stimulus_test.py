@@ -3,7 +3,8 @@ import pytest
 import yaml
 
 from auditory_stimulation.audio import Audio
-from auditory_stimulation.model.stimulus import Stimulus, CreatedStimulus, load_stimuli
+from auditory_stimulation.model.stimulus import Stimulus, CreatedStimulus, load_stimuli, generate_stimulus
+from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
 def get_stimulus_parameters():
@@ -15,6 +16,17 @@ def get_stimulus_parameters():
     target = 1
 
     return audio, prompt, primer, options, time_stamps, target
+
+
+def get_generate_stimulus_parameters(intro_length: int, option_length: int, fs: int, n_options: int):
+    intro_audio = get_mock_audio(intro_length, fs)
+    intro_text = "intro"
+    option_audios = [get_mock_audio(option_length, fs) for _ in range(n_options)]
+    option_texts = [f"option-{i}" for i in range(n_options)]
+    target = 0
+    pause_secs = 0.5
+
+    return intro_audio, intro_text, option_audios, option_texts, target, pause_secs
 
 
 def stimulus_checks(stimulus, audio, prompt, primer, options, time_stamps, target):
@@ -270,3 +282,47 @@ def test_load_stimuli_time_stamps_invalid_format_should_fail(tmp_path, new_time_
 
     with pytest.raises(Exception):
         stimuli = load_stimuli(file)
+
+
+@pytest.mark.parametrize("n_options", [1, 2, 3, 4, 10])
+def test_generate_stimulus_valid_call(n_options: int):
+    intro_length = 1000
+    option_length = 200
+    fs = 100
+
+    intro_audio, intro_text, option_audios, option_texts, target, pause_secs = \
+        get_generate_stimulus_parameters(intro_length, option_length, fs, n_options)
+
+    stimulus = generate_stimulus(intro_audio, intro_text, option_audios, option_texts, target, pause_secs)
+
+    assert stimulus.audio.secs == (intro_length / fs) + (option_length / fs) * n_options + (n_options - 1) * pause_secs
+    assert intro_text in stimulus.prompt
+    assert option_texts[target] in stimulus.primer
+    assert stimulus.target == target
+    assert len(stimulus.options) == len(option_texts)
+
+
+@pytest.mark.parametrize("target", [-10, -1, 2, 3, 4])
+def test_generate_stimulus_invalid_target_should_fail(target: int):
+    intro_length = 1000
+    option_length = 200
+    fs = 100
+
+    intro_audio, intro_text, option_audios, option_texts, _, pause_secs = \
+        get_generate_stimulus_parameters(intro_length, option_length, fs, 2)
+
+    with pytest.raises(ValueError):
+        stimulus = generate_stimulus(intro_audio, intro_text, option_audios, option_texts, target, pause_secs)
+
+
+@pytest.mark.parametrize("pause_secs", [-1000, -10, -1, -0.1, -0.0001])
+def test_generate_stimulus_invalid_pause_secs_should_fail(pause_secs: float):
+    intro_length = 1000
+    option_length = 200
+    fs = 100
+
+    intro_audio, intro_text, option_audios, option_texts, target, _ = \
+        get_generate_stimulus_parameters(intro_length, option_length, fs, 2)
+
+    with pytest.raises(ValueError):
+        stimulus = generate_stimulus(intro_audio, intro_text, option_audios, option_texts, target, pause_secs)

@@ -12,6 +12,7 @@ def get_mock_audio(n_input: int, sampling_frequency: int, seed: int = 100) -> Au
     audio = mockito.mock(Audio)
     audio.array = np.array(np.random.random_sample((n_input, 2)), dtype=np.float32)
     audio.sampling_frequency = sampling_frequency
+    audio.secs = len(audio.array) / sampling_frequency
 
     return audio
 
