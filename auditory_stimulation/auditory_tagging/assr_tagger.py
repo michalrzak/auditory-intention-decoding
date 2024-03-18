@@ -325,7 +325,7 @@ class AMTaggerFactory(AAudioTaggerFactory):
         self._stimulus_generator = tag_generator
         self._signal_interval = signal_interval
 
-    def create_auditory_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audito_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return AMTagger(audio,
                         stimuli_intervals,
                         self._frequency,
@@ -341,7 +341,7 @@ class FMTaggerFactory(AAudioTaggerFactory):
         self._frequency = frequency
         self._modulation_factor = modulation_factor
 
-    def create_auditory_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audito_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return FMTagger(audio,
                         stimuli_intervals,
                         self._frequency,
@@ -354,7 +354,7 @@ class FlippedFMTaggerFactory(AAudioTaggerFactory):
     def __init__(self, frequency: int) -> None:
         self._frequency = frequency
 
-    def create_auditory_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audito_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return FlippedFMTagger(audio,
                                stimuli_intervals,
                                self._frequency)

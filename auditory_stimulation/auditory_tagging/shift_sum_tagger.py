@@ -64,5 +64,5 @@ class ShiftSumTaggerFactory(AAudioTaggerFactory):
     def __init__(self, shift_by: int):
         self.__shift_by = shift_by
 
-    def create_auditory_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audito_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return ShiftSumTagger(audio, stimuli_intervals, self.__shift_by)

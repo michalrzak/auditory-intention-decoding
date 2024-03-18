@@ -32,7 +32,7 @@ def test_audio_taggers_create_valid_call_audio_should_be_modified_to_half_point(
 
     stimuli_intervals = [(0, n_input / sampling_frequency / 2)]
 
-    tagger = audio_tagger_factory.create_auditory_tagger(audio, stimuli_intervals)
+    tagger = audio_tagger_factory.create_audito_tagger(audio, stimuli_intervals)
     modified_audio = tagger.create()
 
     assert modified_audio is not None
