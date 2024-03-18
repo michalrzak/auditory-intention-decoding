@@ -18,7 +18,7 @@ class Stimulus:
     audio: Audio
     prompt: str
     primer: str
-    options: [str]
+    options: Collection[str]
     time_stamps: Collection[Tuple[float, float]]
     target: int
 
