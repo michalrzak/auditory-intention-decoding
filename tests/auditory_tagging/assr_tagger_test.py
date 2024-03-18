@@ -111,3 +111,34 @@ def test_ASSRTagger_create_validCall(tagger_getter):
                          [(0, n_input / sampling_frequency)],
                          stimulus_frequency)
     stim.create()
+
+
+@pytest.mark.parametrize("signal_interval", [(-1, 1), (-2, 2), (-3, -1), (1, 3), (0.5, 1.7)])
+def test_am_tagger_signal_interval_valid_call(signal_interval: Tuple[float, float]):
+    n_input = 1000
+    sampling_frequency = 20
+    audio = get_mock_audio(n_input, sampling_frequency)
+
+    stimulus_frequency = 5
+
+    signal = AMTagger(audio,
+                      [(0, n_input / sampling_frequency)],
+                      stimulus_frequency,
+                      mock_stimulus_generation,
+                      signal_interval)
+
+
+@pytest.mark.parametrize("signal_interval", [(1, -1), (2, -2), (-1, -3), (3, 1), (1.7, 0.5)])
+def test_am_tagger_signal_interval_invalid_interval_should_throw(signal_interval: Tuple[float, float]):
+    n_input = 1000
+    sampling_frequency = 20
+    audio = get_mock_audio(n_input, sampling_frequency)
+
+    stimulus_frequency = 5
+
+    with pytest.raises(ValueError):
+        signal = AMTagger(audio,
+                          [(0, n_input / sampling_frequency)],
+                          stimulus_frequency,
+                          mock_stimulus_generation,
+                          signal_interval)

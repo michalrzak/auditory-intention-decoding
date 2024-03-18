@@ -11,6 +11,21 @@ from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, 
 from auditory_stimulation.auditory_tagging.tag_generators import TagGenerator, sine_signal
 
 
+def _shape_signal(signal: npt.NDArray[np.float32], signal_interval: Tuple[float, float]) -> npt.NDArray[np.float32]:
+    """Expects a signal in the range -1 to 1"""
+    if signal_interval[0] == -1 and signal_interval[1] == 1:
+        return signal
+
+    # the following is just an assert statement as checking it could potentially take a very long time
+    assert all(-1 <= signal) and all(signal <= 1)
+
+    shaped_signal = abs(signal_interval[1] - signal_interval[0]) / 2 * (signal + 1) + signal_interval[0]
+    assert shaped_signal.shape[0] == signal.shape[0]
+    assert len(shaped_signal.shape) == 1
+
+    return shaped_signal
+
+
 def amplitude_modulation(signal: npt.NDArray[np.float32],
                          modulation_code: npt.NDArray[Number]) -> npt.NDArray[np.float32]:
     """Applies amplitude modulation to signal and modulation code and returns the resulting signal. The modulation code
@@ -69,12 +84,14 @@ class AMTagger(AAudioTagger):
     """
     __frequency: int
     __tag_generator: TagGenerator
+    __signal_interval: Tuple[float, float]
 
     def __init__(self,
                  audio: Audio,
                  stimuli_intervals: List[Tuple[float, float]],
                  frequency: int,
-                 tag_generator: TagGenerator) -> None:
+                 tag_generator: TagGenerator,
+                 signal_interval: Tuple[float, float] = (-1, 1)) -> None:
         """Constructs the AMTagger object
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
@@ -83,6 +100,8 @@ class AMTagger(AAudioTagger):
         :param frequency: The frequency of the AM tag
         :param tag_generator: A function, which given the length, stimulus frequency and sampling frequency
          generates the tagging signal.
+        :param signal_interval: Default = (-1, 1). The interval of the generated signal. The first value specifies the
+         lower boundary, the second value of the upper boundary.
         """
 
         super().__init__(audio, stimuli_intervals)
@@ -90,12 +109,17 @@ class AMTagger(AAudioTagger):
         if frequency <= 0:
             raise ValueError("The frequency has to be a positive number")
 
+        if signal_interval[0] > signal_interval[1]:
+            raise ValueError(
+                "The first value of the signal interval needs to be the lower boundary, while the second value"
+                " is the upper boundary, which does not seem to be the case!")
+
+        if signal_interval[0] == signal_interval[1]:
+            raise ValueError("The interval cannot have length 0!")
+
         self.__frequency = frequency
         self.__tag_generator = tag_generator
-
-    def __repr__(self) -> str:
-        return f"AMTagger({super().__repr__()}, frequency={self.__frequency}, " \
-               f"tag_generator={self.__tag_generator.__name__})"
+        self.__signal_interval = signal_interval
 
     def create(self) -> Audio:
         """This method is implemented from the abstract super class. When called, it generates the AM tagged audio.
@@ -109,14 +133,21 @@ class AMTagger(AAudioTagger):
             sample_range = (int(interval[0] * self._audio.sampling_frequency),
                             int(interval[1] * self._audio.sampling_frequency))
 
-            # generate sine of the appropriate frequency
+            # generate tag of the appropriate frequency
             signal_length = sample_range[1] - sample_range[0]
-            added_signal = self.__tag_generator(signal_length, self.__frequency, self._audio.sampling_frequency)
+            added_signal_raw = self.__tag_generator(signal_length, self.__frequency, self._audio.sampling_frequency)
+
+            # change the interval of the tag to the set range
+            added_signal = _shape_signal(added_signal_raw, self.__signal_interval)
 
             modulated_chunk = amplitude_modulation(audio_copy[sample_range[0]:sample_range[1]], added_signal)
             audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
 
         return Audio(audio_copy, self._audio.sampling_frequency)
+
+    def __repr__(self) -> str:
+        return f"AMTagger({super().__repr__()}, frequency={self.__frequency}, " \
+               f"tag_generator={self.__tag_generator.__name__}, signal_interval={self.__signal_interval})"
 
 
 class FMTagger(AAudioTagger):
@@ -284,19 +315,22 @@ class FlippedFMTagger(AAudioTagger):
 class AMTaggerFactory(AAudioTaggerFactory):
     _frequency: int
     _tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]]
+    _signal_interval: Tuple[float, float]
 
     def __init__(self,
                  frequency: int,
                  tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]],
-                 ) -> None:
+                 signal_interval: Tuple[float, float] = (-1, 1)) -> None:
         self._frequency = frequency
         self._stimulus_generator = tag_generator
+        self._signal_interval = signal_interval
 
     def create_auditory_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return AMTagger(audio,
                         stimuli_intervals,
                         self._frequency,
-                        self._stimulus_generator)
+                        self._stimulus_generator,
+                        self._signal_interval)
 
 
 class FMTaggerFactory(AAudioTaggerFactory):
