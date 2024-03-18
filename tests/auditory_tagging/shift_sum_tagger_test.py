@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from auditory_stimulation.auditory_tagging.shift_sum_tagger import ShiftSumTagger
+from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 

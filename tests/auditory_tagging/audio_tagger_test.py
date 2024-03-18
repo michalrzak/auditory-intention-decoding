@@ -4,7 +4,7 @@ import pytest
 
 from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory, FlippedFMTaggerFactory, FMTaggerFactory
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTaggerFactory
-from auditory_stimulation.auditory_tagging.shift_sum_tagger import ShiftSumTaggerFactory
+from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTaggerFactory
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 

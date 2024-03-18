@@ -8,7 +8,7 @@ from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, 
 
 
 class ShiftSumTagger(AAudioTagger):
-    """A tagger, which works by first shifiting the provided audio by the specified frequency and then overlaying
+    """A tagger, which works by first shifting the provided audio by the specified frequency and then overlaying
     (summing) the original and the shifted audio together. This produces a signal with an apparent frequency of the
     shifted amount.
     """
