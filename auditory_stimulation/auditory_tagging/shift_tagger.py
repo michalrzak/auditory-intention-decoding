@@ -1,3 +1,4 @@
+from numbers import Complex
 from typing import List, Tuple
 
 import numpy as np
@@ -8,7 +9,7 @@ from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, 
     AAudioTaggerFactory
 
 
-def _get_shift_multiplier(shift_by: int, length: int, fs: int) -> npt.NDArray[np.float32]:
+def _get_shift_multiplier(shift_by: int, length: int, fs: int) -> npt.NDArray[Complex]:
     n = np.arange(length)
 
     multiplier = np.e ** ((1j * 2 * np.pi * shift_by * n) / fs)
