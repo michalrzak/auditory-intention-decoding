@@ -11,6 +11,7 @@ from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTagg
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTaggerFactory
 from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTaggerFactory
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
+from auditory_stimulation.eeg.FileTriggerSender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
@@ -104,6 +105,9 @@ def main() -> None:
     view = PsychopyView(psychopy_player, experiment_texts, window)
 
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
+
+    trigger_sender = FileTriggerSender("test.txt")
+    model.register(trigger_sender, 1)
 
     experiment = Experiment(model, view)
     experiment.run()
