@@ -54,6 +54,7 @@ package model {
         +str primer
         +List[str] options
         +List[Tuple[float, float]] time_stamps
+        +int target
     }
     Stimulus "1" *-- "1" Audio: audio
 
@@ -66,6 +67,7 @@ package model {
         +str primer()
         +List[str] options()
         +List[Tuple[float, float]] time_stamps()
+        +int target()
     }
     CreatedStimulus "1" *-l- "1" Audio: modified_audio
 
