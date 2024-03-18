@@ -8,10 +8,18 @@ from auditory_stimulation.audio import Audio, load_wav_as_audio, save_audio_as_w
 rng = np.random.default_rng(123)
 
 
+def audio_array_zeros(shape):
+    return np.zeros(shape, dtype=np.float32)
+
+
+def audio_array_ones(shape):
+    return np.ones(shape, dtype=np.float32)
+
+
 @pytest.mark.parametrize("shape", [(100, 2), (1000, 2), (1, 2), (10000, 2)])
 @pytest.mark.parametrize("fs", [1, 2, 10, 20, 100, 1000])
 def test_audio_valid_call(shape, fs):
-    audio_array = np.zeros(shape)
+    audio_array = audio_array_zeros(shape)
     audio = Audio(audio_array, fs)
 
     assert np.all(audio.array == audio_array)
@@ -19,7 +27,7 @@ def test_audio_valid_call(shape, fs):
 
 
 def test_audio_sampling_frequency_zero_should_fail():
-    audio_array = np.zeros((100, 2))
+    audio_array = audio_array_zeros((100, 2))
     fs = 0
 
     with pytest.raises(ValueError):
@@ -28,7 +36,7 @@ def test_audio_sampling_frequency_zero_should_fail():
 
 @pytest.mark.parametrize("fs", [-1, -2, -10, -100, -1000])
 def test_audio_sampling_frequency_bellow_zero_should_fail(fs):
-    audio_array = np.zeros((100, 2))
+    audio_array = audio_array_zeros((100, 2))
 
     with pytest.raises(ValueError):
         audio = Audio(audio_array, fs)
@@ -36,7 +44,7 @@ def test_audio_sampling_frequency_bellow_zero_should_fail(fs):
 
 @pytest.mark.parametrize("shape", [(100, 3), (100, 1), (100, 1000), (100, 0)])
 def test_audio_array_invalid_shape_should_fail(shape):
-    audio_array = np.zeros(shape)
+    audio_array = audio_array_zeros(shape)
     fs = -1
 
     with pytest.raises(ValueError):
@@ -45,7 +53,7 @@ def test_audio_array_invalid_shape_should_fail(shape):
 
 @pytest.mark.parametrize("sample", [2, 3, 1.1, 1.01, -2, -3, -1.1, -1.01])
 def test_audio_array_sample_too_out_of_bounds(sample):
-    audio_array = np.ones((100, 2)) * sample
+    audio_array = audio_array_ones((100, 2)) * sample
     fs = 10
 
     with pytest.raises(ValueError):
