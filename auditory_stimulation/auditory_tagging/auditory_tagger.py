@@ -94,5 +94,5 @@ class AAudioTaggerFactory(ABC):
     """Class, used to construct AuditoryStimuli."""
 
     @abstractmethod
-    def create_audito_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         ...
