@@ -29,7 +29,9 @@ This should automatically create a virtual environment of the required Python ve
 **Note 2:** I prefer to have my virtual environment saved in the repository folder, which is not the default behavior of
 Poetry. To change this, follow the instructions outlined
 in: <https://python-poetry.org/docs/configuration/#virtualenvsin-project>
+
 ---
+
 This project further requires a lot of sound files, which would be too large to include in GitHub. Hence, please
 **download the required sound files** from:
 <https://www.dropbox.com/scl/fo/ho3jkefzlyecmx5554b2t/h?rlkey=xg5qemxm9e57bsmqot4owovv8&dl=0>
