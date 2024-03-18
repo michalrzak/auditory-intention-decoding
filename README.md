@@ -12,7 +12,7 @@ The code in this repository contains all the necessary files to reproduce and re
 # Installation
 
 The repository uses Poetry as its dependency management system. The code should work on Windows, Linux, and MacOS,
-however, Linux and MacOS may require additional steps. `Python 3.8` is used as it is the recommended distribution
+however, Linux and macOS may require additional steps. `Python 3.8` is used as it is the recommended distribution
 for `Psychopy`.
 
 To install Poetry follow the instructions at <https://python-poetry.org/docs/#installation>.
@@ -29,6 +29,26 @@ This should automatically create a virtual environment of the required Python ve
 **Note 2:** I prefer to have my virtual environment saved in the repository folder, which is not the default behavior of
 Poetry. To change this, follow the instructions outlined
 in: <https://python-poetry.org/docs/configuration/#virtualenvsin-project>
+---
+This project further requires a lot of sound files, which would be too large to include in GitHub. Hence, please
+**download the required sound files** from:
+<https://www.dropbox.com/scl/fo/ho3jkefzlyecmx5554b2t/h?rlkey=xg5qemxm9e57bsmqot4owovv8&dl=0>
+and extract them to the `stimumli_sounds` folder. After extracting the files, the resulting folder structure should look
+like this:
+
+```
+stimuli_sounds
+├── eric
+│   ├── ...
+│   └── ...
+├── legacy
+│   ├── ...
+│   └── ...
+├── natasha
+│   ├── ...
+│   └── ...
+└── intro-transcriptions.yaml
+```
 
 ## Linux:
 
@@ -52,7 +72,7 @@ poetry install
 
 If you are using a popular distro, chances are `wxPython` provides pre-built wheels for it which can be used instead of
 the `PyPi` wheels. For this check whether <https://extras.wxpython.org/wxPython4/extras/linux/gtk3/> contains your
-distro. If yes you can run the following commands from the root of the repository to install `wxPython`:
+distro. If yes, you can run the following commands from the root of the repository to install `wxPython`:
 
 ```
 source .venv/bin/activate
@@ -66,14 +86,14 @@ deactivate
 poetry install
 ```
 
-**Note:** This requires that your virtual environment folder is located inside of the repository. If it isn't, navigate
+**Note:** This requires that your virtual environment folder is located inside the repository. If it isn't, navigate
 to its location and activate the environment there, before navigating to the root of the repository.
 
 **TODO: test if this actually works**
 
 ### Psychopy
 
-After successfully installing all dependencies, you have to allow psyhopy access to the keyboard, to properly run the
+After successfully installing all dependencies, you have to allow Psychopy access to the keyboard, to be able to run the
 experiment. You can do this via the following commands on any Linux distribution using `system.d`:
 
 ```
@@ -93,9 +113,9 @@ And paste the following into the opened file:
 
 After saving the file, restart the computer
 
-## MacOS
+## macOS
 
-MacOS is technically untested, but running this repository should be largely without problems. Note, however, that you
+macOS is technically untested, but running this repository should be largely without problems. Note, however, that you
 cannot use the `BittiumNeurOneTrigger`, as this class requires a parallel port interface, which isn't present on any
 Macs.
 
@@ -144,6 +164,7 @@ To add new stimuli or change the existing stimuli simply edit the file [stimuli.
     - [ <left B>, <right B> ]
     - [ <left C>, <right C> ]
     - [ <left etc.>, <right etc.> ]
+  target: <int, index of the targeted option>
 ```
 
 Note that even though you can specify an arbitrary amount of options and time-stamps, the amount of options must match
@@ -157,7 +178,7 @@ portion of the audio.
 The text shown during the experiment is defined inside
 of [experiment_texts.yaml](auditory_stimulation/experiment_texts.yaml). It defines what text is shown for each entry
 of [EExperimentState](auditory_stimulation/model/experiment_state.py). The order of the shown `EExperimentState` is
-defined inside of the [Experiment](auditory_stimulation/experiment.py). Leaving the option empty indicates that
+defined inside the [Experiment](auditory_stimulation/experiment.py). Leaving the option empty indicates that
 no-update should happen when this option is presented.
 
 ```yaml

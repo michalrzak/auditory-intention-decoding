@@ -2,3 +2,7 @@
 .idea
 **/__pycache__/**
 logs
+
+# ignore files which needs to be downloaded additionally
+stimuli_sounds/eric
+stimuli_sounds/natasha
