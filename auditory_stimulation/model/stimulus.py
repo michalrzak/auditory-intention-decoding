@@ -2,12 +2,13 @@ import numbers
 import pathlib
 from dataclasses import dataclass
 from os import PathLike
-from typing import List, Dict, Any, Tuple, Collection, Optional, Final, Sequence
+from typing import List, Dict, Any, Tuple, Collection, Final, Sequence
 
 import numpy as np
 import yaml
 
 from auditory_stimulation.audio import Audio, load_wav_as_audio
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 
 
 @dataclass(frozen=True)
@@ -36,8 +37,12 @@ class Stimulus:
         if self.target >= len(self.options):
             raise ValueError("The target is not contained within the options.")
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps), self.target))
+
+    def __repr__(self) -> str:
+        return f"Stimulus({repr(self.audio)}, prompt={self.prompt}, primer={self.primer}, options={self.options}, " \
+               f"time_stamps={self.time_stamps}, target={self.target})"
 
 
 class CreatedStimulus:
@@ -48,21 +53,19 @@ class CreatedStimulus:
     """
     __stimulus: Stimulus
     modified_audio: Final[Audio]
-    used_tagger_label: Final[Optional[str]]
+    used_tagger: Final[AAudioTagger]
 
-    def __init__(self, stimulus: Stimulus, modified_audio: Audio,
-                 used_tagger_label: Optional[str] = None) -> None:
+    def __init__(self, stimulus: Stimulus, modified_audio: Audio, used_tagger: AAudioTagger) -> None:
         """Helps to construct a CreatedStimulus from a Stimulus + a modified audio
 
         :param stimulus: A stimulus instance, which fields will be copied.
         :param modified_audio: The modified_audio to be added to the class.
-        :param used_tagger_label: An optional parameter, which can be used to add a label denoting which tagger was used
-         to create an audio.
+        :param used_tagger: Denotes which tagger was used to create the modified audio.
         :return: A new instance of CreatedStimulus with the specified fields in stimulus and the modified_audio
         """
         self.__stimulus = stimulus
         self.modified_audio = modified_audio
-        self.used_tagger_label = used_tagger_label
+        self.used_tagger = used_tagger
 
     @property
     def audio(self) -> Audio:
@@ -88,8 +91,11 @@ class CreatedStimulus:
     def target(self) -> int:
         return self.__stimulus.target
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash((hash(self.__stimulus), self.modified_audio))
+
+    def __repr__(self) -> str:
+        return f"CreatedStimulus({repr(self.__stimulus)}, {repr(self.modified_audio)}, {repr(self.used_tagger)})"
 
 
 def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:

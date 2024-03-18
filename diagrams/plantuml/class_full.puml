@@ -108,26 +108,27 @@ AView --|> AObserver
 
 
 package auditory_tagging {
-    abstract class AAuditoryTagger {
+    abstract class AAudioTagger {
       #list[ [float, float] ] stimuli_intervals
 
       +AAuditoryTagger(audio, stimuli)
       +Audio {abstract} create()
     }
 
-    AAuditoryTagger "1" *-- "1" Audio: audio
+    AAudioTagger "1" *-- "1" Audio: audio
 
 
     abstract class AAudioTaggerFactory {
-      +AAudioTagger {abstract} create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+      +AAudioTagger {abstract} create_audio_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float])
     }
 
     package assr_tagger {
         class AMTagger {
           -int frequency
           -Callable[[int, int, int], NDArray[float] tag_generator
+          -[float, float] signal_interval
 
-          +ASSRTagger(audio, stimuli_intervals, frequency, tag_generator)
+          +ASSRTagger(audio, stimuli_intervals, frequency, tag_generator, signal_interval)
           +Audio create()
         }
 
@@ -156,8 +157,9 @@ package auditory_tagging {
         class AMTaggerFactory {
           -int frequency
           -Callable[[int, int, int], NDArray[float]] tag_generator
+          -(float, float) signal_interval
 
-          +AMTaggerFactory(frequency, tag_generator)
+          +AMTaggerFactory(frequency, tag_generator, signal_interval)
         }
 
         class FlippedFMTaggerFactory {
@@ -236,12 +238,12 @@ BittiumTriggerSender -r-|> TriggerSender
 BittiumTriggerSender ..> ETrigger: "uses"
 
 
-AAuditoryTagger <|-- ShiftSumTagger
-AAuditoryTagger <|-- RawTagger
-AAuditoryTagger <|-- NoiseTaggingTagger
-AAuditoryTagger <|-- AMTagger
-AAuditoryTagger <|-- FMTagger
-AAuditoryTagger <|-- FlippedFMTagger
+AAudioTagger <|-- ShiftSumTagger
+AAudioTagger <|-- RawTagger
+AAudioTagger <|-- NoiseTaggingTagger
+AAudioTagger <|-- AMTagger
+AAudioTagger <|-- FMTagger
+AAudioTagger <|-- FlippedFMTagger
 
 AAudioTaggerFactory <|-u- ShiftSumTaggerFactory
 AAudioTaggerFactory <|-u- AMTaggerFactory

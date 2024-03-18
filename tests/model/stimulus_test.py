@@ -3,6 +3,7 @@ import pytest
 import yaml
 
 from auditory_stimulation.audio import Audio
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from auditory_stimulation.model.stimulus import Stimulus, CreatedStimulus, load_stimuli, generate_stimulus
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
@@ -68,7 +69,8 @@ def test_created_stimulus_from_stimulus_valid_call():
     stimulus = Stimulus(audio, prompt, primer, options, time_stamps, target)
 
     modified_audio = mockito.mock(Audio)
-    created_stimulus = CreatedStimulus(stimulus, modified_audio)
+    tagger = mockito.mock(AAudioTagger)
+    created_stimulus = CreatedStimulus(stimulus, modified_audio, tagger)
 
     stimulus_checks(created_stimulus, stimulus.audio, stimulus.prompt, stimulus.primer, stimulus.options,
                     stimulus.time_stamps, target)

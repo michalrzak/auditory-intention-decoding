@@ -54,6 +54,9 @@ class ShiftSumTagger(AAudioTagger):
 
         return audio_combined
 
+    def __repr__(self) -> str:
+        return self._get_repr("ShiftSumTagger", shift_by=str(self.__shift_by))
+
 
 class ShiftSumTaggerFactory(AAudioTaggerFactory):
     __shift_by: int
@@ -61,5 +64,5 @@ class ShiftSumTaggerFactory(AAudioTaggerFactory):
     def __init__(self, shift_by: int):
         self.__shift_by = shift_by
 
-    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return ShiftSumTagger(audio, stimuli_intervals, self.__shift_by)

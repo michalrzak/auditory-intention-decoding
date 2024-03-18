@@ -10,7 +10,10 @@ class RawTagger(AAudioTagger):
     def create(self) -> Audio:
         return self._audio
 
+    def __repr__(self) -> str:
+        return self._get_repr("RawTagger")
+
 
 class RawTaggerFactory(AAudioTaggerFactory):
-    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return RawTagger(audio, stimuli_intervals)

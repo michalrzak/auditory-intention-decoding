@@ -122,6 +122,17 @@ class NoiseTaggingTagger(AAudioTagger):
 
         return np.copy(self.__code)
 
+    def __repr__(self) -> str:
+        code_print = "["
+        for c in self.code[:, 0][::self.__bit_width]:
+            if len(code_print) != 1:
+                code_print += ", "
+            code_print += str(c)
+        code_print += "]"
+
+        return self._get_repr("NoiseTaggingTagger", bit_width=str(self.__bit_width), length_bit=str(self.__length_bit),
+                              code=code_print)
+
 
 class NoiseTaggingTaggerFactory(AAudioTaggerFactory):
     _bits_per_second: int
@@ -136,7 +147,7 @@ class NoiseTaggingTaggerFactory(AAudioTaggerFactory):
         self._length_bit = length_bit
         self._seed = seed
 
-    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return NoiseTaggingTagger(audio,
                                   stimuli_intervals,
                                   self._bits_per_second,

@@ -10,7 +10,7 @@ from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory, F
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTaggerFactory
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTaggerFactory
 from auditory_stimulation.auditory_tagging.shift_sum_tagger import ShiftSumTaggerFactory
-from auditory_stimulation.auditory_tagging.tag_generators import get_sine_signal_tag_generator
+from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
@@ -89,7 +89,7 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
 def main() -> None:
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
     stimuli = generate_stimuli(12, 3, seed=100)
-    model = Model(stimuli, [AMTaggerFactory(42, get_sine_signal_tag_generator()),
+    model = Model(stimuli, [AMTaggerFactory(42, sine_signal),
                             FlippedFMTaggerFactory(40),
                             NoiseTaggingTaggerFactory(126, 256),
                             FMTaggerFactory(40, 100),

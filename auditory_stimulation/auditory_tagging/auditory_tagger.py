@@ -82,10 +82,17 @@ class AAudioTagger(ABC):
         """Constructs the modified audio."""
         ...
 
+    def _get_repr(self, class_name: str, **kwargs) -> str:
+        args = ""
+        for key in kwargs:
+            args += f", {key}={kwargs[key]}"
+
+        return f"{class_name}(audio={repr(self._audio)}, stimuli_intervals={self._stimuli_intervals}{args}"
+
 
 class AAudioTaggerFactory(ABC):
     """Class, used to construct AuditoryStimuli."""
 
     @abstractmethod
-    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         ...
