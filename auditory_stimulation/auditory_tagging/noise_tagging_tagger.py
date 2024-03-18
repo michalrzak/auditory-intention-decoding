@@ -136,7 +136,7 @@ class NoiseTaggingTaggerFactory(AAudioTaggerFactory):
         self._length_bit = length_bit
         self._seed = seed
 
-    def create_auditory_stimulus(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
+    def create_auditory_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
         return NoiseTaggingTagger(audio,
                                   stimuli_intervals,
                                   self._bits_per_second,
