@@ -63,8 +63,15 @@ package auditory_tagging {
 
           +SpectrumShiftTagger(shift_by)
         }
+
+        class BinauralTagger {
+            -int shift_by
+            +BinauralTagger(shift_by)
+        }
     }
 }
+
+AAudioTagger <|-u- BinauralTagger
 AAudioTagger <|-- SpectrumShiftTagger
 AAudioTagger <|-- ShiftSumTagger
 AAudioTagger <|-- RawTagger

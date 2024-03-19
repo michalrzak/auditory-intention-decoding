@@ -170,6 +170,11 @@ package auditory_tagging {
 
           +SpectrumShiftTagger(shift_by)
         }
+
+        class BinauralTagger {
+            -int shift_by
+            +BinauralTagger(shift_by)
+        }
     }
 }
 
@@ -198,7 +203,7 @@ TriggerSender -u-|> AObserver
 BittiumTriggerSender -r-|> TriggerSender
 BittiumTriggerSender ..> ETrigger: "uses"
 
-
+AAudioTagger <|-u- BinauralTagger
 AAudioTagger <|-u- SpectrumShiftTagger
 AAudioTagger <|-u- ShiftSumTagger
 AAudioTagger <|-u- RawTagger
