@@ -74,3 +74,33 @@ class SpectrumShiftTagger(AAudioTagger):
 
     def __repr__(self) -> str:
         return self._get_repr("SpectrumShiftTagger", shift_by=str(self.__shift_by))
+
+
+class BinauralTagger(AAudioTagger):
+    """A tagger, which works  by combining both the original audio and the shifted audio at the same time. For this, it
+    creates an Audio object, which contains the original audio in channel 0 and the shifted audio in channel 1.
+
+    This tagger only utilizes audio channel 0 (the resulting audio is audio channel 0 of the original in output
+    channel 0 and modified audio channel 0 of the modified one in output channel 1).
+    """
+
+    def __init__(self, shift_by: int) -> None:
+        """Constructs the SpectrumShiftTagger object
+
+        :param shift_by: The amount by which original audio will be shifted.
+        """
+        if shift_by < 0:
+            raise ValueError("Shift by has to be a non-negative integer")
+
+        self.__shift_by = shift_by
+
+    def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
+        shift_multiplier = _get_shift_multiplier(self.__shift_by, audio_array_chunk.shape[0], fs)
+
+        audio_array_shifted = np.array(np.real(audio_array_chunk * shift_multiplier), dtype=np.float32)
+        audio_array_shifted_scaled = _scale_down_signal(audio_array_shifted)
+
+        audio_combined = audio_array_shifted_scaled
+        audio_combined[:, 0] = audio_array_chunk[:, 0]
+
+        return audio_combined

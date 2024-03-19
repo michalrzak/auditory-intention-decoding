@@ -1,13 +1,12 @@
 import numpy as np
 import pytest
 
-from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, SpectrumShiftTagger
+from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, SpectrumShiftTagger, BinauralTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
-TAGGER_GETTERS = [
-    lambda shift_by: ShiftSumTagger(shift_by),
-    lambda shift_by: SpectrumShiftTagger(shift_by)
-]
+TAGGER_GETTERS = [ShiftSumTagger,
+                  SpectrumShiftTagger,
+                  BinauralTagger]
 
 
 def similarity_metric_checks(similarity_metric, similarity_cutoff):

@@ -9,7 +9,7 @@ from auditory_stimulation.audio import load_wav_as_audio
 from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger, FMTagger
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
-from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger
+from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
 from auditory_stimulation.eeg.FileTriggerSender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
@@ -96,6 +96,8 @@ def main() -> None:
                             FMTagger(40, 100),
                             ShiftSumTagger(40),
                             RawTagger()])
+
+    model = Model(stimuli, [BinauralTagger(40)])
 
     logger = Logger(LOGGING_DIRECTORY)
     model.register(logger)
