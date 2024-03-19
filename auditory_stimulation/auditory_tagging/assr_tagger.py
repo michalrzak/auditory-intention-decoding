@@ -114,11 +114,6 @@ class AMTagger(AAudioTagger):
         self.__signal_interval = signal_interval
 
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
-        """This method is implemented from the abstract super class. When called, it generates the AM tagged audio.
-        TODO
-        :return: The AM tagged audio.
-        """
-
         # generate tag of the appropriate frequency
         signal_length = audio_array_chunk.shape[0]
         added_signal_raw = self.__tag_generator(signal_length, self.__frequency, fs)
@@ -205,8 +200,6 @@ class FMTagger(AAudioTagger):
         return phases
 
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
-        """TODO"""
-
         assert audio_array_chunk.shape[1] == 2
 
         analytic = hilbert(audio_array_chunk, axis=0)
@@ -252,11 +245,6 @@ class FlippedFMTagger(AAudioTagger):
         self.__frequency = frequency
 
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
-        """This method is implemented from the abstract super class. When called, it generates the FM tagged audio.
-        TODO
-        :return: The FM tagged audio.
-        """
-
         modulated_chunk = frequency_modulation(audio_array_chunk, fs, self.__frequency)
         return modulated_chunk
 

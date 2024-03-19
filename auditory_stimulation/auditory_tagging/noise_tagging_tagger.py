@@ -104,11 +104,6 @@ class NoiseTaggingTagger(AAudioTagger):
         return np.copy(self.__code)
 
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
-        """This method is implemented from the abstract super class. When called, it generates the noise tagging
-         stimulus modified audio. TODO
-
-        :return: The noise tagging stimulus modified audio.
-        """
         if fs != self.__specified_fs:
             raise ValueError("The specified sampling frequency did not match the sampling frequency of the audio chunk")
 

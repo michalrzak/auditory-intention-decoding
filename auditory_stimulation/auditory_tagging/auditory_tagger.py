@@ -56,6 +56,12 @@ class AAudioTagger(ABC):
 
     @abstractmethod
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
+        """Modifies the given chunk of audio, with the paradigm of the tagger.
+
+        :param audio_array_chunk: The to be modified chunk of audio.
+        :param fs: The sampling frequency of the audio.
+        :return: The resulting, modified chunk.
+        """
         ...
 
     def create(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> Audio:

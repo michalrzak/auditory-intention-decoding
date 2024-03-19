@@ -38,8 +38,6 @@ class ShiftSumTagger(AAudioTagger):
         self.__shift_by = shift_by
 
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
-        """TODO"""
-
         shift_multiplier = _get_shift_multiplier(self.__shift_by, audio_array_chunk.shape[0], fs)
 
         audio_array_shifted = np.array(np.real(audio_array_chunk * shift_multiplier), dtype=np.float32)
@@ -67,8 +65,6 @@ class SpectrumShiftTagger(AAudioTagger):
         self.__shift_by = shift_by
 
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
-        """TODO"""
-
         shift_multiplier = _get_shift_multiplier(self.__shift_by, audio_array_chunk.shape[0], fs)
 
         audio_array_shifted = np.array(np.real(audio_array_chunk * shift_multiplier), dtype=np.float32)
