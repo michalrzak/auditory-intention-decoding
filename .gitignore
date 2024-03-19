@@ -2,6 +2,7 @@
 .idea
 **/__pycache__/**
 logs
+triggers
 
 # ignore files which needs to be downloaded additionally
 stimuli_sounds/eric
