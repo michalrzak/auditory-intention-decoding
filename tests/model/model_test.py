@@ -2,7 +2,7 @@ import mockito
 import pytest
 from mockito import verify, when, ANY
 
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model import Model, AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
@@ -13,8 +13,8 @@ from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 def create_model() -> Model:
     raw_stimuli = [mockito.mock(Stimulus)]
-    auditory_tagger_factories = [mockito.mock(AAudioTaggerFactory)]
-    return Model(raw_stimuli, auditory_tagger_factories)
+    audio_tagger = [mockito.mock(AAudioTagger)]
+    return Model(raw_stimuli, audio_tagger)
 
 
 def mock_observer() -> AObserver:

@@ -15,12 +15,11 @@ def test_create_validCall_channelsShouldBeTheSame():
     bits_per_second = 6
     length_bit = 20
 
-    stimulus = NoiseTaggingTagger(audio,
-                                  [(0, n_input / sampling_frequency)],
+    stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length_bit,
                                   SEED)
-    stimulus.create()
+    stimulus.create(audio, [(0, n_input / sampling_frequency)])
     code = stimulus.code
 
     assert np.all(code[:, 0] == code[:, 1])
@@ -34,13 +33,12 @@ def test_create_validCall_codeHasCorrectResolution():
     labeled_interval = (0, 2)  # 2 seconds labeled
     bits_per_second = 5
     length = bits_per_second * 2
-    stimulus = NoiseTaggingTagger(audio,
-                                  [labeled_interval],
+    stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length,
                                   SEED)
 
-    stimulus.create()
+    stimulus.create(audio, [labeled_interval])
     code = stimulus.code
 
     bit_width = sampling_frequency / bits_per_second
@@ -57,12 +55,11 @@ def test_create_validCall_codeRepeatsCorrectly():
     bits_per_second = 5
     length = bits_per_second  # code of length 1 second
 
-    stimulus = NoiseTaggingTagger(audio,
-                                  [labeled_interval],
+    stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length,
                                   SEED)
-    modified_audio = stimulus.create()
+    modified_audio = stimulus.create(audio, [labeled_interval])
 
     # since the code is 1 second and the interval is 2 seconds, the code should repeat twice
     code = stimulus.code
@@ -76,51 +73,36 @@ def test_create_validCall_codeRepeatsCorrectly():
 
 
 def test_create_shouldThrow_bitsPerSecondDoesNotDivideSamplingFrequency():
-    n_input = 100
     sampling_frequency = 10
-    audio = get_mock_audio(n_input, sampling_frequency)
-
-    labeled_interval = (0, 2)  # 2 seconds labeled
     bits_per_second = 3
     length = bits_per_second  # code of length 1 second
 
     with pytest.raises(ValueError):
-        stimulus = NoiseTaggingTagger(audio,
-                                      [labeled_interval],
+        stimulus = NoiseTaggingTagger(sampling_frequency,
                                       bits_per_second,
                                       length,
                                       SEED)
 
 
 def test_create_shouldThrow_bitsPerSecondZero():
-    n_input = 100
     sampling_frequency = 10
-    audio = get_mock_audio(n_input, sampling_frequency)
-
-    labeled_interval = (0, 2)  # 2 seconds labeled
     bits_per_second = 0
     length = bits_per_second  # code of length 1 second
 
     with pytest.raises(ValueError):
-        stimulus = NoiseTaggingTagger(audio,
-                                      [labeled_interval],
+        stimulus = NoiseTaggingTagger(sampling_frequency,
                                       bits_per_second,
                                       length,
                                       SEED)
 
 
 def test_create_shouldThrow_bitsPerSecondBellowZero():
-    n_input = 100
     sampling_frequency = 10
-    audio = get_mock_audio(n_input, sampling_frequency)
-
-    labeled_interval = (0, 2)  # 2 seconds labeled
     bits_per_second = -1
     length = bits_per_second  # code of length 1 second
 
     with pytest.raises(ValueError):
-        stimulus = NoiseTaggingTagger(audio,
-                                      [labeled_interval],
+        stimulus = NoiseTaggingTagger(sampling_frequency,
                                       bits_per_second,
                                       length,
                                       SEED)
@@ -135,12 +117,11 @@ def test_code_should_have_expected_shape():
     bits_per_second = 5
     length = bits_per_second * 2
 
-    stimulus = NoiseTaggingTagger(audio,
-                                  [labeled_interval],
+    stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length,
                                   SEED)
-    stimulus.create()
+    stimulus.create(audio, [labeled_interval])
 
     code = stimulus.code
 

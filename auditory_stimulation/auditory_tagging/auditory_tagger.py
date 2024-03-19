@@ -54,7 +54,18 @@ class AAudioTagger(ABC):
     _audio: Audio
     _stimuli_intervals: List[Tuple[float, float]]  # in seconds
 
-    def __init__(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> None:
+    @abstractmethod
+    def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
+        ...
+
+    def create(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> Audio:
+        """Constructs the modified audio.
+
+        :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
+        :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
+         intervals must be contained within the audio.
+        """
+
         if audio is None:
             raise ValueError("audio cannot be none!")
 
@@ -73,26 +84,26 @@ class AAudioTagger(ABC):
             if to_sample(stimulus[1], audio.sampling_frequency) > audio.array.shape[0]:
                 raise ValueError(f"The stimuli intervals must be contained within the audio. ")
 
-        self._audio = audio
-        self._stimuli_intervals = stimuli_intervals
-        self._modified_audio = None
+        audio_copy = np.copy(audio.array)
 
-    @abstractmethod
-    def create(self) -> Audio:
-        """Constructs the modified audio."""
-        ...
+        for interval in stimuli_intervals:
+            sample_range = (int(interval[0] * audio.sampling_frequency),
+                            int(interval[1] * audio.sampling_frequency))
 
-    def _get_repr(self, class_name: str, **kwargs) -> str:
+            audio_array_chunk = audio_copy[sample_range[0]:sample_range[1]]
+
+            audio_copy[sample_range[0]:sample_range[1]] = self._modify_chunk(audio_array_chunk,
+                                                                             audio.sampling_frequency)
+
+        assert audio_copy.shape == audio.array.shape
+        return Audio(audio_copy, audio.sampling_frequency)
+
+    @staticmethod
+    def _get_repr(class_name: str, **kwargs) -> str:
         args = ""
         for key in kwargs:
-            args += f", {key}={kwargs[key]}"
+            if len(args) != 0:
+                args += ", "
+            args += f"{key}={kwargs[key]}"
 
-        return f"{class_name}(audio={repr(self._audio)}, stimuli_intervals={self._stimuli_intervals}{args}"
-
-
-class AAudioTaggerFactory(ABC):
-    """Class, used to construct AuditoryStimuli."""
-
-    @abstractmethod
-    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
-        ...
+        return f"{class_name}({args})"

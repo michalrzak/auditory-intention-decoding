@@ -6,10 +6,10 @@ import psychopy.visual
 import yaml
 
 from auditory_stimulation.audio import load_wav_as_audio
-from auditory_stimulation.auditory_tagging.assr_tagger import AMTaggerFactory, FlippedFMTaggerFactory, FMTaggerFactory
-from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTaggerFactory
-from auditory_stimulation.auditory_tagging.raw_tagger import RawTaggerFactory
-from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTaggerFactory
+from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger, FMTagger
+from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
+from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
+from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
 from auditory_stimulation.eeg.FileTriggerSender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
@@ -90,12 +90,12 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
 def main() -> None:
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
     stimuli = generate_stimuli(12, 3, seed=100)
-    model = Model(stimuli, [AMTaggerFactory(42, sine_signal),
-                            FlippedFMTaggerFactory(40),
-                            NoiseTaggingTaggerFactory(126, 256),
-                            FMTaggerFactory(40, 100),
-                            ShiftSumTaggerFactory(40),
-                            RawTaggerFactory()])
+    model = Model(stimuli, [AMTagger(42, sine_signal),
+                            FlippedFMTagger(40),
+                            NoiseTaggingTagger(44100, 126, 256),
+                            FMTagger(40, 100),
+                            ShiftSumTagger(40),
+                            RawTagger()])
 
     logger = Logger(LOGGING_DIRECTORY)
     model.register(logger)
