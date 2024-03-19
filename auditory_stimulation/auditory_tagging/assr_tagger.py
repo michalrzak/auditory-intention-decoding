@@ -1,12 +1,11 @@
 from numbers import Number, Complex, Real
-from typing import List, Tuple, Callable
+from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
 from scipy.signal import hilbert
 
-from auditory_stimulation.audio import Audio
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, AAudioTaggerFactory, _duplicate_signal, \
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger, _duplicate_signal, \
     _scale_down_signal
 from auditory_stimulation.auditory_tagging.tag_generators import TagGenerator, sine_signal
 
@@ -87,24 +86,17 @@ class AMTagger(AAudioTagger):
     __signal_interval: Tuple[float, float]
 
     def __init__(self,
-                 audio: Audio,
-                 stimuli_intervals: List[Tuple[float, float]],
                  frequency: int,
                  tag_generator: TagGenerator,
                  signal_interval: Tuple[float, float] = (-1, 1)) -> None:
         """Constructs the AMTagger object
 
-        :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
-        :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
-         intervals must be contained within the audio.
         :param frequency: The frequency of the AM tag
         :param tag_generator: A function, which given the length, stimulus frequency and sampling frequency
          generates the tagging signal.
         :param signal_interval: Default = (-1, 1). The interval of the generated signal. The first value specifies the
          lower boundary, the second value of the upper boundary.
         """
-
-        super().__init__(audio, stimuli_intervals)
 
         if frequency <= 0:
             raise ValueError("The frequency has to be a positive number")
@@ -121,29 +113,17 @@ class AMTagger(AAudioTagger):
         self.__tag_generator = tag_generator
         self.__signal_interval = signal_interval
 
-    def create(self) -> Audio:
-        """This method is implemented from the abstract super class. When called, it generates the AM tagged audio.
+    def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
+        # generate tag of the appropriate frequency
+        signal_length = audio_array_chunk.shape[0]
+        added_signal_raw = self.__tag_generator(signal_length, self.__frequency, fs)
 
-        :return: The AM tagged audio.
-        """
+        # change the interval of the tag to the set range
+        added_signal = _shape_signal(added_signal_raw, self.__signal_interval)
 
-        audio_copy = np.copy(self._audio.array)
+        modulated_chunk = amplitude_modulation(audio_array_chunk, added_signal)
 
-        for interval in self._stimuli_intervals:
-            sample_range = (int(interval[0] * self._audio.sampling_frequency),
-                            int(interval[1] * self._audio.sampling_frequency))
-
-            # generate tag of the appropriate frequency
-            signal_length = sample_range[1] - sample_range[0]
-            added_signal_raw = self.__tag_generator(signal_length, self.__frequency, self._audio.sampling_frequency)
-
-            # change the interval of the tag to the set range
-            added_signal = _shape_signal(added_signal_raw, self.__signal_interval)
-
-            modulated_chunk = amplitude_modulation(audio_copy[sample_range[0]:sample_range[1]], added_signal)
-            audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
-
-        return Audio(audio_copy, self._audio.sampling_frequency)
+        return modulated_chunk
 
     def __repr__(self) -> str:
         return self._get_repr("AMTagger", frequency=str(self.__frequency), tag_generator=self.__tag_generator.__name__,
@@ -158,20 +138,13 @@ class FMTagger(AAudioTagger):
     __modulation_factor: float
 
     def __init__(self,
-                 audio: Audio,
-                 stimuli_intervals: List[Tuple[float, float]],
                  frequency: int,
                  modulation_factor: float) -> None:
         """Constructs the FMTagger object
 
-        :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
-        :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
-         intervals must be contained within the audio.
         :param frequency: The modulating frequency.
         :param modulation_factor: The factor by which the added modulating signal is scaled.
         """
-
-        super().__init__(audio, stimuli_intervals)
 
         if frequency <= 0:
             raise ValueError("The frequency has to be a positive number")
@@ -203,8 +176,8 @@ class FMTagger(AAudioTagger):
 
         return output
 
-    def __phases_to_instantaneous_frequencies(self, phases: npt.NDArray[Real]) -> npt.NDArray[Real]:
-        inst_freq = np.diff(phases, axis=0) / (2 * np.pi) * self._audio.sampling_frequency
+    def __phases_to_instantaneous_frequencies(self, phases: npt.NDArray[Real], fs: int) -> npt.NDArray[Real]:
+        inst_freq = np.diff(phases, axis=0) / (2 * np.pi) * fs
         assert inst_freq.shape[0] == phases.shape[0] - 1, f"Was {inst_freq.shape} vs {phases.shape} - 1"
         assert inst_freq.shape[1] == phases.shape[1] == 2
 
@@ -212,12 +185,13 @@ class FMTagger(AAudioTagger):
 
     def __instantaneous_frequencies_to_phases(self,
                                               instantaneous_frequencies: npt.NDArray[Real],
-                                              first_phase: npt.NDArray[Real]) -> npt.NDArray[Real]:
+                                              first_phase: npt.NDArray[Real],
+                                              fs: int) -> npt.NDArray[Real]:
         first_phase_reshaped = np.reshape(first_phase, (1, 2))
         assert first_phase_reshaped.shape[0] == 1
         assert first_phase_reshaped.shape[1] == 2
 
-        corrected_inst_freq = instantaneous_frequencies * (2 * np.pi) / self._audio.sampling_frequency
+        corrected_inst_freq = instantaneous_frequencies * (2 * np.pi) / fs
         phases = np.append(first_phase_reshaped, corrected_inst_freq, axis=0).cumsum(axis=0)
 
         assert phases.shape[0] == instantaneous_frequencies.shape[0] + 1
@@ -225,39 +199,27 @@ class FMTagger(AAudioTagger):
 
         return phases
 
-    def __modulate(self, signal: npt.NDArray[np.float32]) -> npt.NDArray[np.float32]:
-        assert signal.shape[1] == 2
+    def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
+        assert audio_array_chunk.shape[1] == 2
 
-        analytic = hilbert(signal, axis=0)
+        analytic = hilbert(audio_array_chunk, axis=0)
         amplitude, phase = self.__extract_amplitudes_phases(analytic)
 
-        inst_freq = self.__phases_to_instantaneous_frequencies(phase)
+        inst_freq = self.__phases_to_instantaneous_frequencies(phase, fs)
 
         # generate a sine wave of the appropriate frequency and of the appropriate shape
-        modulating_sine = sine_signal(inst_freq.shape[0], self.__frequency, self._audio.sampling_frequency)
+        modulating_sine = sine_signal(inst_freq.shape[0], self.__frequency, fs)
         modulating_sine_doubled = _duplicate_signal(modulating_sine)
 
         # modulate the signal frequency with the generated sine wave
         shifted_inst_freq = inst_freq + self.__modulation_factor * modulating_sine_doubled
 
-        phase_shifted = self.__instantaneous_frequencies_to_phases(shifted_inst_freq, phase[0, :])
+        phase_shifted = self.__instantaneous_frequencies_to_phases(shifted_inst_freq, phase[0, :], fs)
 
         reconstructed_shifted = self.__get_complex_number(amplitude, phase_shifted)
-        assert reconstructed_shifted.shape == signal.shape
+        assert reconstructed_shifted.shape == audio_array_chunk.shape
 
-        return np.real(reconstructed_shifted)
-
-    def create(self) -> Audio:
-        audio_copy = np.copy(self._audio.array)
-
-        for interval in self._stimuli_intervals:
-            sample_range = (int(interval[0] * self._audio.sampling_frequency),
-                            int(interval[1] * self._audio.sampling_frequency))
-
-            modulated_chunk = self.__modulate(audio_copy[sample_range[0]:sample_range[1]])
-            audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
-
-        return Audio(_scale_down_signal(audio_copy), self._audio.sampling_frequency)
+        return _scale_down_signal(np.real(reconstructed_shifted))
 
     def __repr__(self) -> str:
         return self._get_repr("FMTagger", frequency=str(self.__frequency),
@@ -271,90 +233,20 @@ class FlippedFMTagger(AAudioTagger):
     __frequency: int
 
     def __init__(self,
-                 audio: Audio,
-                 stimuli_intervals: List[Tuple[float, float]],
                  frequency: int) -> None:
         """Constructs the FlippedFMTagger object
 
-        :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio
-        :param stimuli_intervals: The intervals given in seconds, which will be modified with the stimulus. The
-         intervals must be contained within the audio.
         :param frequency: The FM carrier frequency, modulated by the audio
         """
-
-        super().__init__(audio, stimuli_intervals)
 
         if frequency <= 0:
             raise ValueError("The frequency has to be a positive number")
 
         self.__frequency = frequency
 
-    def create(self) -> Audio:
-        """This method is implemented from the abstract super class. When called, it generates the FM tagged audio.
-
-        :return: The FM tagged audio.
-        """
-
-        audio_copy = np.copy(self._audio.array)
-
-        for interval in self._stimuli_intervals:
-            sample_range = (int(interval[0] * self._audio.sampling_frequency),
-                            int(interval[1] * self._audio.sampling_frequency))
-
-            modulated_chunk = frequency_modulation(audio_copy[sample_range[0]:sample_range[1]],
-                                                   self._audio.sampling_frequency,
-                                                   self.__frequency)
-            audio_copy[sample_range[0]:sample_range[1]] = modulated_chunk
-
-        return Audio(audio_copy, self._audio.sampling_frequency)
+    def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
+        modulated_chunk = frequency_modulation(audio_array_chunk, fs, self.__frequency)
+        return modulated_chunk
 
     def __repr__(self) -> str:
         return self._get_repr("FlippedFMTagger", frequency=str(self.__frequency))
-
-
-class AMTaggerFactory(AAudioTaggerFactory):
-    _frequency: int
-    _tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]]
-    _signal_interval: Tuple[float, float]
-
-    def __init__(self,
-                 frequency: int,
-                 tag_generator: Callable[[int, int, int], npt.NDArray[np.float32]],
-                 signal_interval: Tuple[float, float] = (-1, 1)) -> None:
-        self._frequency = frequency
-        self._stimulus_generator = tag_generator
-        self._signal_interval = signal_interval
-
-    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
-        return AMTagger(audio,
-                        stimuli_intervals,
-                        self._frequency,
-                        self._stimulus_generator,
-                        self._signal_interval)
-
-
-class FMTaggerFactory(AAudioTaggerFactory):
-    _frequency: int
-    _modulation_factor: float
-
-    def __init__(self, frequency: int, modulation_factor: float) -> None:
-        self._frequency = frequency
-        self._modulation_factor = modulation_factor
-
-    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
-        return FMTagger(audio,
-                        stimuli_intervals,
-                        self._frequency,
-                        self._modulation_factor)
-
-
-class FlippedFMTaggerFactory(AAudioTaggerFactory):
-    _frequency: int
-
-    def __init__(self, frequency: int) -> None:
-        self._frequency = frequency
-
-    def create_audio_tagger(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> AAudioTagger:
-        return FlippedFMTagger(audio,
-                               stimuli_intervals,
-                               self._frequency)

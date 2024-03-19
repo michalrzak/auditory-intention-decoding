@@ -5,7 +5,7 @@ from bisect import bisect_right
 from typing import List, Any, Optional, Collection, Tuple
 
 from auditory_stimulation.audio import Audio
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTaggerFactory
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.model.stimulus import CreatedStimulus, Stimulus
@@ -21,7 +21,7 @@ class Model:
     """Class, containing all  relevant data for the experiment. Is an observable of the observer pattern
     """
     __raw_stimuli: Collection[Stimulus]
-    __auditory_stimulus_factories: Collection[AAudioTaggerFactory]
+    __auditory_taggers: Collection[AAudioTagger]
     __created_stimuli: Optional[Collection[CreatedStimulus]]
 
     __stimulus_history: List[CreatedStimulus]
@@ -32,13 +32,12 @@ class Model:
 
     def __init__(self,
                  raw_stimuli: Collection[Stimulus],
-                 auditory_tagger_factories: Collection[AAudioTaggerFactory]) -> None:
+                 auditory_taggers: Collection[AAudioTagger]) -> None:
         """Creates a model object.
 
         :param raw_stimuli: A list of stimuli which will be used throughout the experiment.
-        :param auditory_tagger_factories: The to be used auditory_stimuli. Note that the number of
-         auditory_stimulus_factories must divide the number of stimuli, to ensure that each auditory_tagging can be
-         shown the same number of times
+        :param auditory_taggers: The to be used auditory_taggers. Note that the number of auditory_taggers must divide
+         the number of stimuli, to ensure that each auditory_tagging can be shown the same number of times
         """
         self.__stimulus_history = []
         self.__primer_history = []
@@ -47,13 +46,13 @@ class Model:
 
         self.__raw_stimuli = raw_stimuli
 
-        if len(auditory_tagger_factories) == 0:
+        if len(auditory_taggers) == 0:
             raise ValueError("At least one auditory stimulus factory needs to be supplied!")
-        if len(raw_stimuli) % len(auditory_tagger_factories) != 0:
+        if len(raw_stimuli) % len(auditory_taggers) != 0:
             # this can potentially be changed if I e.g. change it to replay the stimuli for each stimulus
             raise ValueError("The amount of factories must fully divide the amount of stimuli,"
                              " to avoid having one stimulus type less!")
-        self.__auditory_stimulus_factories = copy.copy(auditory_tagger_factories)
+        self.__auditory_taggers = copy.copy(auditory_taggers)
 
         self.__created_stimuli = None
 
@@ -64,21 +63,20 @@ class Model:
         if self.__created_stimuli is not None:
             raise RuntimeError("You can only call create_stimuli() once!")
 
-        assert len(self.__raw_stimuli) % len(self.__auditory_stimulus_factories) == 0
+        assert len(self.__raw_stimuli) % len(self.__auditory_taggers) == 0
 
-        repeats = len(self.__raw_stimuli) // len(self.__auditory_stimulus_factories)
+        repeats = len(self.__raw_stimuli) // len(self.__auditory_taggers)
 
-        applied_factories = []
-        for factory in self.__auditory_stimulus_factories:
-            applied_factories += [factory] * repeats
+        applied_taggers = []
+        for tagger in self.__auditory_taggers:
+            applied_taggers += [tagger] * repeats
 
-        random.shuffle(applied_factories)
+        random.shuffle(applied_taggers)
 
         created_stimuli = []
-        for factory, stimulus in zip(applied_factories, self.__raw_stimuli):
-            auditory_tagger = factory.create_audio_tagger(stimulus.audio, stimulus.time_stamps)
-            modified_audio = auditory_tagger.create()
-            created_stimuli.append(CreatedStimulus(stimulus, modified_audio, auditory_tagger))
+        for tagger, stimulus in zip(applied_taggers, self.__raw_stimuli):
+            modified_audio = tagger.create(stimulus.audio, stimulus.time_stamps)
+            created_stimuli.append(CreatedStimulus(stimulus, modified_audio, tagger))
 
         self.__created_stimuli = created_stimuli
 

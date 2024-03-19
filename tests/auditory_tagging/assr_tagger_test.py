@@ -4,7 +4,6 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
-from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger, FMTagger
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
@@ -17,21 +16,21 @@ def mock_stimulus_generation(length: int, frequency: int, sampling_frequency: in
     return -np.ones(length, dtype=np.float32)
 
 
-def get_am_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int) -> AAudioTagger:
-    return AMTagger(audio, stimuli_intervals, frequency, mock_stimulus_generation)
+def get_am_tagger(frequency: int) -> AAudioTagger:
+    return AMTagger(frequency, mock_stimulus_generation)
 
 
-def get_flipped_fm_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int) -> AAudioTagger:
-    return FlippedFMTagger(audio, stimuli_intervals, frequency)
+def get_flipped_fm_tagger(frequency: int) -> AAudioTagger:
+    return FlippedFMTagger(frequency)
 
 
-def get_fm_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float]], frequency: int) -> AAudioTagger:
-    return FMTagger(audio, stimuli_intervals, frequency, 100)
+def get_fm_tagger(frequency: int) -> AAudioTagger:
+    return FMTagger(frequency, 100)
 
 
-TAGGER_GETTERS: List[Callable[[Audio, List[Tuple[float, float]], int], AAudioTagger]] = [get_am_tagger,
-                                                                                         get_flipped_fm_tagger,
-                                                                                         get_fm_tagger]
+TAGGER_GETTERS: List[Callable[[int], AAudioTagger]] = [get_am_tagger,
+                                                       get_flipped_fm_tagger,
+                                                       get_fm_tagger]
 
 
 @pytest.mark.parametrize("tagger_getter", TAGGER_GETTERS)
@@ -42,10 +41,8 @@ def test_ASSRTagger_create_validCall_audioShouldBeModified(tagger_getter):
 
     stimulus_frequency = 2
 
-    stimulus = tagger_getter(audio,
-                             [(0, n_input / sampling_frequency)],
-                             stimulus_frequency)
-    modified_audio = stimulus.create()
+    stimulus = tagger_getter(stimulus_frequency)
+    modified_audio = stimulus.create(audio, [(0, n_input / sampling_frequency)])
 
     assert modified_audio is not None
     assert modified_audio.array is not None
@@ -63,10 +60,8 @@ def test_ASSRTagger_create_validCall_audioShouldBeModifiedToHalfPoint(tagger_get
 
     stimulus_frequency = 1
 
-    stimulus = tagger_getter(audio,
-                             [(0, n_input / sampling_frequency / 2)],
-                             stimulus_frequency)
-    modified_audio = stimulus.create()
+    stimulus = tagger_getter(stimulus_frequency)
+    modified_audio = stimulus.create(audio, [(0, n_input / sampling_frequency / 2)])
 
     assert modified_audio is not None
     assert modified_audio.array is not None
@@ -83,9 +78,7 @@ def test_ASSRTagger_invalidFrequency_0_shouldThrow(tagger_getter):
     stimulus_frequency = 0
 
     with pytest.raises(ValueError):
-        stim = tagger_getter(audio,
-                             [(0, 1)],
-                             stimulus_frequency)
+        stim = tagger_getter(stimulus_frequency)
 
 
 @pytest.mark.parametrize("tagger_getter", TAGGER_GETTERS)
@@ -94,9 +87,7 @@ def test_ASSRTagger_invalidFrequency_negative_shouldThrow(tagger_getter):
     stimulus_frequency = -1
 
     with pytest.raises(ValueError):
-        stim = tagger_getter(audio,
-                             [(0, 1)],
-                             stimulus_frequency)
+        stim = tagger_getter(stimulus_frequency)
 
 
 @pytest.mark.parametrize("tagger_getter", TAGGER_GETTERS)
@@ -107,38 +98,24 @@ def test_ASSRTagger_create_validCall(tagger_getter):
 
     stimulus_frequency = 5
 
-    stim = tagger_getter(audio,
-                         [(0, n_input / sampling_frequency)],
-                         stimulus_frequency)
-    stim.create()
+    stim = tagger_getter(stimulus_frequency)
+    stim.create(audio, [(0, n_input / sampling_frequency)], )
 
 
 @pytest.mark.parametrize("signal_interval", [(-1, 1), (-2, 2), (-3, -1), (1, 3), (0.5, 1.7)])
 def test_am_tagger_signal_interval_valid_call(signal_interval: Tuple[float, float]):
-    n_input = 1000
-    sampling_frequency = 20
-    audio = get_mock_audio(n_input, sampling_frequency)
-
     stimulus_frequency = 5
 
-    signal = AMTagger(audio,
-                      [(0, n_input / sampling_frequency)],
-                      stimulus_frequency,
+    signal = AMTagger(stimulus_frequency,
                       mock_stimulus_generation,
                       signal_interval)
 
 
 @pytest.mark.parametrize("signal_interval", [(1, -1), (2, -2), (-1, -3), (3, 1), (1.7, 0.5)])
 def test_am_tagger_signal_interval_invalid_interval_should_throw(signal_interval: Tuple[float, float]):
-    n_input = 1000
-    sampling_frequency = 20
-    audio = get_mock_audio(n_input, sampling_frequency)
-
     stimulus_frequency = 5
 
     with pytest.raises(ValueError):
-        signal = AMTagger(audio,
-                          [(0, n_input / sampling_frequency)],
-                          stimulus_frequency,
+        signal = AMTagger(stimulus_frequency,
                           mock_stimulus_generation,
                           signal_interval)

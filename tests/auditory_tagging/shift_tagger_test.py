@@ -5,8 +5,8 @@ from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, S
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 TAGGER_GETTERS = [
-    lambda audio, intervals, shift_by: ShiftSumTagger(audio, intervals, shift_by),
-    lambda audio, intervals, shift_by: SpectrumShiftTagger(audio, intervals, shift_by)
+    lambda shift_by: ShiftSumTagger(shift_by),
+    lambda shift_by: SpectrumShiftTagger(shift_by)
 ]
 
 
@@ -25,8 +25,8 @@ def test_shift_sum_tagger_valid_call():
 
     shift_by = 40
 
-    tagger = ShiftSumTagger(audio, [(0, n_input / sampling_frequency)], shift_by)
-    modified_audio = tagger.create()
+    tagger = ShiftSumTagger(shift_by)
+    modified_audio = tagger.create(audio, [(0, n_input / sampling_frequency)], )
 
     similarity_metric = (
         np.correlate(modified_audio.array[:, 0], audio.array[:, 0]),
@@ -51,11 +51,7 @@ def test_shift_sum_tagger_valid_call():
 
 @pytest.mark.parametrize("tagger_getters", TAGGER_GETTERS)
 def test_shift_tagger_invalid_shift_by_should_fail(tagger_getters):
-    n_input = 100
-    sampling_frequency = 12
-    audio = get_mock_audio(n_input, sampling_frequency)
-
     shift_by = -10
 
     with pytest.raises(ValueError):
-        ShiftSumTagger(audio, [(0, n_input / sampling_frequency)], shift_by)
+        tagger_getters(shift_by)

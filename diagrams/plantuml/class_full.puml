@@ -91,10 +91,10 @@ package model {
         +List[Tuple[float, float]] time_stamps()
         +int target()
     }
-    CreatedStimulus "1" *-l- "1" Audio: modified_audio
+    CreatedStimulus "1" *-- "1" Audio: modified_audio
 
 
-    CreatedStimulus "*" *-- "1" Stimulus
+    CreatedStimulus "*" *-l- "1" Stimulus
 }
 
 Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
@@ -109,18 +109,10 @@ AView --|> AObserver
 
 package auditory_tagging {
     abstract class AAudioTagger {
-      #list[ [float, float] ] stimuli_intervals
-
-      +AAuditoryTagger(audio, stimuli)
-      +Audio {abstract} create()
+      #NDArray[float] {abstract} modify_chunk(audio_array_chunk: NDArray[float], fs: int))
+      +Audio create(audio, stimuli)
     }
 
-    AAudioTagger "1" *-- "1" Audio: audio
-
-
-    abstract class AAudioTaggerFactory {
-      +AAudioTagger {abstract} create_audio_tagger(audio: Audio, stimuli_intervals: List[Tuple[float, float])
-    }
 
     package assr_tagger {
         class AMTagger {
@@ -128,20 +120,18 @@ package auditory_tagging {
           -Callable[[int, int, int], NDArray[float] tag_generator
           -[float, float] signal_interval
 
-          +ASSRTagger(audio, stimuli_intervals, frequency, tag_generator, signal_interval)
-          +Audio create()
+          +ASSRTagger(frequency, tag_generator, signal_interval)
         }
 
         class FMTagger {
           -int frequency
           -float modulation_factor
 
-          +FMTagger(audio, stimuli_intervals, frequency, modulation_factor)
-          +Audio create()
+          +FMTagger(frequency, modulation_factor)
           -(NDArray[Real], NDArray[Real]) {static} extract_amplitudes_phases(numbers: NDArray[Complex])
           -NDArray[Complex] {static} get_complex_number(amplitudes: NDArray[Real], phases: NDArray[Real])
-          -NDArray[Real] phases_to_instantaneous_frequencies(phases: NDArray[Real])
-          -NDArray[Real] instantaneous_frequencies_to_phases(instantaneous_frequencies: NDArray[Real], first_phase: Real)
+          -NDArray[Real] phases_to_instantaneous_frequencies(phases: NDArray[Real], fs: int)
+          -NDArray[Real] instantaneous_frequencies_to_phases(instantaneous_frequencies: NDArray[Real], first_phase: NDArray[Real], fs: int)
           -NDArray[float32] modulate(signal: NDArray[float32])
 
         }
@@ -149,82 +139,36 @@ package auditory_tagging {
         class FlippedFMTagger {
           -int frequency
 
-          +FlippedFMTagger(audio, stimuli_intervals, frequency)
-          +Audio create()
-
-        }
-
-        class AMTaggerFactory {
-          -int frequency
-          -Callable[[int, int, int], NDArray[float]] tag_generator
-          -(float, float) signal_interval
-
-          +AMTaggerFactory(frequency, tag_generator, signal_interval)
-        }
-
-        class FlippedFMTaggerFactory {
-          -int frequency
-
-          +FlippedFMTaggerFactory(frequency)
-        }
-
-        class FMTaggerFactory {
-          -int frequency
-
-          +FMTaggerFactory(frequency)
+          +FlippedFMTagger(frequency)
         }
     }
 
     class NoiseTaggingTagger {
       -Optional[int] seed
+      -int specified_fs
       -int bit_width
       -int length_bit
       +Optional[Code] code
 
-      +NoiseTaggingTagger(audio, stimuli_intervals, bits_per_second: int, length_bit, seed)
-      +Audio create()
+      +NoiseTaggingTagger(fs:int, bits_per_second: int, length_bit, seed)
       -void __generate_code()
       -void __get_code(length: int)
     }
 
-    class NoiseTaggingTaggerFactory {
-      -int bits_per_second
-      -int length_bit
-      -Optional[int] seed
-
-      +NoiseTaggingTaggerFactory(bits_per_second, length_bit, seed)
-    }
-
     class RawTagger {
-      +Audio create()
-    }
-
-    class RawTaggerFactory {
     }
 
     package shift_taggers {
         class ShiftSumTagger {
           -int shift_by
 
-          +ShiftSumTagger(audio, stimuli_intervals, shift_by)
-          +Audio create()
-        }
-
-        class ShiftSumTaggerFactory {
-          -int shift_by
-          +ShiftSumTaggerFactory(shift_by)
+          +ShiftSumTagger(shift_by)
         }
 
         class SpectrumShiftTagger {
           -int shift_by
 
-          +SpectrumShiftTagger(audio, stimuli_intervals, shift_by)
-          +Audio create()
-        }
-
-        class SpectrumShiftTaggerFactory {
-          -int shift_by
-          +SpectrumShiftTaggerFactory(shift_by)
+          +SpectrumShiftTagger(shift_by)
         }
     }
 }
@@ -247,34 +191,22 @@ package eeg {
      #void send_trigger(trigger: ETrigger)
    }
 }
+
+view -[hidden]- eeg
+
 TriggerSender -u-|> AObserver
 BittiumTriggerSender -r-|> TriggerSender
 BittiumTriggerSender ..> ETrigger: "uses"
 
 
-AAudioTagger <|-- SpectrumShiftTagger
-AAudioTagger <|-- ShiftSumTagger
-AAudioTagger <|-- RawTagger
-AAudioTagger <|-- NoiseTaggingTagger
-AAudioTagger <|-- AMTagger
-AAudioTagger <|-- FMTagger
-AAudioTagger <|-- FlippedFMTagger
+AAudioTagger <|-u- SpectrumShiftTagger
+AAudioTagger <|-u- ShiftSumTagger
+AAudioTagger <|-u- RawTagger
+AAudioTagger <|-u- NoiseTaggingTagger
+AAudioTagger <|-u- AMTagger
+AAudioTagger <|-u- FMTagger
+AAudioTagger <|-u- FlippedFMTagger
 
-AAudioTaggerFactory <|-u- SpectrumShiftTaggerFactory
-AAudioTaggerFactory <|-u- ShiftSumTaggerFactory
-AAudioTaggerFactory <|-u- AMTaggerFactory
-AAudioTaggerFactory <|-u- FMTaggerFactory
-AAudioTaggerFactory <|-u- FlippedFMTaggerFactory
-AAudioTaggerFactory <|-u- NoiseTaggingTaggerFactory
-AAudioTaggerFactory <|-u- RawTaggerFactory
-
-SpectrumShiftTagger <.. SpectrumShiftTaggerFactory: "creates"
-ShiftSumTagger <.. ShiftSumTaggerFactory: "creates"
-AMTagger <.. AMTaggerFactory: "creates"
-FMTagger <.. FMTaggerFactory: "creates"
-FlippedFMTagger <.. FlippedFMTaggerFactory: "creates"
-NoiseTaggingTagger <.. NoiseTaggingTaggerFactory: "creates"
-RawTagger <.. RawTaggerFactory: "creates"
 
 AView <|-- PsychopyView
 AView <|-- CLIView
@@ -289,7 +221,7 @@ class Experiment {
 Experiment "1" *-- "1" Model
 Experiment "1" *-- "1" AView
 
-Model "1" *-u- "*" AAudioTaggerFactory
+Model "1" *-u- "*" AAudioTagger
 Model "1" *-- "*" Stimulus: raw_stimuli
 Model "1" *-- "*" CreatedStimulus: created_stimuli
 note on link: Created by calling  `create_stimuli()`
