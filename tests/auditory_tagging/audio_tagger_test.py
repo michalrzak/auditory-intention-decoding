@@ -4,7 +4,7 @@ import pytest
 
 from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FMTagger, FlippedFMTagger
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
-from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, SpectrumShiftTagger
+from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, SpectrumShiftTagger, BinauralTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
@@ -23,7 +23,8 @@ AUDIO_TAGGERS = [
     FlippedFMTagger(42),
     NoiseTaggingTagger(SAMPLING_FREQUENCY, 2, 10),
     ShiftSumTagger(3),
-    SpectrumShiftTagger(3)
+    SpectrumShiftTagger(3),
+    BinauralTagger(3)
 ]
 
 

@@ -9,9 +9,8 @@ from auditory_stimulation.audio import load_wav_as_audio
 from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger, FMTagger
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
-from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger
+from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger, SpectrumShiftTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
-from auditory_stimulation.eeg.FileTriggerSender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
@@ -89,12 +88,14 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
 
 def main() -> None:
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
-    stimuli = generate_stimuli(12, 3, seed=100)
+    stimuli = generate_stimuli(16, 3, seed=100)
     model = Model(stimuli, [AMTagger(42, sine_signal),
                             FlippedFMTagger(40),
                             NoiseTaggingTagger(44100, 126, 256),
                             FMTagger(40, 100),
                             ShiftSumTagger(40),
+                            SpectrumShiftTagger(40),
+                            BinauralTagger(40),
                             RawTagger()])
 
     logger = Logger(LOGGING_DIRECTORY)
@@ -106,8 +107,8 @@ def main() -> None:
 
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
-    trigger_sender = FileTriggerSender("test.txt")
-    model.register(trigger_sender, 1)
+    # trigger_sender = FileTriggerSender("test.txt")
+    # model.register(trigger_sender, 1)
 
     experiment = Experiment(model, view)
     experiment.run()
