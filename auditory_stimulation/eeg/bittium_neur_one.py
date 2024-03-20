@@ -42,6 +42,7 @@ class BittiumTriggerSender(ATriggerSender):
         self.__parallel_port.setData(trigger.value)
         time.sleep(self.__trigger_duration_s)
         self.__parallel_port.setData(0)
+        time.sleep(self.__trigger_duration_s)
 
 
 __trigger_sender_cache: Dict[int, BittiumTriggerSender] = {}
