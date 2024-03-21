@@ -110,10 +110,10 @@ def main() -> None:
 
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
-    trigger_sender = FileTriggerSender("test.txt")
+    trigger_sender = FileTriggerSender(5, "test.txt")
 
     with trigger_sender as ts:
-        model.register(trigger_sender, 1)
+        model.register(ts, 1)
         experiment = Experiment(model, view)
 
         try:

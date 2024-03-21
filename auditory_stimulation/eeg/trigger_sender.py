@@ -2,7 +2,7 @@ import queue
 import threading
 import time
 from abc import abstractmethod
-from typing import Any
+from typing import Any, List
 
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.model import AObserver
@@ -17,21 +17,25 @@ class ThreadDiedException(Exception):
 class ATriggerSender(AObserver):
     __trigger_queue: queue.Queue
 
-    __thread_timout: int
+    __thread_timeout: float
     __thread: threading.Thread
     __exit_flag: bool
 
-    def __init__(self, thread_timout: int) -> None:
-        self.__thread_timeout = thread_timout
+    __offset_trigger_threads: List[threading.Thread]
+
+    def __init__(self, thread_timeout: float) -> None:
+        self.__thread_timeout = thread_timeout
 
         self.__thread = threading.Thread(target=self.__trigger_worker)
         self.__trigger_queue = queue.Queue()
         self.__exit_flag = False
 
+        self.__offset_trigger_threads = []
+
     def __trigger_worker(self):
         while not self.__exit_flag:
             try:
-                item = self.__trigger_queue.get(timeout=self.__thread_timout)
+                item = self.__trigger_queue.get(timeout=self.__thread_timeout)
             except queue.Empty:
                 continue
             self._send_trigger(item)
@@ -48,6 +52,7 @@ class ATriggerSender(AObserver):
 
         thread = threading.Thread(target=wait_and_put)
         thread.start()
+        self.__offset_trigger_threads.append(thread)
 
     @abstractmethod
     def _send_trigger(self, trigger: ETrigger) -> None:
@@ -59,7 +64,10 @@ class ATriggerSender(AObserver):
         ...
 
     def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
-        self.__trigger_queue.put(ETrigger.get_trigger(data, identifier))
+        if not self.__thread.is_alive():
+            raise ThreadDiedException("The trigger sending thread died. Did you use the `with` syntax to start the "
+                                      "thread?")
+
         self.__queue_trigger(ETrigger.get_trigger(data, identifier))
 
         # in case a new stimulus is received, also queue sending trigger after it finishes playing and at the beginning
@@ -72,15 +80,19 @@ class ATriggerSender(AObserver):
 
             self.__queue_trigger(ETrigger.END_STIMULUS, data.audio.secs)
 
-    def __enter__(self):
+    def __enter__(self) -> "ATriggerSender":
         self.__thread.start()
+        return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, *args) -> None:
         self.__del__()
 
-    def __del__(self):
+    def __del__(self) -> None:
         if not self.__thread.is_alive():
-            raise ThreadDiedException("The thread died unexpectedly!")
+            return
+
+        for thread in self.__offset_trigger_threads:
+            thread.join()
 
         self.__trigger_queue.join()
         self.__exit_flag = True
