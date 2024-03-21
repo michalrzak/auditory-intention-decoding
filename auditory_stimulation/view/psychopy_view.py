@@ -8,7 +8,7 @@ from psychopy.hardware import keyboard
 from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.stimulus import CreatedStimulus
-from auditory_stimulation.view.view import AView
+from auditory_stimulation.view.view import AView, ViewInterrupted
 
 LETTER_SIZE = 0.05
 TEXT_BOX_COLOR = 1.
@@ -66,7 +66,7 @@ class PsychopyView(AView):
     def __try_to_quit(self) -> None:
         if len(self.__keyboard.getKeys(["escape"])) != 0:
             self.close_view()
-            quit()
+            raise ViewInterrupted("The user has pressed 'escape', indicating they want to quit the view.")
 
     def __draw(self, item: Drawable, clear_buffer: bool):
         if clear_buffer:

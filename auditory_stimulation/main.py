@@ -19,6 +19,7 @@ from auditory_stimulation.model.model import Model
 from auditory_stimulation.model.stimulus import Stimulus, generate_stimulus
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
+from auditory_stimulation.view.view import ViewInterrupted
 
 LOGGING_DIRECTORY = pathlib.Path("logs/")
 
@@ -113,7 +114,12 @@ def main() -> None:
     with trigger_sender as ts:
         model.register(trigger_sender, 1)
         experiment = Experiment(model, view)
-        experiment.run()
+
+        try:
+            experiment.run()
+        except ViewInterrupted:
+            print("Experiment interrupted by user!")
+            pass
 
 
 if __name__ == "__main__":
