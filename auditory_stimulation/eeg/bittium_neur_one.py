@@ -27,14 +27,14 @@ class BittiumTriggerSender(ATriggerSender):
     __parallel_port: IParallelPort
     __trigger_duration_s: float
 
-    def __init__(self, parallel_port: IParallelPort, trigger_duration_s: float) -> None:
+    def __init__(self, thread_timout: int, parallel_port: IParallelPort, trigger_duration_s: float) -> None:
         """Constructs a BittiumTriggerSender object.
         You should always use `get_bittium_trigger_sender(...)` to initialize this class and never the constructor!
 
         :param parallel_port: An object allowing to setData to a parallel port
         :param trigger_duration_s: How long the trigger pins are set to high when sending a trigger.
         """
-        super().__init__()
+        super().__init__(thread_timout)
         self.__parallel_port = parallel_port
         self.__trigger_duration_s = trigger_duration_s
 

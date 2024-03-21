@@ -16,12 +16,12 @@ class FileTriggerSender(ATriggerSender):
     """
     __target_file: PathLike
 
-    def __init__(self, target_file: PathLike):
+    def __init__(self, thread_timout: int, target_file: PathLike):
         """Constructs a FileTriggerSender object.
 
         :param target_file: The target file, where the triggers will be written.
         """
-        super().__init__()
+        super().__init__(thread_timout)
         self.__file = open(target_file, "w")
 
     def __del__(self):
