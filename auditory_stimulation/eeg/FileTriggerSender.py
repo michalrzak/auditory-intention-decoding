@@ -1,8 +1,5 @@
-import threading
 from datetime import datetime
 from os import PathLike
-from queue import Queue
-from typing import IO
 
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.eeg.trigger_sender import ATriggerSender
@@ -18,35 +15,18 @@ class FileTriggerSender(ATriggerSender):
     queue and writes it to the file. This should ensure that the triggers are always in correct order in the file.
     """
     __target_file: PathLike
-    __file: IO
-    __file_lock: threading.Lock
-
-    __file_write_thread: threading.Thread
-    __trigger_queue: Queue
 
     def __init__(self, target_file: PathLike):
         """Constructs a FileTriggerSender object.
 
         :param target_file: The target file, where the triggers will be written.
         """
-        self.__target_file = target_file
-        self.__file = open(self.__target_file, "w")
-        self.__file_lock = threading.Lock()
-
-        self.__trigger_queue = Queue()
-
-    def __write_file_worker(self) -> None:
-        time, trigger = self.__trigger_queue.get(block=False)
-
-        with self.__file_lock:
-            self.__file.write(f"{datetime.timestamp(time) * 1000}: {str(trigger)}\n")
-
-        self.__trigger_queue.task_done()
+        super().__init__()
+        self.__file = open(target_file, "w")
 
     def __del__(self):
-        self.__trigger_queue.join()
+        super().__del__()
         self.__file.close()
 
     def _send_trigger(self, trigger: ETrigger) -> None:
-        self.__trigger_queue.put((datetime.today(), trigger))
-        threading.Thread(target=self.__write_file_worker).start()
+        self.__file.write(f"{datetime.timestamp(datetime.today()) * 1000}: {str(trigger)}\n")

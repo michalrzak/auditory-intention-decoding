@@ -34,6 +34,7 @@ class BittiumTriggerSender(ATriggerSender):
         :param parallel_port: An object allowing to setData to a parallel port
         :param trigger_duration_s: How long the trigger pins are set to high when sending a trigger.
         """
+        super().__init__()
         self.__parallel_port = parallel_port
         self.__trigger_duration_s = trigger_duration_s
 
