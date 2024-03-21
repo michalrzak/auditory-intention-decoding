@@ -19,6 +19,8 @@ MOCK_CREATED_STIMULUS = mockito.mock(CreatedStimulus)
 MOCK_CREATED_STIMULUS.time_stamps = [[0.1, 0.2]]
 MOCK_CREATED_STIMULUS.audio = MOCK_AUDIO
 
+THREAD_TIMOUT = 0
+
 
 def wait_for_threads(previous_thread_count: int) -> None:
     # wait for all threads to finish
@@ -32,11 +34,11 @@ def test_bittium_trigger_sender_update_easy_valid_call(update_identifier: EModel
     parallel_port = mockito.mock(IParallelPort)
     when(parallel_port).setData(ANY).thenReturn(None)
 
-    trigger_sender = BittiumTriggerSender(parallel_port, trigger_duration_s=0)
+    trigger_sender = BittiumTriggerSender(THREAD_TIMOUT, parallel_port, trigger_duration_s=0)
 
     previous_count = threading.active_count()
-
-    trigger_sender.update(data=data, identifier=update_identifier)
+    with trigger_sender as ts:
+        ts.update(data=data, identifier=update_identifier)
     wait_for_threads(previous_count)
 
     verify(parallel_port, times=1).setData(ETrigger.get_trigger(data, update_identifier).value)
@@ -50,9 +52,9 @@ def test_bittium_trigger_sender_update_experiment_state_changed_valid_call(exper
 
     previous_count = threading.active_count()
 
-    trigger_sender = BittiumTriggerSender(parallel_port, trigger_duration_s=0)
-
-    trigger_sender.update(data=experiment_state, identifier=EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
+    trigger_sender = BittiumTriggerSender(THREAD_TIMOUT, parallel_port, trigger_duration_s=0)
+    with trigger_sender as ts:
+        ts.update(data=experiment_state, identifier=EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
     wait_for_threads(previous_count)
 
     verify(parallel_port, times=1).setData(
@@ -64,20 +66,18 @@ def test_bittium_trigger_sender_update_new_stimulus_threads():
     parallel_port = mockito.mock(IParallelPort)
     when(parallel_port).setData(ANY).thenReturn(None)
 
-    trigger_sender = BittiumTriggerSender(parallel_port, trigger_duration_s=0)
+    trigger_sender = BittiumTriggerSender(THREAD_TIMOUT, parallel_port, trigger_duration_s=0)
 
     data = MOCK_CREATED_STIMULUS
     update_identifier = EModelUpdateIdentifier.NEW_STIMULUS
 
     previous_count = threading.active_count()
-    trigger_sender.update(data=data, identifier=update_identifier)
-    new_count = threading.active_count() - previous_count
-
-    assert new_count == 1 + len(data.time_stamps) * 2
+    with trigger_sender as ts:
+        ts.update(data=data, identifier=update_identifier)
     wait_for_threads(previous_count)
 
     verify(parallel_port, times=1).setData(ETrigger.get_trigger(data, update_identifier).value)
     verify(parallel_port, times=1).setData(ETrigger.END_STIMULUS.value)
     verify(parallel_port, times=len(data.time_stamps)).setData(ETrigger.OPTION_START.value)
     verify(parallel_port, times=len(data.time_stamps)).setData(ETrigger.OPTION_END.value)
-    verify(parallel_port, times=new_count + 1).setData(0)
+    verify(parallel_port, times=1 + 1 + 2 * len(data.time_stamps)).setData(0)
