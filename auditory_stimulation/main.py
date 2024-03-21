@@ -12,7 +12,7 @@ from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTagg
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
 from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger, SpectrumShiftTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
-from auditory_stimulation.eeg.FileTriggerSender import FileTriggerSender
+from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
