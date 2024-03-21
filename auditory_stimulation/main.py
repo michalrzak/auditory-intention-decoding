@@ -1,5 +1,6 @@
 import pathlib
 import random
+import warnings
 from typing import List, Optional
 
 import psychopy.visual
@@ -118,7 +119,7 @@ def main() -> None:
         try:
             experiment.run()
         except ViewInterrupted:
-            print("Experiment interrupted by user!")
+            warnings.warn("Experiment interrupted by user!")
             pass
 
 
