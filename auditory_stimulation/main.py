@@ -112,7 +112,7 @@ def main() -> None:
 
     trigger_sender = FileTriggerSender(5, "test.txt")
 
-    with trigger_sender as ts:
+    with trigger_sender.start() as ts:
         model.register(ts, 1)
         experiment = Experiment(model, view)
 

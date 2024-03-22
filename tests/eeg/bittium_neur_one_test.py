@@ -37,7 +37,7 @@ def test_bittium_trigger_sender_update_easy_valid_call(update_identifier: EModel
     trigger_sender = BittiumTriggerSender(THREAD_TIMOUT, parallel_port, trigger_duration_s=0)
 
     previous_count = threading.active_count()
-    with trigger_sender as ts:
+    with trigger_sender.start() as ts:
         ts.update(data=data, identifier=update_identifier)
     wait_for_threads(previous_count)
 
@@ -53,7 +53,7 @@ def test_bittium_trigger_sender_update_experiment_state_changed_valid_call(exper
     previous_count = threading.active_count()
 
     trigger_sender = BittiumTriggerSender(THREAD_TIMOUT, parallel_port, trigger_duration_s=0)
-    with trigger_sender as ts:
+    with trigger_sender.start() as ts:
         ts.update(data=experiment_state, identifier=EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
     wait_for_threads(previous_count)
 
@@ -72,7 +72,7 @@ def test_bittium_trigger_sender_update_new_stimulus_threads():
     update_identifier = EModelUpdateIdentifier.NEW_STIMULUS
 
     previous_count = threading.active_count()
-    with trigger_sender as ts:
+    with trigger_sender.start() as ts:
         ts.update(data=data, identifier=update_identifier)
     wait_for_threads(previous_count)
 

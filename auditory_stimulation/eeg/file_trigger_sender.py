@@ -8,20 +8,16 @@ from auditory_stimulation.eeg.trigger_sender import ATriggerSender
 class FileTriggerSender(ATriggerSender):
     """Constructs a FileTriggerSender object, which writes all acquired triggers to a file.
 
-    The structure of this object is relatively complicated, as to make it non-blocking, the file operations are executed
-    on separate threads. This requires locking/unlocking the written file.
-
-    The class works by enqueuing timestamps + triggers and opening write_file workers, where each pops an item from the
-    queue and writes it to the file. This should ensure that the triggers are always in correct order in the file.
+    For further documentation, please refer to the super class (ATriggerSender).
     """
     __target_file: PathLike
 
-    def __init__(self, thread_timout: float, target_file: PathLike):
+    def __init__(self, thread_timeout_secs: float, target_file: PathLike):
         """Constructs a FileTriggerSender object.
 
         :param target_file: The target file, where the triggers will be written.
         """
-        super().__init__(thread_timout)
+        super().__init__(thread_timeout_secs)
         self.__file = open(target_file, "w")
 
     def __del__(self):
