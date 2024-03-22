@@ -1,6 +1,7 @@
 import pathlib
 import random
 import warnings
+from datetime import datetime
 from typing import List, Optional
 
 import psychopy.visual
@@ -112,7 +113,7 @@ def main() -> None:
 
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
-    trigger_sender = FileTriggerSender(5, "test.txt")
+    trigger_sender = FileTriggerSender(5, f"triggers/{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}.csv")
 
     with trigger_sender.start() as ts:
         model.register(ts, 1)
