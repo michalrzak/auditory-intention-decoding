@@ -24,6 +24,8 @@ from auditory_stimulation.view.view import ViewInterrupted
 
 LOGGING_DIRECTORY = pathlib.Path("logs/")
 
+PARPORT_TRIGGER_DURATION_SECS = 0.001
+
 
 def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
                      seed: Optional[int] = None) -> List[Stimulus]:
