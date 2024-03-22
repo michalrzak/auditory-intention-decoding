@@ -24,4 +24,4 @@ class FileTriggerSender(ATriggerSender):
         self.__file.close()
 
     def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
-        self.__file.write(f"{timestamp}: {str(trigger)}\n")
+        self.__file.write(f"{timestamp},{str(trigger)}\n")

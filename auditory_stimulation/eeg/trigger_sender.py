@@ -1,10 +1,11 @@
 import queue
+import sched
 import threading
 import time
 from abc import abstractmethod
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any, List
+from typing import Any
 
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.model import AObserver
@@ -50,19 +51,22 @@ class ATriggerSender(AObserver):
     __thread: threading.Thread
     __exit_flag: bool
 
-    __offset_trigger_threads: List[threading.Thread]
+    __trigger_scheduler: sched.scheduler
 
     def __init__(self, thread_timeout_secs: float) -> None:
         """
         :param thread_timeout_secs: Specifies how long the thread tries to send something, before it attempts to quit.
         """
+        if thread_timeout_secs < 0:
+            raise ValueError("thread_timout_secs has to be a non-negative number!")
+
         self.__thread_timeout_secs = thread_timeout_secs
 
         self.__thread = threading.Thread(target=self.__trigger_worker)
         self.__trigger_queue = queue.Queue()
         self.__exit_flag = False
 
-        self.__offset_trigger_threads = []
+        self.__trigger_scheduler = sched.scheduler(time.time, time.sleep)
 
     def __trigger_worker(self) -> None:
         """The method which runs on the trigger sender thread. To quit the thread, set self.__exit_flag to True.
@@ -78,25 +82,21 @@ class ATriggerSender(AObserver):
             self.__trigger_queue.task_done()
 
     def __queue_trigger(self, trigger: ETrigger, offset_secs: float = 0) -> None:
-        """Enques the given trigger, to be sent after the specified amount.
+        """Enqueues the given trigger, to be sent after the specified amount.
 
         :param trigger: The to be sent trigger.
         :param offset_secs: How long, in seconds, to wait before sending the trigger.
         :return: None
         """
-        current_timestamp = datetime.timestamp(datetime.today()) * 1000
+        current_timestamp_ms = datetime.timestamp(datetime.today()) * 1000
 
         if offset_secs == 0:
-            self.__trigger_queue.put((trigger, current_timestamp))
+            self.__trigger_queue.put((trigger, current_timestamp_ms))
             return
 
-        def wait_and_put():
-            time.sleep(offset_secs)
-            self.__trigger_queue.put((trigger, current_timestamp))
-
-        thread = threading.Thread(target=wait_and_put)
-        thread.start()
-        self.__offset_trigger_threads.append(thread)
+        item = (trigger, current_timestamp_ms + offset_secs * 1000)
+        self.__trigger_scheduler.enter(offset_secs, 1, lambda tr, ts: self.__trigger_queue.put((tr, ts)),
+                                       argument=(item))
 
     @abstractmethod
     def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
@@ -139,8 +139,7 @@ class ATriggerSender(AObserver):
         if not self.__thread.is_alive():
             return
 
-        for thread in self.__offset_trigger_threads:
-            thread.join()
+        self.__trigger_scheduler.run()
 
         self.__trigger_queue.join()
         self.__exit_flag = True
