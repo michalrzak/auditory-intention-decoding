@@ -1,5 +1,7 @@
 import pathlib
 import random
+import warnings
+from datetime import datetime
 from typing import List, Optional
 
 import psychopy.visual
@@ -11,6 +13,7 @@ from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTagg
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
 from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger, SpectrumShiftTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
+from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
@@ -18,8 +21,11 @@ from auditory_stimulation.model.model import Model
 from auditory_stimulation.model.stimulus import Stimulus, generate_stimulus
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
+from auditory_stimulation.view.view import ViewInterrupted
 
 LOGGING_DIRECTORY = pathlib.Path("logs/")
+
+PARPORT_TRIGGER_DURATION_SECS = 0.001
 
 
 def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
@@ -107,11 +113,17 @@ def main() -> None:
 
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
-    # trigger_sender = FileTriggerSender("test.txt")
-    # model.register(trigger_sender, 1)
+    trigger_sender = FileTriggerSender(5, f"triggers/{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}.csv")
 
-    experiment = Experiment(model, view)
-    experiment.run()
+    with trigger_sender.start() as ts:
+        model.register(ts, 1)
+        experiment = Experiment(model, view)
+
+        try:
+            experiment.run()
+        except ViewInterrupted:
+            warnings.warn("Experiment interrupted by user!")
+            pass
 
 
 if __name__ == "__main__":

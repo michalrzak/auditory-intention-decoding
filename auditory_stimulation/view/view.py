@@ -8,6 +8,10 @@ from auditory_stimulation.model.model_update_identifier import EModelUpdateIdent
 from auditory_stimulation.model.stimulus import CreatedStimulus
 
 
+class ViewInterrupted(Exception):
+    ...
+
+
 class AView(AObserver):
     """Abstract class, to be implemented by new Views of the MVC pattern.
     Implements the Observer pattern.
