@@ -36,7 +36,7 @@ class BittiumTriggerSender(ATriggerSender):
         self.__parallel_port = parallel_port
         self.__trigger_duration_s = trigger_duration_s
 
-    def _send_trigger(self, trigger: ETrigger) -> None:
+    def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
         assert isinstance(trigger.value, int)
         self.__parallel_port.setData(trigger.value)
         time.sleep(self.__trigger_duration_s)

@@ -1,4 +1,3 @@
-from datetime import datetime
 from os import PathLike
 
 from auditory_stimulation.eeg.common import ETrigger
@@ -24,5 +23,5 @@ class FileTriggerSender(ATriggerSender):
         super().__del__()
         self.__file.close()
 
-    def _send_trigger(self, trigger: ETrigger) -> None:
-        self.__file.write(f"{datetime.timestamp(datetime.today()) * 1000}: {str(trigger)}\n")
+    def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
+        self.__file.write(f"{timestamp}: {str(trigger)}\n")

@@ -3,6 +3,7 @@ import threading
 import time
 from abc import abstractmethod
 from contextlib import contextmanager
+from datetime import datetime
 from typing import Any, List
 
 from auditory_stimulation.eeg.common import ETrigger
@@ -70,10 +71,10 @@ class ATriggerSender(AObserver):
         """
         while not self.__exit_flag:
             try:
-                item = self.__trigger_queue.get(timeout=self.__thread_timeout_secs)
+                item, ts = self.__trigger_queue.get(timeout=self.__thread_timeout_secs)
             except queue.Empty:
                 continue
-            self._send_trigger(item)
+            self._send_trigger(item, ts)
             self.__trigger_queue.task_done()
 
     def __queue_trigger(self, trigger: ETrigger, offset_secs: float = 0) -> None:
@@ -83,24 +84,27 @@ class ATriggerSender(AObserver):
         :param offset_secs: How long, in seconds, to wait before sending the trigger.
         :return: None
         """
+        current_timestamp = datetime.timestamp(datetime.today()) * 1000
+
         if offset_secs == 0:
-            self.__trigger_queue.put(trigger)
+            self.__trigger_queue.put((trigger, current_timestamp))
             return
 
         def wait_and_put():
             time.sleep(offset_secs)
-            self.__trigger_queue.put(trigger)
+            self.__trigger_queue.put((trigger, current_timestamp))
 
         thread = threading.Thread(target=wait_and_put)
         thread.start()
         self.__offset_trigger_threads.append(thread)
 
     @abstractmethod
-    def _send_trigger(self, trigger: ETrigger) -> None:
+    def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
         """To be implemented by the subclasses. Responsible for properly sending the trigger to the used trigger
         mechanism.
 
         :param trigger: The to be sent trigger.
+        :param timestamp: Timestamp of the trigger.
         :return: None
         """
         ...
@@ -110,7 +114,6 @@ class ATriggerSender(AObserver):
         if not self.__thread.is_alive():
             raise ThreadDiedException("The trigger sending thread died. Did you use the `with` syntax to start the "
                                       "thread?")
-
         self.__queue_trigger(ETrigger.get_trigger(data, identifier))
 
         # in case a new stimulus is received, also queue sending trigger after it finishes playing and at the beginning
