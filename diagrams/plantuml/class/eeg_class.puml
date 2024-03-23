@@ -7,26 +7,51 @@ package model {
 }
 
 
+
 package eeg {
    enum ETrigger{
      +ETrigger {static} get_trigger(data: Any, identifier: EModelUpdateIdentifier
    }
    note bottom of ETrigger: Contains tha mappings to\nthe actual trigger numbers\nsent
 
-    abstract class TriggerSender {
-        #void {abstract} send_trigger(trigger: ETrigger)
-    }
+    abstract class ATriggerSender {
+        -Queue trigger_queue
+        -float thread_timout_secs
+        -thread Thread
+        -bool exit_flag
+        -scheduler: trigger_scheduler
 
-   class BittiumTriggerSender<<Observer>> {
+        +ATriggerSender(thread_timout_secs: float)
+        -void trigger_worker()
+        -void queue_trigger(trigger: ETrigger, offset_secs: float)
+        #void {abstract} send_trigger(trigger: ETrigger)
+        +ATriggerSender start()
+        +void __del__()
+    }
+    note bottom
+        This class uses a context management]
+        (i.e. the with syntax) to start/stop threads.
+        Call the start method to enter into a context
+        which gets automatically cleaned up
+        (the thread is killed).
+    end note
+
+   class BittiumTriggerSender {
      -IParallelPort parallel_port
      -int trigger_duration_s
-     +BittiumTriggerSender(parallel_port, trigger_duration_s)
+     +BittiumTriggerSender(thread_timout_secs, parallel_port, trigger_duration_s)
      #void send_trigger(trigger: ETrigger)
    }
-}
-TriggerSender -u-|> AObserver
-BittiumTriggerSender -r-|> TriggerSender
-BittiumTriggerSender ..> ETrigger: "uses"
 
+   class FileTriggerSender {
+     -PathLike target_file
+     +FileTriggerSender(thread_timout_secs, target_file)
+   }
+}
+
+ATriggerSender -u-|> AObserver
+BittiumTriggerSender -r-|> ATriggerSender
+FileTriggerSender -d-|> ATriggerSender
+ATriggerSender ..> ETrigger: "uses"
 
 @enduml
