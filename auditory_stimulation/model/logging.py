@@ -21,16 +21,8 @@ class Logger(AObserver):
     __exported_stimuli: Set[CreatedStimulus] = set()
     __exports_directory: pathlib.Path
 
-    @staticmethod
-    def __create_directory_if_not_exists(directory: PathLike) -> None:
-        directory_path = pathlib.Path(directory)
-        directory_path.mkdir(parents=True, exist_ok=True)
-
-    def __init__(self, logging_directory: PathLike):
-        self.__create_directory_if_not_exists(logging_directory)
-
-        self.__exports_directory = pathlib.Path(logging_directory) / datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
-        self.__create_directory_if_not_exists(self.__exports_directory)
+    def __init__(self, target_folder: PathLike):
+        self.__exports_directory = pathlib.Path(target_folder)
 
         logging.basicConfig(filename=str(self.__exports_directory / "logs.log"),
                             filemode='w',

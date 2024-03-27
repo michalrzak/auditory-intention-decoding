@@ -2,6 +2,7 @@ import pathlib
 import random
 import warnings
 from datetime import datetime
+from os import PathLike
 from typing import List, Optional
 
 import psychopy.visual
@@ -24,6 +25,9 @@ from auditory_stimulation.view.sound_players import psychopy_player
 from auditory_stimulation.view.view import ViewInterrupted
 
 LOGGING_DIRECTORY = pathlib.Path("logs/")
+TRIGGER_DIRECTORY = pathlib.Path("triggers/")
+
+EXPERIMENT_TEXTS = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
 
 PARPORT_TRIGGER_DURATION_SECS = 0.001
 
@@ -92,7 +96,19 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
     return stimuli
 
 
+def create_directory_if_not_exists(directory: PathLike) -> None:
+    directory_path = pathlib.Path(directory)
+    directory_path.mkdir(parents=True, exist_ok=True)
+
+
 def main() -> None:
+    str_day = datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
+    logging_folder = LOGGING_DIRECTORY / str_day
+
+    create_directory_if_not_exists(LOGGING_DIRECTORY)
+    create_directory_if_not_exists(logging_folder)
+    create_directory_if_not_exists(TRIGGER_DIRECTORY)
+
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
     stimuli = generate_stimuli(16, 3, seed=100)
     model = Model(stimuli, [AMTagger(42, sine_signal),
@@ -104,16 +120,15 @@ def main() -> None:
                             BinauralTagger(40),
                             RawTagger()])
 
-    logger = Logger(LOGGING_DIRECTORY)
-    model.register(logger)
+    logger = Logger(logging_folder)
+    model.register(logger, 10)
 
-    experiment_texts = load_experiment_texts(pathlib.Path("auditory_stimulation/experiment_texts.yaml"))
     window = psychopy.visual.Window(fullscr=True)
+    experiment_texts = load_experiment_texts(EXPERIMENT_TEXTS)
     view = PsychopyView(psychopy_player, experiment_texts, window)
-
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
-    trigger_sender = FileTriggerSender(5, f"triggers/{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}.csv")
+    trigger_sender = FileTriggerSender(5, TRIGGER_DIRECTORY / (str_day + ".csv"))
 
     with trigger_sender.start() as ts:
         model.register(ts, 1)
