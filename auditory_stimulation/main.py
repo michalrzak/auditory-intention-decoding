@@ -10,6 +10,7 @@ import yaml
 
 from auditory_stimulation.audio import load_wav_as_audio
 from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger, FMTagger
+from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
 from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger, SpectrumShiftTagger
@@ -32,8 +33,8 @@ EXPERIMENT_TEXTS = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
 PARPORT_TRIGGER_DURATION_SECS = 0.001
 
 
-def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
-                     seed: Optional[int] = None) -> List[Stimulus]:
+def generate_stimuli(n_repetitions: int, taggers: List[AAudioTagger], n_number_stimuli: int = 3,
+                     pause_secs: float = 0.5, seed: Optional[int] = None) -> List[Stimulus]:
     """Generates n stimuli, consisting of n_number_stimuli options.
 
     :param n: The amount of stimuli to be generated
@@ -43,8 +44,8 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
     :return: A list of the generated stimuli.
     """
 
-    if n <= 0:
-        raise ValueError("n must be a positive integer!")
+    # if n <= 0:
+    #     raise ValueError("n must be a positive integer!")
 
     if n_number_stimuli <= 0:
         raise ValueError("n_number_stimuli must be a positive integer!")
@@ -57,42 +58,54 @@ def generate_stimuli(n: int, n_number_stimuli: int = 3, pause_secs: float = 0.5,
     input_text_dict = {key: input_text_dict_raw[key][0] for key in input_text_dict_raw}
 
     stimuli: List[Stimulus] = []
-    for i in range(n):
+    for i in range(n_repetitions):
 
-        # randomly draw, whether eric, or natasha voice is used
-        is_eric = bool(random.randint(0, 1))
-        folder = "eric" if is_eric else "natasha"
+        # draw what target is used
+        target_number = str(random.randint(100, 1000))
 
-        # randomly draw which of the intros will be used
-        intro = random.choice(list(input_text_dict.keys()))
+        taggers_clone = taggers.copy()
+        random.shuffle(taggers_clone)
+        for tagger in taggers_clone:
+            # randomly draw, whether eric, or natasha voice is used
+            is_eric = bool(random.randint(0, 1))
+            folder = "eric" if is_eric else "natasha"
 
-        # randomly draw what numbers will be contained within the stimulus
-        number_stimuli = [str(random.randint(100, 1000)) for _ in range(n_number_stimuli)]
+            # randomly draw which of the intros will be used
+            intro = random.choice(list(input_text_dict.keys()))
 
-        # load the necessary audios to construct the stimulus
-        try:
-            loaded_intro = load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{intro}.wav"))
-            loaded_numbers = [load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{num}.wav"))
-                              for num in number_stimuli]
-            assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
+            # draw what numbers will be contained within the stimulus (minus the target which is already chosen)
+            number_stimuli = []
+            first = True
+            while first or target_number in number_stimuli:
+                first = False
+                number_stimuli = [str(random.randint(100, 1000)) for _ in range(n_number_stimuli - 1)]
 
-        except FileNotFoundError as e:
-            raise FileNotFoundError(str(e) + f"\nAre you sure you downloaded and extracted the stimuli correctly?"
-                                             f" Please check the installation section of the README!")
+            # append the target to the number stimuli and get the index of the target
+            number_stimuli.append(target_number)
+            random.shuffle(number_stimuli)
+            target = number_stimuli.index(target_number)
 
-        # randomly draw which of the numbers is the target
-        target = random.randint(0, n_number_stimuli - 1)
+            # load the necessary audios to construct the stimulus
+            try:
+                loaded_intro = load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{intro}.wav"))
+                loaded_numbers = [load_wav_as_audio(pathlib.Path(f"stimuli_sounds/{folder}/{num}.wav"))
+                                  for num in number_stimuli]
+                assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
 
-        # generate stimulus
-        stimulus = generate_stimulus(loaded_intro,
-                                     input_text_dict[intro],
-                                     loaded_numbers,
-                                     number_stimuli,
-                                     target,
-                                     pause_secs)
-        stimuli.append(stimulus)
+            except FileNotFoundError as e:
+                raise FileNotFoundError(str(e) + f"\nAre you sure you downloaded and extracted the stimuli correctly?"
+                                                 f" Please check the installation section of the README!")
 
-    assert len(stimuli) == n
+            # generate stimulus
+            stimulus = generate_stimulus(loaded_intro,
+                                         input_text_dict[intro],
+                                         loaded_numbers,
+                                         number_stimuli,
+                                         target,
+                                         pause_secs)
+            stimuli.append(stimulus)
+
+    assert len(stimuli) == n_repetitions * len(taggers)
     return stimuli
 
 
@@ -109,16 +122,18 @@ def main() -> None:
     create_directory_if_not_exists(logging_folder)
     create_directory_if_not_exists(TRIGGER_DIRECTORY)
 
+    taggers = [AMTagger(42, sine_signal),
+               FlippedFMTagger(40),
+               NoiseTaggingTagger(44100, 126, 256),
+               FMTagger(40, 100),
+               ShiftSumTagger(40),
+               SpectrumShiftTagger(40),
+               BinauralTagger(40),
+               RawTagger()]
+
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
-    stimuli = generate_stimuli(16, 3, seed=100)
-    model = Model(stimuli, [AMTagger(42, sine_signal),
-                            FlippedFMTagger(40),
-                            NoiseTaggingTagger(44100, 126, 256),
-                            FMTagger(40, 100),
-                            ShiftSumTagger(40),
-                            SpectrumShiftTagger(40),
-                            BinauralTagger(40),
-                            RawTagger()])
+    stimuli = generate_stimuli(16, taggers, 3, seed=100)
+    model = Model(stimuli, taggers)
 
     logger = Logger(logging_folder)
     model.register(logger, 10)
