@@ -28,7 +28,7 @@ package model {
 
     class Logger<<Observer>> {
         -Path exports_directory
-        +Logger(logging_directory: PathLike)
+        +Logger(target_folder: PathLike)
     }
     Logger -u-|> AObserver
 
