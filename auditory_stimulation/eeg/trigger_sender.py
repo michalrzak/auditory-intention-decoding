@@ -1,11 +1,10 @@
 import queue
-import sched
 import threading
-import time
 from abc import abstractmethod
 from contextlib import contextmanager
 from datetime import datetime
-from typing import Any
+from threading import Timer
+from typing import Any, List
 
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.model import AObserver
@@ -51,7 +50,7 @@ class ATriggerSender(AObserver):
     __thread: threading.Thread
     __exit_flag: bool
 
-    __trigger_scheduler: sched.scheduler
+    __trigger_enqueue_threads: List[threading.Thread]
 
     def __init__(self, thread_timeout_secs: float) -> None:
         """
@@ -66,7 +65,7 @@ class ATriggerSender(AObserver):
         self.__trigger_queue = queue.Queue()
         self.__exit_flag = False
 
-        self.__trigger_scheduler = sched.scheduler(time.time, time.sleep)
+        self.__trigger_enqueue_threads = []
 
     def __trigger_worker(self) -> None:
         """The method which runs on the trigger sender thread. To quit the thread, set self.__exit_flag to True.
@@ -95,8 +94,10 @@ class ATriggerSender(AObserver):
             return
 
         item = (trigger, current_timestamp_ms + offset_secs * 1000)
-        self.__trigger_scheduler.enter(offset_secs, 1, lambda tr, ts: self.__trigger_queue.put((tr, ts)),
-                                       argument=(item))
+
+        t = Timer(offset_secs, lambda tr, ts: self.__trigger_queue.put((tr, ts)), args=item)
+        t.start()
+        self.__trigger_enqueue_threads.append(t)
 
     @abstractmethod
     def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
@@ -139,7 +140,8 @@ class ATriggerSender(AObserver):
         if not self.__thread.is_alive():
             return
 
-        self.__trigger_scheduler.run()
+        for t in self.__trigger_enqueue_threads:
+            t.join()
 
         self.__trigger_queue.join()
         self.__exit_flag = True

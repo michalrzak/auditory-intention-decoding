@@ -50,7 +50,7 @@ package model {
 
     class Logger<<Observer>> {
         -Path exports_directory
-        +Logger(logging_directory: PathLike)
+        +Logger(target_folder: PathLike)
     }
     Logger -u-|> AObserver
 
@@ -190,7 +190,7 @@ package eeg {
         -float thread_timout_secs
         -thread Thread
         -bool exit_flag
-        -scheduler: trigger_scheduler
+        -List[Trigger]: trigger_enqueue_threads
 
         +ATriggerSender(thread_timout_secs: float)
         -void trigger_worker()

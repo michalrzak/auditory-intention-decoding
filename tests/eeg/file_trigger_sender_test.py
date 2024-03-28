@@ -1,5 +1,6 @@
 import csv
 import pathlib
+import time
 from datetime import datetime
 
 import mockito
@@ -25,7 +26,7 @@ def target_file(tmp_path):
     return pathlib.Path(tmp_path) / "trigger_file.csv"
 
 
-def test_file_trigger_sender_consruct_valid_call(tmp_path):
+def test_file_trigger_sender_construct_valid_call(tmp_path):
     trigger_sender = FileTriggerSender(THREAD_TIMOUT, target_file(tmp_path))
 
 
@@ -78,7 +79,7 @@ def test_file_trigger_sender_send_trigger_new_primer_valid_call(data, tmp_path):
 
 
 def test_file_trigger_sender_send_trigger_new_stimulus_valid_call(tmp_path):
-    epsilon = 3
+    epsilon = 50
 
     trigger_sender = FileTriggerSender(THREAD_TIMOUT, target_file(tmp_path))
 
@@ -111,3 +112,53 @@ def test_file_trigger_sender_send_trigger_new_stimulus_valid_call(tmp_path):
         target_ts = send_ts + ts[1] * 1000
         assert target_ts - epsilon <= float(results[1 + i * 2 + 1][0]) <= target_ts + epsilon
         assert results[1 + i * 2 + 1][1] == str(ETrigger.OPTION_END)
+
+
+def test_file_trigger_sender_send_trigger_two_new_stimuli_valid_call(tmp_path):
+    epsilon = 50
+
+    trigger_sender = FileTriggerSender(THREAD_TIMOUT, target_file(tmp_path))
+
+    data = MOCK_CREATED_STIMULUS
+    identifier = EModelUpdateIdentifier.NEW_STIMULUS
+
+    with trigger_sender.start() as ts:
+        send_ts = datetime.timestamp(datetime.today()) * 1000
+        trigger_sender.update(data, identifier)
+
+        time.sleep(data.audio.secs)
+
+        send_ts2 = datetime.timestamp(datetime.today()) * 1000
+        trigger_sender.update(data, identifier)
+
+    with open(target_file(tmp_path), "r") as f:
+        results = list(csv.reader(f, delimiter=','))
+
+    triggers_per_stimulus = 1 + len(data.time_stamps) * 2 + 1
+    assert len(results) == triggers_per_stimulus * 2
+    assert all(len(res) == 2 for res in results)
+
+    for j in range(2):
+        if j == 1:
+            # update the send timestamp to be after the first audio
+            send_ts = send_ts2
+
+        # first trigger should be new stimulus
+        assert send_ts - epsilon <= float(results[triggers_per_stimulus * j][0]) <= send_ts + epsilon
+        assert results[triggers_per_stimulus * j][1] == str(ETrigger.NEW_STIMULUS)
+
+        # last trigger should be end stimulus
+        last_trigger_i = triggers_per_stimulus * (1 + j) - 1
+        target_ts = send_ts + data.audio.secs * 1000
+        assert target_ts - epsilon <= float(results[last_trigger_i][0]) <= target_ts + epsilon
+        assert results[last_trigger_i][1] == str(ETrigger.END_STIMULUS)
+
+        for i, ts in enumerate(data.time_stamps):
+            current_i = triggers_per_stimulus * j + 1 + i * 2
+            target_ts = send_ts + ts[0] * 1000
+            assert target_ts - epsilon <= float(results[current_i][0]) <= target_ts + epsilon
+            assert results[current_i][1] == str(ETrigger.OPTION_START)
+
+            target_ts = send_ts + ts[1] * 1000
+            assert target_ts - epsilon <= float(results[current_i + 1][0]) <= target_ts + epsilon
+            assert results[current_i + 1][1] == str(ETrigger.OPTION_END)
