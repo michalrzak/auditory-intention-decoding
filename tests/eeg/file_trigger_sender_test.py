@@ -26,7 +26,7 @@ def target_file(tmp_path):
     return pathlib.Path(tmp_path) / "trigger_file.csv"
 
 
-def test_file_trigger_sender_consruct_valid_call(tmp_path):
+def test_file_trigger_sender_construct_valid_call(tmp_path):
     trigger_sender = FileTriggerSender(THREAD_TIMOUT, target_file(tmp_path))
 
 

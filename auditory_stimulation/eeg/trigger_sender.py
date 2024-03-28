@@ -1,11 +1,10 @@
 import queue
 import threading
-import time
 from abc import abstractmethod
 from contextlib import contextmanager
 from datetime import datetime
 from threading import Timer
-from typing import Any, Collection, List
+from typing import Any, List
 
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.model import AObserver
