@@ -32,6 +32,11 @@ EXPERIMENT_TEXTS = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
 
 PARPORT_TRIGGER_DURATION_SECS = 0.001
 
+STIMULUS_REPEAT = 5
+RESTING_STATE_SECS = 5
+PRIMER_SECS = 5
+BREAK_SECS = 5
+
 
 def generate_stimuli(n_repetitions: int,
                      taggers: List[AAudioTagger],
@@ -156,7 +161,12 @@ def main() -> None:
 
     with trigger_sender.start() as ts:
         model.register(ts, 1)
-        experiment = Experiment(model, view)
+        experiment = Experiment(model,
+                                view,
+                                STIMULUS_REPEAT,
+                                RESTING_STATE_SECS,
+                                PRIMER_SECS,
+                                BREAK_SECS)
 
         try:
             experiment.run()
