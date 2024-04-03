@@ -123,7 +123,7 @@ class PsychopyView(AView):
 
         return True
 
-    def wait(self, secs: int) -> None:
+    def wait(self, secs: float) -> None:
         self.__try_to_quit()
 
         psychopy.core.wait(secs)

@@ -21,5 +21,5 @@ class CLIView(AView):
         input("Please press the enter key")
         return True
 
-    def wait(self, secs: int) -> None:
+    def wait(self, secs: float) -> None:
         time.sleep(secs)
