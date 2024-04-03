@@ -67,16 +67,16 @@ class Experiment:
 
             for i in range(self.__stimulus_repeat):
                 self.__model.present_primer(stimulus.primer)
-                self.__view.wait(PRIMER_SECS)
+                self.__view.wait(self.__primer_secs)
 
                 self.__model.present_stimulus(stimulus)
 
             self.__model.change_experiment_state(EExperimentState.BREAK)
-            self.__view.wait(BREAK_SECS)
+            self.__view.wait(self.__break_secs)
             self.__view.get_confirmation()
 
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_OPEN)
-        self.__view.wait(RESTING_STATE_SECS)
+        self.__view.wait(self.__resting_state_secs)
 
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_CLOSED)
-        self.__view.wait(RESTING_STATE_SECS)
+        self.__view.wait(self.__resting_state_secs)
