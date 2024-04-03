@@ -96,20 +96,29 @@ class PsychopyView(AView):
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
         self.__try_to_quit()
 
-        # if the data was not provided, skip showing anything
-        assert data in self._experiment_texts
-        if data not in self._experiment_texts or self._experiment_texts[data] is None:
-            self._experiment_texts[data] = ""
+        drawn_item: Drawable
+        # if resting state measurement, show fixation cross instead of text
+        if data == EExperimentState.RESTING_STATE_EYES_OPEN or data == EExperimentState.RESTING_STATE_EYES_CLOSED:
+            drawn_item = self.__create_fixation_cross()
 
-        # if the experiment state changed from resting state eyes closed, need to beep to notify the user to open their
-        #  eyes
-        if self.__previous_state == EExperimentState.RESTING_STATE_EYES_CLOSED:
+        else:
+            # if the data was not provided, skip showing anything
+            assert data in self._experiment_texts
+            if data not in self._experiment_texts or self._experiment_texts[data] is None:
+                self._experiment_texts[data] = ""
+
+            drawn_item = self.__create_text_box(self._experiment_texts[data],
+                                                EXPERIMENT_STATE_TEXT_BOX_POSITION,
+                                                EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
+                                                EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
+
+        # at the beginning and end of eyes closed play a beep
+        if data == EExperimentState.RESTING_STATE_EYES_CLOSED or \
+                self.__previous_state == EExperimentState.RESTING_STATE_EYES_CLOSED:
             self.__beep()
         self.__previous_state = data
 
-        text = self.__create_text_box(self._experiment_texts[data], EXPERIMENT_STATE_TEXT_BOX_POSITION,
-                                      EXPERIMENT_STATE_TEXT_BOX_SIZE[0], EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
-        self.__draw(text, True)
+        self.__draw(drawn_item, True)
 
     def get_confirmation(self) -> bool:
         self.__try_to_quit()
@@ -158,6 +167,15 @@ class PsychopyView(AView):
                                             colorSpace=TEXT_BOX_COLOR_SPACE)
 
         return text_box
+
+    def __create_fixation_cross(self) -> Drawable:
+        return psychopy.visual.shape.ShapeStim(win=self.__window,
+                                               units="pix",
+                                               vertices="cross",
+                                               fillColor="white",
+                                               lineColor="white",
+                                               size=(50, 50),
+                                               pos=(0, 0))
 
     def close_view(self):
         """Closes the view properly."""
