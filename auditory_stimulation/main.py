@@ -70,7 +70,7 @@ def generate_stimuli(n_repetitions: int,
     """
 
     if n_stimuli <= 0:
-        raise ValueError("n_number_stimuli must be a positive integer!")
+        raise ValueError("n_stimuli must be a positive integer!")
 
     if seed is not None:
         random.seed(seed)
