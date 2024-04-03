@@ -1,7 +1,6 @@
 import logging
 import pathlib
 import threading
-from datetime import datetime
 from os import PathLike
 from typing import Any, Set
 

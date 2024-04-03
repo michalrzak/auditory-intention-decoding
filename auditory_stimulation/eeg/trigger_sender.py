@@ -47,7 +47,7 @@ class ATriggerSender(AObserver):
     __trigger_queue: queue.Queue
 
     __thread_timeout_secs: float
-    __thread: threading.Thread
+    __thread: threading.Thread = None  # this is None in order to catch __del__ call after failed __init__ call
     __exit_flag: bool
 
     __trigger_enqueue_threads: List[threading.Thread]
@@ -137,7 +137,7 @@ class ATriggerSender(AObserver):
             self.__del__()
 
     def __del__(self) -> None:
-        if not self.__thread.is_alive():
+        if self.__thread is None or not self.__thread.is_alive():
             return
 
         for t in self.__trigger_enqueue_threads:

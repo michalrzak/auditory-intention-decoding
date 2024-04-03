@@ -1,4 +1,5 @@
 from os import PathLike
+from typing import IO
 
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.eeg.trigger_sender import ATriggerSender
@@ -9,7 +10,7 @@ class FileTriggerSender(ATriggerSender):
 
     For further documentation, please refer to the super class (ATriggerSender).
     """
-    __target_file: PathLike
+    __file: IO = None
 
     def __init__(self, thread_timeout_secs: float, target_file: PathLike):
         """Constructs a FileTriggerSender object.
@@ -21,6 +22,10 @@ class FileTriggerSender(ATriggerSender):
 
     def __del__(self):
         super().__del__()
+        if self.__file is None:
+            # object not properly initialized
+            return
+
         self.__file.close()
 
     def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:

@@ -84,11 +84,6 @@ class PsychopyView(AView):
 
     def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
         self.__try_to_quit()
-
-        prompt = self.__create_text_box(stimulus.prompt, EXPERIMENT_STATE_TEXT_BOX_POSITION,
-                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[0], EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
-        self.__draw(prompt, True)
-
         self._sound_player(stimulus.modified_audio)
 
     def _update_new_primer(self, primer: str) -> None:
@@ -128,7 +123,7 @@ class PsychopyView(AView):
 
         return True
 
-    def wait(self, secs: int) -> None:
+    def wait(self, secs: float) -> None:
         self.__try_to_quit()
 
         psychopy.core.wait(secs)

@@ -64,6 +64,6 @@ class AView(AObserver):
         ...
 
     @abstractmethod
-    def wait(self, secs: int) -> None:
+    def wait(self, secs: float) -> None:
         """Wait for the specified amount of time."""
         ...

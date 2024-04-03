@@ -30,7 +30,14 @@ package view {
 }
 
 class Experiment {
-    +Experiment(model: Model, view: AView, stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
+    -Model model
+    -AView view
+    -int stimulus_repeat
+    -float resting_state_secs
+    -float primer_secs
+    -float break_secs
+
+    +Experiment(model, view, stimulus_repeat, resting_state_secs, primer_secs, break_secs)
     +void create_stimuli()
     +void run()
 }
