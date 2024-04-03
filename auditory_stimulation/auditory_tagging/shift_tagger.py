@@ -107,4 +107,3 @@ class BinauralTagger(AAudioTagger):
 
     def __repr__(self) -> str:
         return self._get_repr("BinauralTagger", shift_by=str(self.__shift_by))
-   

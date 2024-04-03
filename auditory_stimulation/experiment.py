@@ -9,7 +9,7 @@ class Experiment:
     """
     __model: Model
     __view: AView
-    __stimulus_repeat: int
+    __block_size: int
     __resting_state_secs: float
     __primer_secs: float
     __break_secs: float
@@ -17,7 +17,7 @@ class Experiment:
     def __init__(self,
                  model: Model,
                  view: AView,
-                 stimulus_repeat: int,
+                 block_size: int,
                  resting_state_secs: float,
                  primer_secs: float,
                  break_secs: float) -> None:
@@ -25,7 +25,7 @@ class Experiment:
 
         :param model: The underlying model of the experiment, saving all relevant experiment data.
         :param view: The used view of the experiment, showing the current state of the model and interacting with users
-        :param stimulus_repeat: How often each stimulus is repeated
+        :param block_size: The size of one block. After each block a break happens.
         :param resting_state_secs: How long to measure the resting state
         :param primer_secs: How long the primer is shown
         :param break_secs: How long the break is
@@ -34,9 +34,20 @@ class Experiment:
         self.__model = model
         self.__view = view
 
-        self.__stimulus_repeat = stimulus_repeat
+        if block_size <= 0:
+            raise ValueError("block_size must be a positive integer!")
+        self.__block_size = block_size
+
+        if resting_state_secs < 0:
+            raise ValueError("resting_state_secs must be a non-negative number!")
         self.__resting_state_secs = resting_state_secs
+
+        if primer_secs < 0:
+            raise ValueError("primer_secs must be a non-negative number!")
         self.__primer_secs = primer_secs
+
+        if primer_secs < 0:
+            raise ValueError("break_secs must be a non-negative number!")
         self.__break_secs = break_secs
 
         assert self.__model.experiment_state == EExperimentState.INACTIVE
@@ -44,8 +55,6 @@ class Experiment:
     def run(self) -> None:
         """Runs the experiment.
         """
-        self.__model.create_stimuli()
-
         self.__model.change_experiment_state(EExperimentState.INTRODUCTION)
         self.__view.get_confirmation()
 
@@ -62,18 +71,17 @@ class Experiment:
         self.__model.change_experiment_state(EExperimentState.EXPERIMENT_INTRODUCTION)
         self.__view.get_confirmation()
 
-        for stimulus in self.__model.created_stimuli:
-            self.__model.change_experiment_state(EExperimentState.EXPERIMENT)
+        self.__model.change_experiment_state(EExperimentState.EXPERIMENT)
+        for i, stimulus in enumerate(self.__model.created_stimuli):
+            self.__model.present_primer(stimulus.primer)
+            self.__view.wait(self.__primer_secs)
+            self.__model.present_stimulus(stimulus)
 
-            for i in range(self.__stimulus_repeat):
-                self.__model.present_primer(stimulus.primer)
-                self.__view.wait(self.__primer_secs)
-
-                self.__model.present_stimulus(stimulus)
-
-            self.__model.change_experiment_state(EExperimentState.BREAK)
-            self.__view.wait(self.__break_secs)
-            self.__view.get_confirmation()
+            if (i + 1) % self.__block_size == 0:
+                self.__model.change_experiment_state(EExperimentState.BREAK)
+                self.__view.wait(self.__break_secs)
+                self.__view.get_confirmation()
+                self.__model.change_experiment_state(EExperimentState.EXPERIMENT)
 
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_OPEN)
         self.__view.wait(self.__resting_state_secs)

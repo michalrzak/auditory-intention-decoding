@@ -20,7 +20,7 @@ from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.model.stimulus import Stimulus, generate_stimulus
+from auditory_stimulation.model.stimulus import generate_stimulus, CreatedStimulus
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 from auditory_stimulation.view.view import ViewInterrupted
@@ -32,29 +32,37 @@ EXPERIMENT_TEXTS = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
 
 PARPORT_TRIGGER_DURATION_SECS = 0.001
 
-STIMULUS_REPEAT = 5
 RESTING_STATE_SECS = 5
 PRIMER_SECS = 5
 BREAK_SECS = 5
+
+TAGGERS = [AMTagger(42, sine_signal),
+           FlippedFMTagger(40),
+           NoiseTaggingTagger(44100, 126, 256),
+           FMTagger(40, 100),
+           ShiftSumTagger(40),
+           SpectrumShiftTagger(40),
+           BinauralTagger(40),
+           RawTagger()]
 
 
 def generate_stimuli(n_repetitions: int,
                      taggers: List[AAudioTagger],
                      n_stimuli: int = 3,
                      pause_secs: float = 0.5,
-                     seed: Optional[int] = None) -> List[Stimulus]:
+                     seed: Optional[int] = None) -> List[CreatedStimulus]:
     """Generates $len(taggers) * n_repetitions$ stimuli. The stimuli are generated in the following way:
-     1. A target number is generated.
-     2. For each tagger:
-         3. Generate which voice is used
-         4. Generate which intro is used
-         5. Generate which numbers are added (count: n_stimuli - 1)
-         6. Shuffle everything
-         7. Construct a stimulus with the given parameters
-     8. Repeat n_repetition times.
+     1. Repeat n_repetition times:
+        2. A target number is generated.
+        3. For each tagger:
+            4. Generate which voice is used
+            5. Generate which intro is used
+            6. Generate which numbers are added (count: n_stimuli - 1)
+            7. Shuffle everything
+            8. Construct a stimulus with the given parameters
 
-    :param n_repetitions:
-    :param taggers:
+    :param n_repetitions: How often each block will be repeated
+    :param taggers: The used taggers.
     :param n_stimuli: The amount of options generated in each stimulus.
     :param pause_secs: Define how long the pause is between two adjacent numbers.
     :param seed: The seed for the random number generation.
@@ -71,7 +79,7 @@ def generate_stimuli(n_repetitions: int,
         input_text_dict_raw = yaml.safe_load(file)
     input_text_dict = {key: input_text_dict_raw[key][0] for key in input_text_dict_raw}
 
-    stimuli: List[Stimulus] = []
+    stimuli: List[CreatedStimulus] = []
     for i in range(n_repetitions):
 
         # draw what target is used
@@ -111,12 +119,14 @@ def generate_stimuli(n_repetitions: int,
                                                  f" Please check the installation section of the README!")
 
             # generate stimulus
-            stimulus = generate_stimulus(loaded_intro,
-                                         input_text_dict[intro],
-                                         loaded_numbers,
-                                         number_stimuli,
-                                         target,
-                                         pause_secs)
+            raw_stimulus = generate_stimulus(loaded_intro,
+                                             input_text_dict[intro],
+                                             loaded_numbers,
+                                             number_stimuli,
+                                             target,
+                                             pause_secs)
+            modified_audio = tagger.create(raw_stimulus.audio, raw_stimulus.time_stamps)
+            stimulus = CreatedStimulus(raw_stimulus, modified_audio, tagger)
             stimuli.append(stimulus)
 
     assert len(stimuli) == n_repetitions * len(taggers)
@@ -136,18 +146,9 @@ def main() -> None:
     create_directory_if_not_exists(logging_folder)
     create_directory_if_not_exists(TRIGGER_DIRECTORY)
 
-    taggers = [AMTagger(42, sine_signal),
-               FlippedFMTagger(40),
-               NoiseTaggingTagger(44100, 126, 256),
-               FMTagger(40, 100),
-               ShiftSumTagger(40),
-               SpectrumShiftTagger(40),
-               BinauralTagger(40),
-               RawTagger()]
-
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
-    stimuli = generate_stimuli(16, taggers, 3, seed=100)
-    model = Model(stimuli, taggers)
+    stimuli = generate_stimuli(16, TAGGERS, 3, seed=100)
+    model = Model(stimuli)
 
     logger = Logger(logging_folder)
     model.register(logger, 10)
@@ -163,11 +164,10 @@ def main() -> None:
         model.register(ts, 1)
         experiment = Experiment(model,
                                 view,
-                                STIMULUS_REPEAT,
+                                len(TAGGERS),
                                 RESTING_STATE_SECS,
                                 PRIMER_SECS,
                                 BREAK_SECS)
-
         try:
             experiment.run()
         except ViewInterrupted:
