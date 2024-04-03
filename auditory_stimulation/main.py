@@ -33,21 +33,30 @@ EXPERIMENT_TEXTS = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
 PARPORT_TRIGGER_DURATION_SECS = 0.001
 
 
-def generate_stimuli(n_repetitions: int, taggers: List[AAudioTagger], n_number_stimuli: int = 3,
-                     pause_secs: float = 0.5, seed: Optional[int] = None) -> List[Stimulus]:
-    """Generates n stimuli, consisting of n_number_stimuli options.
+def generate_stimuli(n_repetitions: int,
+                     taggers: List[AAudioTagger],
+                     n_stimuli: int = 3,
+                     pause_secs: float = 0.5,
+                     seed: Optional[int] = None) -> List[Stimulus]:
+    """Generates $len(taggers) * n_repetitions$ stimuli. The stimuli are generated in the following way:
+     1. A target number is generated.
+     2. For each tagger:
+         3. Generate which voice is used
+         4. Generate which intro is used
+         5. Generate which numbers are added (count: n_stimuli - 1)
+         6. Shuffle everything
+         7. Construct a stimulus with the given parameters
+     8. Repeat n_repetition times.
 
-    :param n: The amount of stimuli to be generated
-    :param n_number_stimuli: The amount of options generated in each stimulus.
+    :param n_repetitions:
+    :param taggers:
+    :param n_stimuli: The amount of options generated in each stimulus.
     :param pause_secs: Define how long the pause is between two adjacent numbers.
     :param seed: The seed for the random number generation.
     :return: A list of the generated stimuli.
     """
 
-    # if n <= 0:
-    #     raise ValueError("n must be a positive integer!")
-
-    if n_number_stimuli <= 0:
+    if n_stimuli <= 0:
         raise ValueError("n_number_stimuli must be a positive integer!")
 
     if seed is not None:
@@ -78,7 +87,7 @@ def generate_stimuli(n_repetitions: int, taggers: List[AAudioTagger], n_number_s
             first = True
             while first or target_number in number_stimuli:
                 first = False
-                number_stimuli = [str(random.randint(100, 1000)) for _ in range(n_number_stimuli - 1)]
+                number_stimuli = [str(random.randint(100, 1000)) for _ in range(n_stimuli - 1)]
 
             # append the target to the number stimuli and get the index of the target
             number_stimuli.append(target_number)
