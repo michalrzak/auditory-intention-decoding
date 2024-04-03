@@ -32,6 +32,7 @@ EXPERIMENT_TEXTS = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
 
 PARPORT_TRIGGER_DURATION_SECS = 0.001
 
+N_REPETITIONS = 2
 RESTING_STATE_SECS = 5
 PRIMER_SECS = 5
 BREAK_SECS = 5
@@ -147,7 +148,7 @@ def main() -> None:
     create_directory_if_not_exists(TRIGGER_DIRECTORY)
 
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
-    stimuli = generate_stimuli(16, TAGGERS, 3, seed=100)
+    stimuli = generate_stimuli(N_REPETITIONS, TAGGERS, 3, seed=100)
     model = Model(stimuli)
 
     logger = Logger(logging_folder)
