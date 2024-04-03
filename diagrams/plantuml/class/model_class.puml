@@ -4,9 +4,11 @@ class Audio {
     +NDArray[float] array
     +int sampling_frequency
 }
+
 package auditory_tagging {
-   abstract class AAudioTaggerFactory {
-      +AAudioTagger {abstract} create_auditory_stimulus(audio: Audio, stimuli_intervals: List[Tuple[float, float])
+    abstract class AAudioTagger {
+      #NDArray[float] {abstract} modify_chunk(audio_array_chunk: NDArray[float], fs: int))
+      +Audio create(audio, stimuli)
     }
 }
 
@@ -18,7 +20,7 @@ package model {
     class Model <<Observable>>{
         -List[str] primer_history
 
-        -Model(raw_stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
+        -Model(stimuli: List[CreatedStimulus])
         -void notify(data: Any, identifier: EModelUpdateIdentifier)
         +void register(view: AObserver, priority: int)
         +void new_stimulus(stimulus: CreatedStimulus)
@@ -33,20 +35,20 @@ package model {
     Logger -u-|> AObserver
 
     package constants {
-    enum EExperimentState {
-        INACTIVE
-        INTRODUCTION
-        RESTING_STATE_EYES_OPEN
-        RESTING_STATE_EYES_CLOSED
-        EXPERIMENT_INTRODUCTION
-        EXPERIMENT
-    }
+        enum EExperimentState {
+            INACTIVE
+            INTRODUCTION
+            RESTING_STATE_EYES_OPEN
+            RESTING_STATE_EYES_CLOSED
+            EXPERIMENT_INTRODUCTION
+            EXPERIMENT
+        }
 
-    enum EModelUpdateIdentifier {
-        NEW_STIMULUS
-        NEW_PRIMER
-        EXPERIMENT_STATE_CHANGED
-    }
+        enum EModelUpdateIdentifier {
+            NEW_STIMULUS
+            NEW_PRIMER
+            EXPERIMENT_STATE_CHANGED
+        }
     }
 
     class Stimulus {
@@ -59,10 +61,9 @@ package model {
     Stimulus "1" *-- "1" Audio: audio
 
     class CreatedStimulus {
-        -Stimulus stimulus
         +Optional[str] used_tagger_label
 
-        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio)
+        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio, used_tagger: AAudioTagger)
         +str prompt()
         +str primer()
         +List[str] options()
@@ -70,8 +71,7 @@ package model {
         +int target()
     }
     CreatedStimulus "1" *-l- "1" Audio: modified_audio
-
-
+    CreatedStimulus "*" *-u- "1" AAudioTagger: used_tagger
     CreatedStimulus "*" *-- "1" Stimulus
 }
 
@@ -82,9 +82,6 @@ Model ..> EModelUpdateIdentifier: "uses"
 
 AObserver .l.> constants: "uses"
 
-Model "1" *-u- "*" AAudioTaggerFactory
-Model "1" *-- "*" Stimulus: raw_stimuli
 Model "1" *-- "*" CreatedStimulus: created_stimuli
-note on link: Created by calling  `create_stimuli()`
 
 @enduml

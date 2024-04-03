@@ -44,8 +44,8 @@ package eeg {
    }
 
    class FileTriggerSender {
-     -PathLike target_file
-     +FileTriggerSender(thread_timout_secs, target_file)
+     -IO file
+     +FileTriggerSender(thread_timout_secs, target_file: PathLike)
    }
 }
 

@@ -32,81 +32,6 @@ package view {
     }
 }
 
-package model {
-    abstract class AObserver {
-        +void update(data: Any, identifier: EModelUpdateIdentifier)
-    }
-
-    class Model <<Observable>>{
-        -List[str] primer_history
-
-        -Model(raw_stimuli: List[Stimulus], auditory_stimulus_factories: List[AAudioTaggerFactory])
-        -void notify(data: Any, identifier: EModelUpdateIdentifier)
-        +void register(view: AObserver)
-        +void new_stimulus(stimulus: CreatedStimulus)
-        +void new_primer(stimulus: CreatedStimulus)
-        +void change_experiment_state(new_state: EExperimentState)
-    }
-
-    class Logger<<Observer>> {
-        -Path exports_directory
-        +Logger(target_folder: PathLike)
-    }
-    Logger -u-|> AObserver
-
-    package constants {
-    enum EExperimentState {
-        INACTIVE
-        INTRODUCTION
-        RESTING_STATE_EYES_OPEN
-        RESTING_STATE_EYES_CLOSED
-        EXPERIMENT_INTRODUCTION
-        EXPERIMENT
-    }
-
-    enum EModelUpdateIdentifier {
-        NEW_STIMULUS
-        NEW_PRIMER
-        EXPERIMENT_STATE_CHANGED
-    }
-    }
-
-    class Stimulus {
-        +str prompt
-        +str primer
-        +List[str] options
-        +List[Tuple[float, float]] time_stamps
-        +int target
-    }
-    Stimulus "1" *-- "1" Audio: audio
-
-    class CreatedStimulus {
-        -Stimulus stimulus
-        +Optional[str] used_tagger_label
-
-        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio)
-        +str prompt()
-        +str primer()
-        +List[str] options()
-        +List[Tuple[float, float]] time_stamps()
-        +int target()
-    }
-    CreatedStimulus "1" *-- "1" Audio: modified_audio
-
-
-    CreatedStimulus "*" *-l- "1" Stimulus
-}
-
-Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
-Model "*" o--- "1" EExperimentState: "experiment_state"
-Model "1" o-l-- "*" AObserver
-Model ..> EModelUpdateIdentifier: "uses"
-
-AObserver .l.> constants: "uses"
-
-AView --|> AObserver
-
-
 package auditory_tagging {
     abstract class AAudioTagger {
       #NDArray[float] {abstract} modify_chunk(audio_array_chunk: NDArray[float], fs: int))
@@ -178,6 +103,76 @@ package auditory_tagging {
     }
 }
 
+package model {
+    abstract class AObserver {
+        +void update(data: Any, identifier: EModelUpdateIdentifier)
+    }
+
+    class Model <<Observable>>{
+        -List[str] primer_history
+
+        -Model(stimuli: List[CreatedStimulus])
+        -void notify(data: Any, identifier: EModelUpdateIdentifier)
+        +void register(view: AObserver, priority: int)
+        +void new_stimulus(stimulus: CreatedStimulus)
+        +void new_primer(stimulus: CreatedStimulus)
+        +void change_experiment_state(new_state: EExperimentState)
+    }
+    class Logger<<Observer>> {
+        -Path exports_directory
+        +Logger(target_folder: PathLike)
+    }
+    Logger -u-|> AObserver
+
+    package constants {
+    enum EExperimentState {
+        INACTIVE
+        INTRODUCTION
+        RESTING_STATE_EYES_OPEN
+        RESTING_STATE_EYES_CLOSED
+        EXPERIMENT_INTRODUCTION
+        EXPERIMENT
+    }
+
+    enum EModelUpdateIdentifier {
+        NEW_STIMULUS
+        NEW_PRIMER
+        EXPERIMENT_STATE_CHANGED
+    }
+    }
+
+    class Stimulus {
+        +str prompt
+        +str primer
+        +List[str] options
+        +List[Tuple[float, float]] time_stamps
+        +int target
+    }
+    Stimulus "1" *-- "1" Audio: audio
+
+    class CreatedStimulus {
+        +Optional[str] used_tagger_label
+
+        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio, used_tagger: AAudioTagger)
+        +str prompt()
+        +str primer()
+        +List[str] options()
+        +List[Tuple[float, float]] time_stamps()
+        +int target()
+    }
+    CreatedStimulus "1" *-- "1" Audio: modified_audio
+    CreatedStimulus "*" *-u- "1" AAudioTagger: used_tagger
+    CreatedStimulus "*" *-- "1" Stimulus
+}
+Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
+Model "*" o--- "1" EExperimentState: "experiment_state"
+Model "1" o-l-- "*" AObserver
+Model ..> EModelUpdateIdentifier: "uses"
+
+AObserver .l.> constants: "uses"
+
+AView --|> AObserver
+
 
 package eeg {
    enum ETrigger{
@@ -215,8 +210,8 @@ package eeg {
    }
 
    class FileTriggerSender {
-     -PathLike target_file
-     +FileTriggerSender(thread_timout_secs, target_file)
+     -IO file
+     +FileTriggerSender(thread_timout_secs, target_file: PathLike)
    }
 }
 
@@ -257,10 +252,7 @@ class Experiment {
 Experiment "1" *-- "1" Model
 Experiment "1" *-- "1" AView
 
-Model "1" *-u- "*" AAudioTagger
-Model "1" *-- "*" Stimulus: raw_stimuli
 Model "1" *-- "*" CreatedStimulus: created_stimuli
-note on link: Created by calling  `create_stimuli()`
 
 Experiment -[hidden] auditory_tagging
 @enduml
