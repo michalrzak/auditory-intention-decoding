@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from numbers import Number
-from typing import List, Tuple
+from typing import List, Tuple, Collection
 
 import numpy as np
 import numpy.typing as npt
@@ -64,7 +64,7 @@ class AAudioTagger(ABC):
         """
         ...
 
-    def create(self, audio: Audio, stimuli_intervals: List[Tuple[float, float]]) -> Audio:
+    def create(self, audio: Audio, stimuli_intervals: Collection[Tuple[float, float]]) -> Audio:
         """Constructs the modified audio.
 
         :param audio: Object containing the audio signal as a numpy array and the sampling frequency of the audio

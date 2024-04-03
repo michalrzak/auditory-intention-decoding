@@ -104,3 +104,7 @@ class BinauralTagger(AAudioTagger):
         audio_combined[:, 0] = audio_array_chunk[:, 0]
 
         return audio_combined
+
+    def __repr__(self) -> str:
+        return self._get_repr("BinauralTagger", shift_by=str(self.__shift_by))
+   
