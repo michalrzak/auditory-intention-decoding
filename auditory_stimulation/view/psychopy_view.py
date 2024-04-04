@@ -2,7 +2,6 @@ from typing import Callable, Protocol, Dict, Optional, Tuple, List
 
 import numpy as np
 import psychopy
-import psychopy.gui
 import psychopy.visual
 from psychopy.hardware import keyboard
 
