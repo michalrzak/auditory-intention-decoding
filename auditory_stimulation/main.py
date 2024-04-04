@@ -21,9 +21,9 @@ from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
 from auditory_stimulation.model.model import Model
 from auditory_stimulation.model.stimulus import generate_stimulus, CreatedStimulus
-from auditory_stimulation.view.psychopy_view import PsychopyView
+from auditory_stimulation.view.psychopy_view import PsychopyView, PsychopyConfigurator
 from auditory_stimulation.view.sound_players import psychopy_player
-from auditory_stimulation.view.view import ViewInterrupted
+from auditory_stimulation.view.view import ViewInterrupted, CheckboxEntry
 
 LOGGING_DIRECTORY = pathlib.Path("logs/")
 TRIGGER_DIRECTORY = pathlib.Path("triggers/")
@@ -140,6 +140,14 @@ def create_directory_if_not_exists(directory: PathLike) -> None:
 
 
 def main() -> None:
+    configurator = PsychopyConfigurator("Some title")
+    configurator.add_field("Test", "key", "123")
+    configurator.add_field("Test2", "key2", "12345")
+    configurator.add_dropdown("Dropdown", "key3", ["123", "456"])
+    configurator.add_checkboxes("Checkbox", "key4",
+                                [CheckboxEntry("abc", "key3-abc", True), CheckboxEntry("abc", "key3-abc2", True)])
+    configurator.get()
+
     str_day = datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
     logging_folder = LOGGING_DIRECTORY / str_day
 
