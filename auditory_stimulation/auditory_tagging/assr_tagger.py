@@ -72,7 +72,7 @@ def frequency_modulation(signal: npt.NDArray[np.float32],
 
     samples = _duplicate_signal(f_carrier / f_sampling * np.arange(signal.shape[0]))
 
-    combined_signal = np.sin(2 * np.pi * (samples + signal * modulation_factor), dtype=np.float32) * 0.9
+    combined_signal = np.sin(2 * np.pi * (samples + signal * modulation_factor), dtype=np.float32)
     assert combined_signal.shape == signal.shape
 
     return combined_signal
@@ -250,10 +250,12 @@ class FlippedFMTagger(AAudioTagger):
             raise ValueError("The scaling_factor has to be in the interval [0, 1].")
 
         self.__frequency = frequency
+        self.__scaling_factor = scaling_factor
 
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
-        modulated_chunk = frequency_modulation(audio_array_chunk, fs, self.__frequency)
+        modulated_chunk = frequency_modulation(audio_array_chunk, fs, self.__frequency) * self.__scaling_factor
         return modulated_chunk
 
     def __repr__(self) -> str:
-        return self._get_repr("FlippedFMTagger", frequency=str(self.__frequency))
+        return self._get_repr("FlippedFMTagger", frequency=str(self.__frequency),
+                              scaling_factor=str(self.__scaling_factor))
