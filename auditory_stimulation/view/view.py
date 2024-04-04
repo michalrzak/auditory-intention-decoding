@@ -1,6 +1,5 @@
 from abc import abstractmethod
-from dataclasses import dataclass
-from typing import Callable, Any, Dict, Optional, Collection
+from typing import Callable, Any, Dict, Optional
 
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
@@ -68,29 +67,3 @@ class AView(AObserver):
     def wait(self, secs: float) -> None:
         """Wait for the specified amount of time."""
         ...
-
-
-@dataclass
-class CheckboxEntry:
-    label: str
-    key: str
-    initial_value: bool
-
-
-class AConfigurator:
-
-    @abstractmethod
-    def add_field(self, label: str, key: str, initial_value: None) -> None:
-        pass
-
-    @abstractmethod
-    def add_checkboxes(self, label: str, key: str, items: Collection[CheckboxEntry]):
-        pass
-
-    @abstractmethod
-    def add_dropdown(self, label: str, key: str, options: Collection[str]):
-        pass
-
-    @abstractmethod
-    def get(self) -> Dict[str, Any]:
-        pass

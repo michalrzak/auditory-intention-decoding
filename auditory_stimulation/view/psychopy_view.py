@@ -1,4 +1,4 @@
-from typing import Callable, Protocol, Dict, Optional, Tuple, List, Collection, Union
+from typing import Callable, Protocol, Dict, Optional, Tuple, List
 
 import numpy as np
 import psychopy
@@ -9,7 +9,7 @@ from psychopy.hardware import keyboard
 from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.stimulus import CreatedStimulus
-from auditory_stimulation.view.view import AView, ViewInterrupted, AConfigurator, CheckboxEntry
+from auditory_stimulation.view.view import AView, ViewInterrupted
 
 LETTER_SIZE = 0.05
 TEXT_BOX_COLOR = 1.
@@ -184,61 +184,3 @@ class PsychopyView(AView):
 
     def __del__(self):
         self.close_view()
-
-
-class PsychopyConfigurator(AConfigurator):
-    __dialog: psychopy.gui.Dlg
-    __key_ordered: List[str]
-    __checkbox_key_map: Dict[str, str]
-
-    def __init__(self, title: str):
-        self.__dialog = psychopy.gui.Dlg(title=title)
-        self.__key_ordered = []
-        self.__checkbox_key_map = {}
-
-    def __process_key(self, key: str) -> None:
-        if key in self.__key_ordered:
-            raise ValueError("The provided key already exists!")
-
-        self.__key_ordered.append(key)
-
-    def add_field(self, label: str, key: str, initial_value: Optional[str] = None) -> None:
-        self.__process_key(key)
-
-        if initial_value is None:
-            initial_value = ""
-
-        self.__dialog.addField(label=label, initial=initial_value)
-
-    def add_checkboxes(self, label: Optional[str], key: str, items: Collection[CheckboxEntry]):
-        separator = "________________"
-        self.__dialog.addText(separator)
-        if label is not None:
-            self.__dialog.addText("<b>" + label + "</b>")
-
-        for item in items:
-            self.__process_key(item.key)
-            self.__checkbox_key_map[item.key] = key
-            self.__dialog.addField(item.label, item.initial_value)
-
-        self.__dialog.addText(separator)
-
-    def add_dropdown(self, label: str, key: str, options: Collection[str]):
-        self.__process_key(key)
-        self.__dialog.addField(label, choices=options)
-
-    def get(self) -> Dict[str, Union[str, Collection[bool]]]:
-        outputs = self.__dialog.show()
-
-        ret = {}
-        for item, key in zip(outputs, self.__key_ordered):
-            if key in self.__checkbox_key_map:
-                parent_key = self.__checkbox_key_map[key]
-                if parent_key not in ret:
-                    ret[parent_key] = []
-                ret[parent_key].append(item)
-                continue
-
-            ret[key] = item
-
-        return ret
