@@ -72,7 +72,7 @@ def frequency_modulation(signal: npt.NDArray[np.float32],
 
     samples = _duplicate_signal(f_carrier / f_sampling * np.arange(signal.shape[0]))
 
-    combined_signal = np.sin(2 * np.pi * (samples + signal * modulation_factor), dtype=np.float32)
+    combined_signal = np.sin(2 * np.pi * (samples + signal * modulation_factor), dtype=np.float32) * 0.9
     assert combined_signal.shape == signal.shape
 
     return combined_signal
@@ -231,16 +231,23 @@ class FlippedFMTagger(AAudioTagger):
     carrier frequency of FM and the audio signal as the modulating signal. This hence flips the interpretation of the
     FM, as the taggers attempt to tag the audio (carrier) with a frequency (modulator)."""
     __frequency: int
+    __scaling_factor: float
 
     def __init__(self,
-                 frequency: int) -> None:
+                 frequency: int,
+                 scaling_factor: float) -> None:
         """Constructs the FlippedFMTagger object
 
         :param frequency: The FM carrier frequency, modulated by the audio
+        :param scaling_factor: With what value the resulting modulated signal is scaled. Note that a scale of 1 results
+          in artefacts when playing the audio. Valid range: [0, 1]
         """
 
         if frequency <= 0:
-            raise ValueError("The frequency has to be a positive number")
+            raise ValueError("The frequency has to be a positive number.")
+
+        if not (0 <= scaling_factor <= 1):
+            raise ValueError("The scaling_factor has to be in the interval [0, 1].")
 
         self.__frequency = frequency
 

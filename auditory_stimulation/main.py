@@ -38,7 +38,7 @@ PRIMER_SECS = 5
 BREAK_SECS = 5
 
 TAGGERS = [AMTagger(42, sine_signal),
-           FlippedFMTagger(40),
+           FlippedFMTagger(40, 0.8),
            NoiseTaggingTagger(44100, 126, 256),
            FMTagger(40, 100),
            ShiftSumTagger(40),

@@ -20,7 +20,7 @@ SAMPLING_FREQUENCY = 2
 AUDIO_TAGGERS = [
     AMTagger(1, mock_tag_generation),
     FMTagger(42, 100),
-    FlippedFMTagger(42),
+    FlippedFMTagger(42, 1),
     NoiseTaggingTagger(SAMPLING_FREQUENCY, 2, 10),
     ShiftSumTagger(3),
     SpectrumShiftTagger(3),

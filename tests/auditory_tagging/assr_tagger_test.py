@@ -21,7 +21,7 @@ def get_am_tagger(frequency: int) -> AAudioTagger:
 
 
 def get_flipped_fm_tagger(frequency: int) -> AAudioTagger:
-    return FlippedFMTagger(frequency)
+    return FlippedFMTagger(frequency, 1)
 
 
 def get_fm_tagger(frequency: int) -> AAudioTagger:
