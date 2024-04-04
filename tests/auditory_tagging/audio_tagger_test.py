@@ -21,7 +21,7 @@ AUDIO_TAGGERS = [
     AMTagger(1, mock_tag_generation),
     FMTagger(42, 100),
     FlippedFMTagger(42, 1),
-    NoiseTaggingTagger(SAMPLING_FREQUENCY, 2, 10),
+    NoiseTaggingTagger(SAMPLING_FREQUENCY, 2, 10, np.random.default_rng()),
     ShiftSumTagger(3),
     SpectrumShiftTagger(3),
     BinauralTagger(3)
