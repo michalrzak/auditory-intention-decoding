@@ -50,13 +50,11 @@ def main() -> None:
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
     stimuli = generate_created_stimuli(n_repetitions=config.repetitions,
                                        taggers=TAGGERS,
-                                       n_stimuli=3,
-                                       pause_secs=0.5,
-                                       number_stimuli_interval=(100, 1000),
-                                       intro_transcription_path=pathlib.Path(
-                                           "stimuli_sounds/intro-transcriptions.yaml"),
-                                       voices_folders=[pathlib.Path(f"stimuli_sounds/eric"),
-                                                       pathlib.Path(f"stimuli_sounds/natasha")],
+                                       n_stimuli=config.n_stimuli,
+                                       pause_secs=config.pause_secs,
+                                       number_stimuli_interval=config.stimuli_numbers_interval,
+                                       intro_transcription_path=config.intro_transcription_path,
+                                       voices_folders=config.voices_folders,
                                        rng=Random(config.subject_ID))
     model = Model(stimuli)
 

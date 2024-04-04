@@ -26,6 +26,8 @@ def get_configuration_psychopy() -> configuration.Configuration:
     dlg.addText("<b>Stimulus generation parameters</b>")
     dlg.addField(label="n_stimuli", initial=configuration.DEFAULTS.n_stimuli)
     dlg.addField(label="Pause secs", initial=configuration.DEFAULTS.pause_secs)
+    dlg.addField(label="Stimuli numbers interval lower", initial=configuration.DEFAULTS.stimuli_numbers_interval[0])
+    dlg.addField(label="Stimuli numbers interval upper", initial=configuration.DEFAULTS.stimuli_numbers_interval[1])
     dlg.addField(label="Intro transcription file path", initial=str(configuration.DEFAULTS.intro_transcription_path))
     dlg.addText("Voices")
     dlg.addField(label="  - eric", initial=True)
@@ -44,21 +46,22 @@ def get_configuration_psychopy() -> configuration.Configuration:
     if results is None:
         raise FailedToGetConfigurationException("The user has aborted the dialogue!")
 
-    voices = [voice for voice, choice in zip(configuration.DEFAULTS.voices_folders, [results[6], results[7]]) if choice]
+    voices = [voice for voice, choice in zip(configuration.DEFAULTS.voices_folders, [results[8], results[9]]) if choice]
 
-    assert len(results) == 13
+    assert len(results) == 15
     config = configuration.Configuration(subject_ID=int(results[0]),
                                          logging_directory_path=pathlib.Path(results[1]),
                                          trigger_directory_path=pathlib.Path(results[2]),
                                          n_stimuli=int(results[3]),
-                                         pause_secs=int(results[4]),
-                                         intro_transcription_path=pathlib.Path(results[5]),
+                                         pause_secs=float(results[4]),
+                                         stimuli_numbers_interval=(int(results[5]), int(results[6])),
+                                         intro_transcription_path=pathlib.Path(results[7]),
                                          voices_folders=voices,
-                                         repetitions=int(results[8]),
-                                         resting_state_secs=int(results[9]),
-                                         primer_secs=int(results[10]),
-                                         break_secs=int(results[11]),
-                                         experiment_texts_file_path=pathlib.Path(results[12]))
+                                         repetitions=int(results[10]),
+                                         resting_state_secs=float(results[11]),
+                                         primer_secs=float(results[12]),
+                                         break_secs=float(results[13]),
+                                         experiment_texts_file_path=pathlib.Path(results[14]))
 
     return config
 

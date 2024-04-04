@@ -1,6 +1,6 @@
 import pathlib
 from dataclasses import dataclass
-from typing import List
+from typing import List, Tuple
 
 
 @dataclass(frozen=True)
@@ -16,9 +16,10 @@ class Configuration:
     # stimulus generation parameters
     n_stimuli: int
     pause_secs: float
+    stimuli_numbers_interval: Tuple[int, int]
     intro_transcription_path: pathlib.Path
     voices_folders: List[pathlib.Path]
-    
+
     # experiment flow parameters
     repetitions: int
     resting_state_secs: float
@@ -30,10 +31,13 @@ class Configuration:
 DEFAULTS = Configuration(subject_ID=-1,
                          logging_directory_path=pathlib.Path("logs/"),
                          trigger_directory_path=pathlib.Path("triggers/"),
+
                          n_stimuli=3,
                          pause_secs=0.5,
+                         stimuli_numbers_interval=(100, 1000),
                          intro_transcription_path=pathlib.Path("stimuli_sounds/intro-transcriptions.yaml"),
                          voices_folders=[pathlib.Path(f"stimuli_sounds/eric"), pathlib.Path(f"stimuli_sounds/natasha")],
+
                          repetitions=2,
                          resting_state_secs=5,
                          primer_secs=5,
