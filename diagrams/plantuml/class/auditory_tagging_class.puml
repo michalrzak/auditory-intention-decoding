@@ -38,13 +38,13 @@ package auditory_tagging {
     }
 
     class NoiseTaggingTagger {
-      -Optional[int] seed
+      -Generator rng
       -int specified_fs
       -int bit_width
       -int length_bit
       +Optional[Code] code
 
-      +NoiseTaggingTagger(fs:int, bits_per_second: int, length_bit, seed)
+      +NoiseTaggingTagger(fs:int, bits_per_second: int, length_bit, rng)
       -void __generate_code()
       -void __get_code(length: int)
     }
