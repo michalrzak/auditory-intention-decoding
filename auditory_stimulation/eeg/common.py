@@ -21,6 +21,7 @@ class ETrigger(Enum):
     EXPERIMENT_INTRODUCTION = 2
     EXPERIMENT = 3
     BREAK_START = 4
+    OUTRO = 5
 
     INACTIVE = 200
 
@@ -50,5 +51,7 @@ class ETrigger(Enum):
                 return ETrigger.RESTING_STATE_EYES_OPEN_INTRODUCTION
             elif data == EExperimentState.RESTING_STATE_EYES_CLOSED_INTRODUCTION:
                 return ETrigger.RESTING_STATE_EYES_CLOSED_INTRODUCTION
+            elif data == EExperimentState.OUTRO:
+                return ETrigger.OUTRO
 
         raise NotImplementedError(f"Could not resolve trigger for data: {data} and identifier: {identifier}")

@@ -17,7 +17,7 @@ def get_configuration_psychopy() -> configuration.Configuration:
     dlg = psychopy.gui.Dlg(title=WINDOW_TITLE)
 
     dlg.addText("<b>Overall parameters</b>")
-    dlg.addField(label="Subject ID", required=True)
+    dlg.addField(label="Subject ID*", required=True)
     dlg.addField(label="Logging directory path", initial=str(configuration.DEFAULTS.logging_directory_path))
     dlg.addField(label="Trigger directory path", initial=str(configuration.DEFAULTS.trigger_directory_path))
 
@@ -35,6 +35,7 @@ def get_configuration_psychopy() -> configuration.Configuration:
 
     dlg.addText(separator)
 
+    dlg.addText("<b>Experiment flow parameters</b>")
     dlg.addField(label="Repetitions", initial=configuration.DEFAULTS.repetitions)
     dlg.addField(label="Resting state secs", initial=configuration.DEFAULTS.resting_state_secs)
     dlg.addField(label="Primer secs", initial=configuration.DEFAULTS.primer_secs)

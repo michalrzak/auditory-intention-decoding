@@ -92,3 +92,6 @@ class Experiment:
         self.__view.get_confirmation()
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_CLOSED)
         self.__view.wait(self.__resting_state_secs)
+
+        self.__model.change_experiment_state(EExperimentState.OUTRO)
+        self.__view.get_confirmation()
