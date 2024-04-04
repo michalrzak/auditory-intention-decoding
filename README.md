@@ -191,6 +191,7 @@ resting-state-eyes-closed: <text or empty>
 experiment-introduction: <text or empty>
 experiment: <text or empty>
 break: <text or empty>
+outro: <text or empty>
 ```
 
 # Changing the experiment flow
