@@ -2,6 +2,7 @@ import numbers
 import pathlib
 from dataclasses import dataclass
 from os import PathLike
+from random import Random
 from typing import List, Dict, Any, Tuple, Collection, Final, Sequence
 
 import numpy as np
@@ -251,3 +252,92 @@ def generate_stimulus(intro_audio: Audio,
                         time_stamps=time_stamps,
                         target=target)
     return stimulus
+
+
+def generate_created_stimuli(n_repetitions: int,
+                             taggers: List[AAudioTagger],
+                             n_stimuli: int,
+                             pause_secs: float,
+                             number_stimuli_interval: Tuple[int, int],
+                             intro_transcription_path: PathLike,
+                             voices_folders: List[pathlib.Path],
+                             rng: Random) -> List[CreatedStimulus]:
+    """Generates $len(taggers) * n_repetitions$ stimuli. The stimuli are generated in the following way:
+     1. Repeat n_repetition times:
+        2. A target number is generated.
+        3. For each tagger:
+            4. Generate which voice is used
+            5. Generate which intro is used
+            6. Generate which numbers are added (count: n_stimuli - 1)
+            7. Shuffle everything
+            8. Construct a stimulus with the given parameters
+
+    :param n_repetitions: How often each block will be repeated
+    :param taggers: The used taggers.
+    :param n_stimuli: The amount of options generated in each stimulus.
+    :param pause_secs: Define how long the pause is between two adjacent numbers.
+    :param number_stimuli_interval: Defines from what number interval the stimuli will be drawn.
+    :param intro_transcription_path: The path to the intro transcription file.
+    :param voices_folders: Paths to all folders of voices available.
+    :param rng: The random number generator, used to generate all items in this function.
+    :return: A list of the generated stimuli.
+    """
+
+    if n_stimuli <= 0:
+        raise ValueError("n_stimuli must be a positive integer!")
+
+    with open(intro_transcription_path, 'r') as file:
+        input_text_dict_raw = yaml.safe_load(file)
+    input_text_dict = {key: input_text_dict_raw[key][0] for key in input_text_dict_raw}
+
+    stimuli: List[CreatedStimulus] = []
+    for i in range(n_repetitions):
+
+        # draw what target is used
+        target_number = str(rng.randint(number_stimuli_interval[0], number_stimuli_interval[1]))
+
+        taggers_clone = taggers.copy()
+        rng.shuffle(taggers_clone)
+        for tagger in taggers_clone:
+            # randomly draw, which voice is used
+            folder = rng.choice(voices_folders)
+
+            # randomly draw which of the intros will be used
+            intro = rng.choice(list(input_text_dict.keys()))
+
+            # draw what numbers will be contained within the stimulus (minus the target which is already chosen)
+            number_stimuli = []
+            first = True
+            while first or target_number in number_stimuli:
+                first = False
+                number_stimuli = [str(rng.randint(number_stimuli_interval[0], number_stimuli_interval[1]))
+                                  for _ in range(n_stimuli - 1)]
+
+            # append the target to the number stimuli and get the index of the target
+            number_stimuli.append(target_number)
+            rng.shuffle(number_stimuli)
+            target = number_stimuli.index(target_number)
+
+            # load the necessary audios to construct the stimulus
+            try:
+                loaded_intro = load_wav_as_audio(folder / f"{intro}.wav")
+                loaded_numbers = [load_wav_as_audio(folder / f"{num}.wav") for num in number_stimuli]
+                assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
+
+            except FileNotFoundError as e:
+                raise FileNotFoundError(str(e) + f"\nAre you sure you downloaded and extracted the stimuli correctly?"
+                                                 f" Please check the installation section of the README!")
+
+            # generate stimulus
+            raw_stimulus = generate_stimulus(loaded_intro,
+                                             input_text_dict[intro],
+                                             loaded_numbers,
+                                             number_stimuli,
+                                             target,
+                                             pause_secs)
+            modified_audio = tagger.create(raw_stimulus.audio, raw_stimulus.time_stamps)
+            stimulus = CreatedStimulus(raw_stimulus, modified_audio, tagger)
+            stimuli.append(stimulus)
+
+    assert len(stimuli) == n_repetitions * len(taggers)
+    return stimuli
