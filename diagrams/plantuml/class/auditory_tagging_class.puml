@@ -31,8 +31,9 @@ package auditory_tagging {
 
         class FlippedFMTagger {
           -int frequency
+          -int scaling_factor
 
-          +FlippedFMTagger(frequency)
+          +FlippedFMTagger(frequency, scaling_factor)
         }
     }
 
