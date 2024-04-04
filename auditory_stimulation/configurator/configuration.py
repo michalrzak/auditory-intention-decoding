@@ -1,5 +1,6 @@
 import pathlib
 from dataclasses import dataclass
+from typing import List
 
 
 @dataclass(frozen=True)
@@ -7,11 +8,34 @@ class Configuration:
     """Defines the settings used in the project. All parameters, apart from the subjectID, provide default options.
     These can be used by omitting the specific kw_arg."""
 
+    # general parameters
     subject_ID: int
-    repetitions: int = 2
-    resting_state_secs: float = 5
-    primer_secs: float = 5
-    break_secs: float = 5
-    experiment_texts_file_path: pathlib.Path = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
-    logging_directory_path: pathlib.Path = pathlib.Path("logs/")
-    trigger_directory_path: pathlib.Path = pathlib.Path("triggers/")
+    logging_directory_path: pathlib.Path
+    trigger_directory_path: pathlib.Path
+
+    # stimulus generation parameters
+    n_stimuli: int
+    pause_secs: float
+    intro_transcription_path: pathlib.Path
+    voices_folders: List[pathlib.Path]
+    
+    # experiment flow parameters
+    repetitions: int
+    resting_state_secs: float
+    primer_secs: float
+    break_secs: float
+    experiment_texts_file_path: pathlib.Path
+
+
+DEFAULTS = Configuration(subject_ID=-1,
+                         logging_directory_path=pathlib.Path("logs/"),
+                         trigger_directory_path=pathlib.Path("triggers/"),
+                         n_stimuli=3,
+                         pause_secs=0.5,
+                         intro_transcription_path=pathlib.Path("stimuli_sounds/intro-transcriptions.yaml"),
+                         voices_folders=[pathlib.Path(f"stimuli_sounds/eric"), pathlib.Path(f"stimuli_sounds/natasha")],
+                         repetitions=2,
+                         resting_state_secs=5,
+                         primer_secs=5,
+                         break_secs=5,
+                         experiment_texts_file_path=pathlib.Path("auditory_stimulation/experiment_texts.yaml"))
