@@ -41,4 +41,4 @@ DEFAULTS = Configuration(subject_ID=-1,
                          resting_state_secs=5,
                          primer_secs=5,
                          break_secs=5,
-                         experiment_texts_file_path=pathlib.Path("auditory_stimulation/experiment_texts.yaml"))
+                         experiment_texts_file_path=pathlib.Path("experiment_texts.yaml"))

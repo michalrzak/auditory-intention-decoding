@@ -48,7 +48,7 @@ def main() -> None:
     create_directory_if_not_exists(logging_folder)
     create_directory_if_not_exists(config.trigger_directory_path)
 
-    # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
+    # stimuli = load_stimuli(pathlib.Path("stimuli.yaml"))
     stimuli = generate_created_stimuli(n_repetitions=config.repetitions,
                                        taggers=taggers,
                                        n_stimuli=config.n_stimuli,
