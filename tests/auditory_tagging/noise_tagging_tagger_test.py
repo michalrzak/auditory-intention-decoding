@@ -4,7 +4,7 @@ import pytest
 from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio, get_mock_ones_audio
 
-SEED = 123
+GENERATOR = np.random.default_rng()
 
 
 def test_create_validCall_channelsShouldBeTheSame():
@@ -18,7 +18,7 @@ def test_create_validCall_channelsShouldBeTheSame():
     stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length_bit,
-                                  SEED)
+                                  GENERATOR)
     stimulus.create(audio, [(0, n_input / sampling_frequency)])
     code = stimulus.code
 
@@ -36,7 +36,7 @@ def test_create_validCall_codeHasCorrectResolution():
     stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length,
-                                  SEED)
+                                  GENERATOR)
 
     stimulus.create(audio, [labeled_interval])
     code = stimulus.code
@@ -58,7 +58,7 @@ def test_create_validCall_codeRepeatsCorrectly():
     stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length,
-                                  SEED)
+                                  GENERATOR)
     modified_audio = stimulus.create(audio, [labeled_interval])
 
     # since the code is 1 second and the interval is 2 seconds, the code should repeat twice
@@ -81,7 +81,7 @@ def test_create_shouldThrow_bitsPerSecondDoesNotDivideSamplingFrequency():
         stimulus = NoiseTaggingTagger(sampling_frequency,
                                       bits_per_second,
                                       length,
-                                      SEED)
+                                      GENERATOR)
 
 
 def test_create_shouldThrow_bitsPerSecondZero():
@@ -93,7 +93,7 @@ def test_create_shouldThrow_bitsPerSecondZero():
         stimulus = NoiseTaggingTagger(sampling_frequency,
                                       bits_per_second,
                                       length,
-                                      SEED)
+                                      GENERATOR)
 
 
 def test_create_shouldThrow_bitsPerSecondBellowZero():
@@ -105,7 +105,7 @@ def test_create_shouldThrow_bitsPerSecondBellowZero():
         stimulus = NoiseTaggingTagger(sampling_frequency,
                                       bits_per_second,
                                       length,
-                                      SEED)
+                                      GENERATOR)
 
 
 def test_code_should_have_expected_shape():
@@ -120,7 +120,7 @@ def test_code_should_have_expected_shape():
     stimulus = NoiseTaggingTagger(sampling_frequency,
                                   bits_per_second,
                                   length,
-                                  SEED)
+                                  GENERATOR)
     stimulus.create(audio, [labeled_interval])
 
     code = stimulus.code

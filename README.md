@@ -148,7 +148,7 @@ patient.
 
 # Adding stimuli:
 
-To add new stimuli or change the existing stimuli simply edit the file [stimuli.yaml](auditory_stimulation/stimuli.yaml)
+To add new stimuli or change the existing stimuli simply edit the file [stimuli.yaml](stimuli.yaml)
 . For the structure of the file, best look at the existing entries. A formal definition is outlined below:
 
 ```yaml
@@ -178,7 +178,7 @@ portion of the audio.
 # Changing the shown experiment text
 
 The text shown during the experiment is defined inside
-of [experiment_texts.yaml](auditory_stimulation/experiment_texts.yaml). It defines what text is shown for each entry
+of [experiment_texts.yaml](experiment_texts.yaml). It defines what text is shown for each entry
 of [EExperimentState](auditory_stimulation/model/experiment_state.py). The order of the shown `EExperimentState` is
 defined inside the [Experiment](auditory_stimulation/experiment.py). Leaving the option empty indicates that
 no-update should happen when this option is presented.
