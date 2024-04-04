@@ -15,27 +15,16 @@ from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTagg
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
 from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger, SpectrumShiftTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
+from auditory_stimulation.configurator.configuration_loader import get_configuration_psychopy
 from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
 from auditory_stimulation.model.model import Model
 from auditory_stimulation.model.stimulus import generate_stimulus, CreatedStimulus
-from auditory_stimulation.view.psychopy_view import PsychopyView, PsychopyConfigurator
+from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
-from auditory_stimulation.view.view import ViewInterrupted, CheckboxEntry
-
-LOGGING_DIRECTORY = pathlib.Path("logs/")
-TRIGGER_DIRECTORY = pathlib.Path("triggers/")
-
-EXPERIMENT_TEXTS = pathlib.Path("auditory_stimulation/experiment_texts.yaml")
-
-PARPORT_TRIGGER_DURATION_SECS = 0.001
-
-N_REPETITIONS = 2
-RESTING_STATE_SECS = 5
-PRIMER_SECS = 5
-BREAK_SECS = 5
+from auditory_stimulation.view.view import ViewInterrupted
 
 TAGGERS = [AMTagger(42, sine_signal),
            FlippedFMTagger(40, 0.8),
@@ -140,43 +129,37 @@ def create_directory_if_not_exists(directory: PathLike) -> None:
 
 
 def main() -> None:
-    configurator = PsychopyConfigurator("Some title")
-    configurator.add_field("Test", "key", "123")
-    configurator.add_field("Test2", "key2", "12345")
-    configurator.add_dropdown("Dropdown", "key3", ["123", "456"])
-    configurator.add_checkboxes("Checkbox", "key4",
-                                [CheckboxEntry("abc", "key3-abc", True), CheckboxEntry("abc", "key3-abc2", True)])
-    configurator.get()
+    config = get_configuration_psychopy()
 
-    str_day = datetime.today().strftime('%Y-%m-%d-%H-%M-%S')
-    logging_folder = LOGGING_DIRECTORY / str_day
+    day_id = f"{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}_subject-{config.subject_ID}"
+    logging_folder = config.logging_directory_path / day_id
 
-    create_directory_if_not_exists(LOGGING_DIRECTORY)
+    create_directory_if_not_exists(config.logging_directory_path)
     create_directory_if_not_exists(logging_folder)
-    create_directory_if_not_exists(TRIGGER_DIRECTORY)
+    create_directory_if_not_exists(config.trigger_directory_path)
 
     # stimuli = load_stimuli(pathlib.Path("auditory_stimulation/stimuli.yaml"))
-    stimuli = generate_stimuli(N_REPETITIONS, TAGGERS, 3, seed=100)
+    stimuli = generate_stimuli(config.repetitions, TAGGERS, 3, seed=config.subject_ID)
     model = Model(stimuli)
 
     logger = Logger(logging_folder)
     model.register(logger, 10)
 
     window = psychopy.visual.Window(fullscr=True)
-    experiment_texts = load_experiment_texts(EXPERIMENT_TEXTS)
+    experiment_texts = load_experiment_texts(config.experiment_texts_file_path)
     view = PsychopyView(psychopy_player, experiment_texts, window)
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
-    trigger_sender = FileTriggerSender(5, TRIGGER_DIRECTORY / (str_day + ".csv"))
+    trigger_sender = FileTriggerSender(5, config.trigger_directory_path / (day_id + ".csv"))
 
     with trigger_sender.start() as ts:
         model.register(ts, 1)
         experiment = Experiment(model,
                                 view,
                                 len(TAGGERS),
-                                RESTING_STATE_SECS,
-                                PRIMER_SECS,
-                                BREAK_SECS)
+                                config.resting_state_secs,
+                                config.primer_secs,
+                                config.break_secs)
         try:
             experiment.run()
         except ViewInterrupted:
