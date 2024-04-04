@@ -5,8 +5,7 @@ from typing import List, Tuple
 
 @dataclass(frozen=True)
 class Configuration:
-    """Defines the settings used in the project. All parameters, apart from the subjectID, provide default options.
-    These can be used by omitting the specific kw_arg."""
+    """Defines the settings used in the project. See the DEFAULTS constant for default values for all fields."""
 
     # general parameters
     subject_ID: int
