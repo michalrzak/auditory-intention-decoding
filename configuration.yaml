@@ -1,0 +1,20 @@
+## Edit this file to change the experiment configuration defaults.
+
+# general parameters
+subject_ID:
+logging_directory_path: "logs/"
+trigger_directory_path: "triggers/"
+
+# stimulus generation parameters
+n_stimuli: 3
+pause_secs: 0.5
+stimuli_numbers_interval: [ 100, 1000 ]
+intros_transcription_path: "stimuli_sounds/intro-transcriptions.yaml"
+voices_folders: [ "stimuli_sounds/eric", "stimuli_sounds/natasha" ]
+
+# experiment flow parameters
+repetitions: 2
+resting_state_secs: 5
+primer_secs: 5
+break_secs: 5
+experiment_texts_file_path: "experiment_texts.yaml"
