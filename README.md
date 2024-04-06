@@ -134,10 +134,6 @@ poetry run python -m auditory_stimulation.main
 If you want to run the script using Pycharm make sure to set the working directory to the root of the repository and not
 to the root of the code `.../auditory-stimulation` vs. `.../auditory-stimulation/audiory_stimulation`.
 
-# Usage
-
-TODO: extend when I make some introduction stuff
-
 ## Quitting the application:
 
 The application either quits automatically once the experiment is over, or you can force the application to quit by
@@ -145,6 +141,37 @@ pressing `ESC` at any time during the experiment.
 
 **Note:** Pressing `ESC` quits the application after the current stimulus is finished presenting, so be a little
 patient.
+
+# Configuring the application
+
+The application can be configured on startup, by setting the appropriate parameters in the dialogue box shown. The
+defaults shown in the dialogue box can be edited through the [configuration.yaml](configuration.yaml). The YAML file
+follows the following structure:
+
+```yaml
+## Edit this file to change the experiment configuration defaults.
+
+# general parameters
+subject_id: -1
+logging_directory_path: "logs/"
+trigger_directory_path: "triggers/"
+
+# stimulus generation parameters
+n_stimuli: 3
+pause_secs: 0.5
+stimuli_numbers_interval: [ 100, 1000 ]
+intros_transcription_path: "stimuli_sounds/intro-transcriptions.yaml"
+voices_folders: [ "stimuli_sounds/eric", "stimuli_sounds/natasha" ]
+
+# experiment flow parameters
+repetitions: 2
+resting_state_secs: 5
+primer_secs: 5
+break_secs: 5
+experiment_texts_file_path: "experiment_texts.yaml"
+```
+
+The code in the main file can changed such that the configuration is loaded only from the YAML.
 
 # Adding stimuli:
 
