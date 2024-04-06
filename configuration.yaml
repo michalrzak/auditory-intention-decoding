@@ -1,7 +1,7 @@
 ## Edit this file to change the experiment configuration defaults.
 
 # general parameters
-subject_ID:
+subject_id: -1
 logging_directory_path: "logs/"
 trigger_directory_path: "triggers/"
 

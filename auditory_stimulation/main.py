@@ -12,7 +12,7 @@ from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTagg
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
 from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger, SpectrumShiftTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
-from auditory_stimulation.configurator.configuration_loader import get_configuration_psychopy
+from auditory_stimulation.configuration import get_configuration_psychopy, get_configuration_yaml
 from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
@@ -30,18 +30,19 @@ def create_directory_if_not_exists(directory: PathLike) -> None:
 
 
 def main() -> None:
-    config = get_configuration_psychopy()
+    defaults = get_configuration_yaml(pathlib.Path("configuration.yaml"))
+    config = get_configuration_psychopy(defaults)
 
     taggers = [AMTagger(42, sine_signal),
                FlippedFMTagger(40, 0.8),
-               NoiseTaggingTagger(44100, 126, 256, np.random.default_rng(config.subject_ID)),
+               NoiseTaggingTagger(44100, 126, 256, np.random.default_rng(config.subject_id)),
                FMTagger(40, 100),
                ShiftSumTagger(40),
                SpectrumShiftTagger(40),
                BinauralTagger(40),
                RawTagger()]
 
-    day_id = f"{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}_subject-{config.subject_ID}"
+    day_id = f"{datetime.today().strftime('%Y-%m-%d-%H-%M-%S')}_subject-{config.subject_id}"
     logging_folder = config.logging_directory_path / day_id
 
     create_directory_if_not_exists(config.logging_directory_path)
@@ -54,9 +55,9 @@ def main() -> None:
                                        n_stimuli=config.n_stimuli,
                                        pause_secs=config.pause_secs,
                                        number_stimuli_interval=config.stimuli_numbers_interval,
-                                       intro_transcription_path=config.intro_transcription_path,
+                                       intro_transcription_path=config.intros_transcription_path,
                                        voices_folders=config.voices_folders,
-                                       rng=Random(config.subject_ID))
+                                       rng=Random(config.subject_id))
     model = Model(stimuli)
 
     logger = Logger(logging_folder)
