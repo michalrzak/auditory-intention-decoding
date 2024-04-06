@@ -8,7 +8,7 @@ import yaml
 
 @dataclass(frozen=True)
 class Configuration:
-    """Defines the settings used in the project. See the DEFAULTS constant for default values for all fields."""
+    """Defines the settings used in the project."""
 
     # general parameters
     subject_id: int
@@ -36,6 +36,12 @@ class FailedToGetConfigurationException(Exception):
 
 def get_configuration_psychopy(defaults: Configuration,
                                window_title: str = "Experiment configuration") -> Configuration:
+    """Creates a psychopy dialogue box, which allows to set the configuration by the user.
+
+    :param defaults: Default configuration, which will be autofilled into the fields.
+    :param window_title: The title which will be shown on top of the dialogue box.
+    :return: A generated configuration from the provided settings.
+    """
     # only import this if the function is run; I don't want the entire module to depend on psychopy
     import psychopy.gui
 
@@ -95,6 +101,11 @@ def get_configuration_psychopy(defaults: Configuration,
 
 
 def get_configuration_yaml(configuration_path: PathLike) -> Configuration:
+    """Given a path to a YAML, loads the configuration defined in it.
+
+    :param configuration_path: Path to YAML.
+    :return: The loaded configuration object.
+    """
     with open(configuration_path, 'r') as file:
         configuration_raw = yaml.safe_load(file)
 
