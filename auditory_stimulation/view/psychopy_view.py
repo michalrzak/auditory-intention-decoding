@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Callable, Protocol, Dict, Optional, Tuple, List
 
 import numpy as np
@@ -24,6 +25,12 @@ BEEP_FS = 44100
 BEEP_LENGTH_SECS = 0.5
 BEEP_NOTE = 440  # A4
 BEEP_VOLUME = 0.5
+
+
+class EAlignment(Enum):
+    LEFT = "left"
+    RIGHT = "right"
+    CENTER = "center"
 
 
 class Drawable(Protocol):
@@ -110,7 +117,8 @@ class PsychopyView(AView):
             drawn_item = self.__create_text_box(self._experiment_texts[data],
                                                 EXPERIMENT_STATE_TEXT_BOX_POSITION,
                                                 EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
-                                                EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
+                                                EXPERIMENT_STATE_TEXT_BOX_SIZE[1],
+                                                EAlignment.LEFT)
 
         # at the beginning and end of eyes closed play a beep
         if data == EExperimentState.RESTING_STATE_EYES_CLOSED or \
@@ -141,7 +149,8 @@ class PsychopyView(AView):
                           text: str,
                           position: Tuple[float, float],
                           width: Optional[float] = None,
-                          height: Optional[float] = None) -> Drawable:
+                          height: Optional[float] = None,
+                          alignment: EAlignment = EAlignment.CENTER) -> Drawable:
         """Creates a drawable TextBox2 stimulus at the specified location and of the specified size.
         Keep in mind that psychopy sets the (0, 0) location to the center of the screen. This function further uses
         normalized units, hence your screen edges are located 1 and -1 each in both dimensions.
@@ -152,6 +161,7 @@ class PsychopyView(AView):
          and grows dynamically, with longer text. If specified, fixes a width for the TextBox
         :param height: Same as width, if left empty the height grows dynamically with longer text, otherwise fix a
          height.
+        :param alignment: The alignment of the text inside of the text box.
         :return: A drawable textbox.
         """
 
@@ -160,7 +170,7 @@ class PsychopyView(AView):
         text_box = psychopy.visual.TextBox2(win=self.__window,
                                             text=text,
                                             letterHeight=LETTER_SIZE,
-                                            alignment="center",
+                                            alignment=alignment.value,
                                             pos=position,
                                             size=size,
                                             color=1.,
