@@ -1,10 +1,10 @@
 inactive:
-introduction: "Welcome to the experiment! In this experiment, we are trying to decode a focused word in a spoken sentence from your brain data."
-resting-state-eyes-open-introduction: "We will now measure your resting state brain waves. Sit comfortably, relax, keep your eyes open and try to blink as little as possible until the section is over."
+introduction: "Welcome to the experiment! We're aiming to decode a specific target word from your brain activity in spoken sentences."
+resting-state-eyes-open-introduction: "Now, we'll measure your resting brain waves. Sit comfortably, relax, and keep your eyes open. Minimizing blinking and swallowing until this section is complete."
 resting-state-eyes-open:
-resting-state-eyes-closed-introduction: "Nicely done!\nIn the next section, we will record your brain while you have your eyes closed. After you press space, you will hear a beep. Please close your eyes after this beep and relax. You will hear another beep when you can open your eyes again."
+resting-state-eyes-closed-introduction: "Great job!\nNext, we'll record your brain activity with your eyes closed. After pressing space, you'll hear a beep. Close your eyes after this beep, relax, and wait for another beep before opening your eyes."
 resting-state-eyes-closed:
-experiment-introduction: "Now the real experiment starts. You will be presented with a target number, which you must focus on. After a while, you will hear a sentence, consisting of your target number and other numbers.\nYour only task is to focus on your target number while the sentences is played. You will hear multiple different sentences for one and the same target. Before the target changes, you will be prompted to take a break. Please do not rush the experiment and take as along as you need in the break.\nIf you have any questions, please ask them now."
+experiment-introduction: "Now, let's begin the actual experiment. You'll focus on a target number presented to you. Then, you'll hear sentences containing your target and other numbers.\nYour task is to concentrate solely on your target number during playback. Multiple sentences will be presented for each target, after which you will be able to take a break.\nIf you have any questions, feel free to ask now."
 experiment:
-break: "Take a short break and press space when you are ready.\nDo not hesitate to call the experimenter if you need something or if you want to talk for a while."
-outro: "Thank you for participating in the experiment :)"
+break: "Take a brief break and press space when you're ready.\nDon't hesitate to call the experimenter if you need anything or wish to chat for a bit."
+outro: "Thank you for participating in the experiment! :)"
