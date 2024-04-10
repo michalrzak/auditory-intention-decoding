@@ -11,15 +11,15 @@ from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 
 THREAD_TIMOUT = 0
 
 MOCK_AUDIO = mockito.mock(Audio)
 MOCK_AUDIO.secs = 3
-MOCK_CREATED_STIMULUS = mockito.mock(CreatedStimulus)
-MOCK_CREATED_STIMULUS.time_stamps = [[1, 2]]
-MOCK_CREATED_STIMULUS.audio = MOCK_AUDIO
+MOCK_STIMULUS = mockito.mock(AStimulus)
+MOCK_STIMULUS.time_stamps = [[1, 2]]
+MOCK_STIMULUS.audio = MOCK_AUDIO
 
 
 def target_file(tmp_path):
@@ -83,7 +83,7 @@ def test_file_trigger_sender_send_trigger_new_stimulus_valid_call(tmp_path):
 
     trigger_sender = FileTriggerSender(THREAD_TIMOUT, target_file(tmp_path))
 
-    data = MOCK_CREATED_STIMULUS
+    data = MOCK_STIMULUS
     identifier = EModelUpdateIdentifier.NEW_STIMULUS
 
     with trigger_sender.start() as ts:
@@ -119,7 +119,7 @@ def test_file_trigger_sender_send_trigger_two_new_stimuli_valid_call(tmp_path):
 
     trigger_sender = FileTriggerSender(THREAD_TIMOUT, target_file(tmp_path))
 
-    data = MOCK_CREATED_STIMULUS
+    data = MOCK_STIMULUS
     identifier = EModelUpdateIdentifier.NEW_STIMULUS
 
     with trigger_sender.start() as ts:

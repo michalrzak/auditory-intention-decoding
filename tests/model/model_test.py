@@ -5,14 +5,14 @@ from mockito import verify, when, ANY
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model import Model, AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 from auditory_stimulation.view.view import AView
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
 def create_model() -> Model:
-    raw_stimuli = [mockito.mock(CreatedStimulus)]
-    return Model(raw_stimuli)
+    stimuli = [mockito.mock(AStimulus)]
+    return Model(stimuli)
 
 
 def mock_observer() -> AObserver:
@@ -27,7 +27,7 @@ def test_new_stimulus():
     new_prompt = "new prompt"
     new_audio = get_mock_audio(1000, 100)
 
-    new_stimulus = mockito.mock(CreatedStimulus)
+    new_stimulus = mockito.mock(AStimulus)
     new_stimulus.audio = new_audio
     new_stimulus.prompt = new_prompt
 
@@ -66,7 +66,7 @@ def test_register_view_and_new_stimulus_should_get_updated():
     new_prompt = "new prompt"
     new_audio = get_mock_audio(1000, 100)
 
-    new_stimulus = mockito.mock(CreatedStimulus)
+    new_stimulus = mockito.mock(AStimulus)
     new_stimulus.array = new_audio
     new_stimulus.prompt = new_prompt
 
@@ -98,7 +98,7 @@ def test_register_observer_and_change_state_should_get_updated(experiment_state:
 
 def test_register_observer_new_stimulus_twice_should_get_updated():
     model = create_model()
-    stimulus = mockito.mock(CreatedStimulus)
+    stimulus = mockito.mock(AStimulus)
 
     observer = mock_observer()
     model.register(observer)

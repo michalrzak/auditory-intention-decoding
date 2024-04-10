@@ -130,7 +130,9 @@ def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
     return stimuli
 
 
-def __combine_parts(intro: Audio, number_audios: Collection[Audio], break_length: float = 0.5) -> Audio:
+def __combine_parts(intro: Audio,
+                    number_audios: Collection[Audio],
+                    break_length: float = 0.5) -> Audio:
     audio_break = np.zeros((int(break_length * intro.sampling_frequency), 2), dtype=np.float32)
 
     stimulus_array = intro.array
@@ -142,9 +144,8 @@ def __combine_parts(intro: Audio, number_audios: Collection[Audio], break_length
         stimulus_array = np.append(stimulus_array, num.array, axis=0)
         first = False
 
-    # add a short silence at the end of the audio to pad it a little
-    short_silence = np.zeros((100, 2), dtype=np.float32)
-    stimulus_array = np.append(stimulus_array, short_silence, axis=0)
+    # add silence at the end of the audio to pad it
+    stimulus_array = np.append(stimulus_array, audio_break, axis=0)
 
     return Audio(stimulus_array, intro.sampling_frequency)
 
