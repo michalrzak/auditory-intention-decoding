@@ -1,6 +1,5 @@
 import mockito
 import pytest
-import when as when
 import yaml
 from mockito import when
 
