@@ -126,48 +126,45 @@ package model {
     Logger -u-|> AObserver
 
     package constants {
-    enum EExperimentState {
-        INACTIVE
-        INTRODUCTION
-        RESTING_STATE_EYES_OPEN
-        RESTING_STATE_EYES_CLOSED
-        EXPERIMENT_INTRODUCTION
-        EXPERIMENT
+        enum EExperimentState {
+            INACTIVE
+            INTRODUCTION
+            RESTING_STATE_EYES_OPEN
+            RESTING_STATE_EYES_CLOSED
+            EXPERIMENT_INTRODUCTION
+            EXPERIMENT
+        }
+
+        enum EModelUpdateIdentifier {
+            NEW_STIMULUS
+            NEW_PRIMER
+            EXPERIMENT_STATE_CHANGED
+        }
     }
 
-    enum EModelUpdateIdentifier {
-        NEW_STIMULUS
-        NEW_PRIMER
-        EXPERIMENT_STATE_CHANGED
-    }
-    }
-
-    class Stimulus {
+    abstract class AStimulus {
         +str prompt
         +str primer
         +List[str] options
         +List[Tuple[float, float]] time_stamps
-        +int target
     }
-    Stimulus "1" *-- "1" Audio: audio
+    AStimulus "*" *-u- "1" AAudioTagger: used_tagger
+    AStimulus "1" *-r- "1" Audio: audio
 
-    class CreatedStimulus {
-        +Optional[str] used_tagger_label
 
-        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio, used_tagger: AAudioTagger)
-        +str prompt()
-        +str primer()
-        +List[str] options()
-        +List[Tuple[float, float]] time_stamps()
-        +int target()
+    class Stimulus {
+        +int target_index
     }
-    CreatedStimulus "1" *-- "1" Audio: modified_audio
-    CreatedStimulus "*" *-u- "1" AAudioTagger: used_tagger
-    CreatedStimulus "*" *-- "1" Stimulus
+    Stimulus -u-|> AStimulus
+
+    class AttentionCheckStimulus {}
+     AttentionCheckStimulus -u-|> AStimulus
 }
-Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
+Model "1" *-r- "*" AStimulus: "stimulus_history"
+Model "1" *-r- "*" AStimulus: created_stimuli
 Model "*" o--- "1" EExperimentState: "experiment_state"
 Model "1" o-l-- "*" AObserver
+
 Model ..> EModelUpdateIdentifier: "uses"
 
 AObserver .l.> constants: "uses"
@@ -253,7 +250,6 @@ class Experiment {
 Experiment "1" *-- "1" Model
 Experiment "1" *-- "1" AView
 
-Model "1" *-- "*" CreatedStimulus: created_stimuli
 
 Experiment -[hidden] auditory_tagging
 @enduml

@@ -27,7 +27,6 @@ package model {
         +void new_primer(stimulus: CreatedStimulus)
         +void change_experiment_state(new_state: EExperimentState)
     }
-
     class Logger<<Observer>> {
         -Path exports_directory
         +Logger(target_folder: PathLike)
@@ -51,37 +50,31 @@ package model {
         }
     }
 
-    class Stimulus {
+    abstract class AStimulus {
         +str prompt
         +str primer
         +List[str] options
         +List[Tuple[float, float]] time_stamps
-        +int target
     }
-    Stimulus "1" *-- "1" Audio: audio
+    AStimulus "*" *-u- "1" AAudioTagger: used_tagger
+    AStimulus "1" *-r- "1" Audio: audio
 
-    class CreatedStimulus {
-        +Optional[str] used_tagger_label
 
-        +CreatedStimulus(stimulus: Stimulus, modified_audio: Audio, used_tagger: AAudioTagger)
-        +str prompt()
-        +str primer()
-        +List[str] options()
-        +List[Tuple[float, float]] time_stamps()
-        +int target()
+    class Stimulus {
+        +int target_index
     }
-    CreatedStimulus "1" *-l- "1" Audio: modified_audio
-    CreatedStimulus "*" *-u- "1" AAudioTagger: used_tagger
-    CreatedStimulus "*" *-- "1" Stimulus
+    Stimulus -u-|> AStimulus
+
+    class AttentionCheckStimulus {}
+     AttentionCheckStimulus -u-|> AStimulus
 }
-
-Model "1" *-r- "*" CreatedStimulus: "stimulus_history"
+Model "1" *-r- "*" AStimulus: "stimulus_history"
+Model "1" *-r- "*" AStimulus: created_stimuli
 Model "*" o--- "1" EExperimentState: "experiment_state"
 Model "1" o-l-- "*" AObserver
+
 Model ..> EModelUpdateIdentifier: "uses"
 
 AObserver .l.> constants: "uses"
-
-Model "1" *-- "*" CreatedStimulus: created_stimuli
 
 @enduml
