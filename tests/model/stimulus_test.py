@@ -6,7 +6,7 @@ from mockito import when
 
 from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
-from auditory_stimulation.model.stimulus import Stimulus, load_stimuli, generate_stimulus
+from auditory_stimulation.model.stimulus import Stimulus, load_stimuli, generate_stimulus, AttentionCheckStimulus
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 
@@ -69,6 +69,46 @@ def test_stimulus_valid_call():
     audio, tagger, prompt, primer, options, time_stamps, target = get_stimulus_parameters()
     stimulus = Stimulus(audio, tagger, prompt, primer, options, time_stamps, target)
     stimulus_checks(stimulus, audio, tagger, prompt, primer, options, time_stamps, target)
+
+
+def test_stimulus_options_not_in_prompt_should_fail():
+    options = ["not contained 1", "not contained 2"]
+
+    audio, tagger, prompt, primer, _, time_stamps, target = get_stimulus_parameters()
+    with pytest.raises(ValueError):
+        stimulus = Stimulus(audio, tagger, prompt, primer, options, time_stamps, target)
+
+
+@pytest.mark.parametrize("time_stamps", [[(1000, 100002), (1001, 100003)],
+                                         [(0, 1), (-10, -20)],
+                                         [(0, 1), (1, 0)],
+                                         [(0, 1), (-100, 100)]])
+def test_stimulus_time_stamps_invalid_calls_should_fail(time_stamps):
+    audio, tagger, prompt, primer, options, _, target = get_stimulus_parameters()
+    with pytest.raises(ValueError):
+        stimulus = Stimulus(audio, tagger, prompt, primer, options, time_stamps, target)
+
+
+@pytest.mark.parametrize("time_stamps", [[(0, 1), (1, 2), (2, 3)], [(0, 1)]])
+def test_stimulus_time_stamps_invalid_count_should_fail(time_stamps):
+    audio, tagger, prompt, primer, options, _, target = get_stimulus_parameters()
+    with pytest.raises(LookupError):
+        stimulus = Stimulus(audio, tagger, prompt, primer, options, time_stamps, target)
+
+
+@pytest.mark.parametrize("target", [-1, 2, 3])
+def test_stimulus_invalid_target_should_fail(target):
+    audio, tagger, prompt, primer, options, time_stamps, _ = get_stimulus_parameters()
+    with pytest.raises(ValueError):
+        stimulus = Stimulus(audio, tagger, prompt, primer, options, time_stamps, target)
+
+
+def test_stimulus_repr_and_attention_check_stimulus_repr_must_be_different():
+    audio, tagger, prompt, primer, options, time_stamps, target = get_stimulus_parameters()
+    stimulus = Stimulus(audio, tagger, prompt, primer, options, time_stamps, target)
+    attention_check_stimulus = AttentionCheckStimulus(audio, tagger, prompt, primer, options, time_stamps)
+
+    assert repr(stimulus) != repr(attention_check_stimulus)
 
 
 @pytest.mark.skip(reason="The target function is currently not maintained!")
