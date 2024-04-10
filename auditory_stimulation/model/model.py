@@ -6,7 +6,7 @@ from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 
 
 class AObserver(ABC):
@@ -19,15 +19,15 @@ class Model:
     """Class, containing all  relevant data for the experiment. Is an observable of the observer pattern
     """
     __auditory_taggers: Collection[AAudioTagger]
-    __created_stimuli: Collection[CreatedStimulus]
+    __created_stimuli: Collection[AStimulus]
 
-    __stimulus_history: List[CreatedStimulus]
+    __stimulus_history: List[AStimulus]
     __primer_history: List[str]
     __experiment_state: EExperimentState
 
     __observers: List[Tuple[AObserver, int]]
 
-    def __init__(self, stimuli: Collection[CreatedStimulus]) -> None:
+    def __init__(self, stimuli: Collection[AStimulus]) -> None:
         """Creates a model object.
 
         :param stimuli: A list of stimuli which will be used throughout the experiment.
@@ -64,7 +64,7 @@ class Model:
         # insert the observer and priority based on the computed key
         self.__observers.insert(insertion_point, (observer, priority))
 
-    def present_stimulus(self, stimulus: CreatedStimulus) -> None:
+    def present_stimulus(self, stimulus: AStimulus) -> None:
         """Mark the given stimulus as presented.
 
         :param stimulus: The to be added stimulus.
@@ -115,5 +115,5 @@ class Model:
         return self.__experiment_state
 
     @property
-    def created_stimuli(self) -> Collection[CreatedStimulus]:
+    def created_stimuli(self) -> Collection[AStimulus]:
         return self.__created_stimuli

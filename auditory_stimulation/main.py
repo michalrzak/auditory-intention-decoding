@@ -18,7 +18,7 @@ from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.model.stimulus import generate_created_stimuli
+from auditory_stimulation.model.stimulus import generate_stimuli
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 from auditory_stimulation.view.view import ViewInterrupted
@@ -50,14 +50,14 @@ def main() -> None:
     create_directory_if_not_exists(config.trigger_directory_path)
 
     # stimuli = load_stimuli(pathlib.Path("stimuli.yaml"))
-    stimuli = generate_created_stimuli(n_repetitions=config.repetitions,
-                                       taggers=taggers,
-                                       n_stimuli=config.n_stimuli,
-                                       pause_secs=config.pause_secs,
-                                       number_stimuli_interval=config.stimuli_numbers_interval,
-                                       intro_transcription_path=config.intros_transcription_path,
-                                       voices_folders=config.voices_folders,
-                                       rng=Random(config.subject_id))
+    stimuli = generate_stimuli(n_repetitions=config.repetitions,
+                               taggers=taggers,
+                               n_stimuli=config.n_stimuli,
+                               pause_secs=config.pause_secs,
+                               number_stimuli_interval=config.stimuli_numbers_interval,
+                               intro_transcription_path=config.intros_transcription_path,
+                               voices_folders=config.voices_folders,
+                               rng=Random(config.subject_id))
     model = Model(stimuli)
 
     logger = Logger(logging_folder)

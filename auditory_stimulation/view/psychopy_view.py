@@ -8,7 +8,7 @@ from psychopy.hardware import keyboard
 
 from auditory_stimulation.auditory_tagging.auditory_tagger import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 from auditory_stimulation.view.view import AView, ViewInterrupted
 
 LETTER_SIZE = 0.05
@@ -89,9 +89,9 @@ class PsychopyView(AView):
     def __beep(self):
         self._sound_player(self.__beep_audio)
 
-    def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
+    def _update_new_stimulus(self, stimulus: AStimulus) -> None:
         self.__try_to_quit()
-        self._sound_player(stimulus.modified_audio)
+        self._sound_player(stimulus.audio)
 
     def _update_new_primer(self, primer: str) -> None:
         self.__try_to_quit()
