@@ -17,4 +17,5 @@ repetitions: 2
 resting_state_secs: 5
 primer_secs: 5
 break_secs: 5
+attention_check_secs: 1
 experiment_texts_file_path: "experiment_texts.yaml"

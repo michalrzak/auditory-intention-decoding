@@ -5,7 +5,7 @@ from auditory_stimulation.audio import Audio
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model import AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 
 
 class ViewInterrupted(Exception):
@@ -26,7 +26,7 @@ class AView(AObserver):
         self._experiment_texts = experiment_texts
 
     @abstractmethod
-    def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
+    def _update_new_stimulus(self, stimulus: AStimulus) -> None:
         ...
 
     @abstractmethod
@@ -45,22 +45,25 @@ class AView(AObserver):
         :return:
         """
         if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
-            # TODO: assert type is correct
             self._update_new_stimulus(data)
         elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
-            # TODO: assert type is correct
             self._update_new_primer(data)
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
-            # TODO: assert type is correct
             self._update_experiment_state_changed(data)
+        elif identifier == EModelUpdateIdentifier.ATTENTION_CHECK:
+            pass
         else:
-            # this should never happen
-            assert False
+            assert False  # this should never happen
 
     @abstractmethod
     def get_confirmation(self) -> bool:
         """Wait for the user to confirm with some action.
         """
+        ...
+
+    @abstractmethod
+    def attention_check(self) -> bool:
+        """True, if the specified attention_check_action has been taken."""
         ...
 
     @abstractmethod

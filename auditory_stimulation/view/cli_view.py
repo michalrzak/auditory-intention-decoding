@@ -1,14 +1,14 @@
 import time
 
 from auditory_stimulation.model.experiment_state import EExperimentState
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 from auditory_stimulation.view.view import AView
 
 
 class CLIView(AView):
     """Simple view, utilizing the console as its output. Can be used for debugging."""
 
-    def _update_new_stimulus(self, stimulus: CreatedStimulus) -> None:
+    def _update_new_stimulus(self, stimulus: AStimulus) -> None:
         print(f"Prompt: {stimulus.prompt}")
 
     def _update_new_primer(self, primer: str) -> None:
@@ -20,6 +20,10 @@ class CLIView(AView):
     def get_confirmation(self) -> bool:
         input("Please press the enter key")
         return True
+
+    def attention_check(self) -> bool:
+        result = input("Was your stimulus present? [y/n]: ")
+        return result == "y"
 
     def wait(self, secs: float) -> None:
         time.sleep(secs)

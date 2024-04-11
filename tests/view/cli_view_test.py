@@ -6,7 +6,7 @@ import mockito
 
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 from auditory_stimulation.view.cli_view import CLIView
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio_player, get_mock_audio
 
@@ -28,7 +28,7 @@ def test_update_new_stimulus():
     new_prompt = "new prompt"
     new_audio = get_mock_audio(1000, 100)
 
-    new_stimulus = mockito.mock(CreatedStimulus)
+    new_stimulus = mockito.mock(AStimulus)
     new_stimulus.array = new_audio
     new_stimulus.prompt = new_prompt
 

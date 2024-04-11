@@ -22,6 +22,7 @@ class ETrigger(Enum):
     EXPERIMENT = 3
     BREAK_START = 4
     OUTRO = 5
+    ATTENTION_CHECK = 6
 
     INACTIVE = 200
 
@@ -31,6 +32,8 @@ class ETrigger(Enum):
             return ETrigger.NEW_STIMULUS
         elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
             return ETrigger.NEW_PROMPT
+        elif identifier == EModelUpdateIdentifier.ATTENTION_CHECK:
+            return ETrigger.ATTENTION_CHECK
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             assert isinstance(data, EExperimentState)
             if data == EExperimentState.INTRODUCTION:

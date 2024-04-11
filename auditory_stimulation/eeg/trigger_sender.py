@@ -9,7 +9,7 @@ from typing import Any, List
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.model import AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 
 
 class ThreadDiedException(Exception):
@@ -120,7 +120,7 @@ class ATriggerSender(AObserver):
         # in case a new stimulus is received, also queue sending trigger after it finishes playing and at the beginning
         #  of each option
         if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
-            assert isinstance(data, CreatedStimulus)
+            assert isinstance(data, AStimulus)
             for time_stamp in data.time_stamps:
                 self.__queue_trigger(ETrigger.OPTION_START, time_stamp[0])
                 self.__queue_trigger(ETrigger.OPTION_END, time_stamp[1])

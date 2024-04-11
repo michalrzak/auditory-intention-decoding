@@ -11,13 +11,13 @@ from auditory_stimulation.eeg.bittium_neur_one import BittiumTriggerSender, IPar
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import CreatedStimulus
+from auditory_stimulation.model.stimulus import AStimulus
 
 MOCK_AUDIO = mockito.mock(Audio)
 MOCK_AUDIO.secs = 0.3
-MOCK_CREATED_STIMULUS = mockito.mock(CreatedStimulus)
-MOCK_CREATED_STIMULUS.time_stamps = [[0.1, 0.2]]
-MOCK_CREATED_STIMULUS.audio = MOCK_AUDIO
+MOCK_STIMULUS = mockito.mock(AStimulus)
+MOCK_STIMULUS.time_stamps = [[0.1, 0.2]]
+MOCK_STIMULUS.audio = MOCK_AUDIO
 
 THREAD_TIMOUT = 0
 
@@ -68,7 +68,7 @@ def test_bittium_trigger_sender_update_new_stimulus_threads():
 
     trigger_sender = BittiumTriggerSender(THREAD_TIMOUT, parallel_port, trigger_duration_s=0)
 
-    data = MOCK_CREATED_STIMULUS
+    data = MOCK_STIMULUS
     update_identifier = EModelUpdateIdentifier.NEW_STIMULUS
 
     previous_count = threading.active_count()

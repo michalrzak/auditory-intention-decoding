@@ -1,9 +1,10 @@
 import numbers
 import pathlib
+from abc import ABC
 from dataclasses import dataclass
 from os import PathLike
 from random import Random
-from typing import List, Dict, Any, Tuple, Collection, Final, Sequence
+from typing import List, Dict, Any, Tuple, Collection, Sequence, Optional
 
 import numpy as np
 import yaml
@@ -13,17 +14,15 @@ from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 
 
 @dataclass(frozen=True)
-class Stimulus:
-    """Simple data class, used to store all information of a stimulus. Should contain the same information as the
-    stimulus YAML file, but this is not explicitly checked."""
+class AStimulus(ABC):
     audio: Audio
+    used_tagger: AAudioTagger
     prompt: str
     primer: str
     options: Collection[str]
     time_stamps: Collection[Tuple[float, float]]
-    target: int
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if len(self.options) != len(self.time_stamps):
             raise LookupError("For every option specified, there needs to be a time-stamp specified!")
 
@@ -32,71 +31,36 @@ class Stimulus:
                 raise ValueError("The time-stamp needs to be a proper interval, having the lower interval index at "
                                  "pos. 0 and the higher interval index at pos. 1")
 
-        if self.target < 0:
-            raise ValueError("The target has to be a non-negative integer.")
+            if ts[1] > self.audio.secs:
+                raise ValueError(
+                    f"The given timestamp: {ts} is not contained within the audio! Audio length: {self.audio.secs}")
 
-        if self.target >= len(self.options):
-            raise ValueError("The target is not contained within the options.")
+        if any(opt not in self.prompt for opt in self.options):
+            raise ValueError("Some of the options are not contained within the prompt!")
 
-    def __hash__(self) -> int:
-        return hash((self.audio, self.prompt, self.primer, str(self.options), str(self.time_stamps), self.target))
-
-    def __repr__(self) -> str:
-        return f"Stimulus({repr(self.audio)}, prompt={self.prompt}, primer={self.primer}, options={self.options}, " \
-               f"time_stamps={self.time_stamps}, target={self.target})"
+    def _common_repr(self) -> str:
+        return f"{repr(self.audio)}, prompt={self.prompt}, primer={self.primer}, options={self.options}, " \
+               f"time_stamps={self.time_stamps}"
 
 
-class CreatedStimulus:
-    """Wraps the stimulus class and adds a modified audio and an optional label, to denote what tagging technique was
-    used.
+@dataclass(frozen=True)
+class Stimulus(AStimulus):
+    target_index: int
 
-    The used tagger is sort of a bad solution and this should be done a bit differently
-    """
-    __stimulus: Stimulus
-    modified_audio: Final[Audio]
-    used_tagger: Final[AAudioTagger]
+    def __post_init__(self) -> None:
+        super().__post_init__()
 
-    def __init__(self, stimulus: Stimulus, modified_audio: Audio, used_tagger: AAudioTagger) -> None:
-        """Helps to construct a CreatedStimulus from a Stimulus + a modified audio
+        if not (0 <= self.target_index < len(self.options)):
+            raise ValueError("The target index is not contained within the options.")
 
-        :param stimulus: A stimulus instance, which fields will be copied.
-        :param modified_audio: The modified_audio to be added to the class.
-        :param used_tagger: Denotes which tagger was used to create the modified audio.
-        :return: A new instance of CreatedStimulus with the specified fields in stimulus and the modified_audio
-        """
-        self.__stimulus = stimulus
-        self.modified_audio = modified_audio
-        self.used_tagger = used_tagger
+    def __repr__(self):
+        return f"Stimulus({self._common_repr()}, target_index={self.target_index})"
 
-    @property
-    def audio(self) -> Audio:
-        return self.__stimulus.audio
 
-    @property
-    def prompt(self) -> str:
-        return self.__stimulus.prompt
-
-    @property
-    def primer(self) -> str:
-        return self.__stimulus.primer
-
-    @property
-    def options(self) -> Collection[str]:
-        return self.__stimulus.options
-
-    @property
-    def time_stamps(self) -> Collection[Tuple[float, float]]:
-        return self.__stimulus.time_stamps
-
-    @property
-    def target(self) -> int:
-        return self.__stimulus.target
-
-    def __hash__(self) -> int:
-        return hash((hash(self.__stimulus), self.modified_audio))
-
-    def __repr__(self) -> str:
-        return f"CreatedStimulus({repr(self.__stimulus)}, {repr(self.modified_audio)}, {repr(self.used_tagger)})"
+@dataclass(frozen=True)
+class AttentionCheckStimulus(AStimulus):
+    def __repr__(self):
+        return f"AttentionCheckStimulus({self._common_repr()})"
 
 
 def __validate_stimulus_raw(stimulus_raw: Dict[str, Any]) -> None:
@@ -137,6 +101,8 @@ def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
     :param path_to_yaml: A system path to a valid yaml file containing the stimuli.
     :return: A list of the loaded stimuli, from the provided file.
     """
+    raise NotImplementedError("Unfortunately, this function is currently not functional and requires some changes!")
+
     with open(path_to_yaml, 'r') as file:
         stimuli_raw = yaml.safe_load(file)
 
@@ -152,18 +118,21 @@ def load_stimuli(path_to_yaml: PathLike) -> List[Stimulus]:
         audio = load_wav_as_audio(pathlib.Path(stimulus_raw["file"]))
         time_stamps = [(time_stamp[0], time_stamp[1]) for time_stamp in stimulus_raw["time-stamps"]]
 
-        stimulus = Stimulus(audio,
-                            stimulus_raw["prompt"],
-                            stimulus_raw["primer"],
-                            stimulus_raw["options"],
-                            time_stamps,
-                            stimulus_raw["target"])
+        stimulus = Stimulus(audio=...,
+                            used_tagger=...,
+                            prompt=stimulus_raw["prompt"],
+                            primer=stimulus_raw["primer"],
+                            options=stimulus_raw["options"],
+                            time_stamps=time_stamps,
+                            target_index=stimulus_raw["target"])
         stimuli.append(stimulus)
 
     return stimuli
 
 
-def __combine_parts(intro: Audio, number_audios: Collection[Audio], break_length: float = 0.5) -> Audio:
+def __combine_parts(intro: Audio,
+                    number_audios: Collection[Audio],
+                    break_length: float = 0.5) -> Audio:
     audio_break = np.zeros((int(break_length * intro.sampling_frequency), 2), dtype=np.float32)
 
     stimulus_array = intro.array
@@ -174,6 +143,9 @@ def __combine_parts(intro: Audio, number_audios: Collection[Audio], break_length
 
         stimulus_array = np.append(stimulus_array, num.array, axis=0)
         first = False
+
+    # add silence at the end of the audio to pad it
+    stimulus_array = np.append(stimulus_array, audio_break, axis=0)
 
     return Audio(stimulus_array, intro.sampling_frequency)
 
@@ -216,7 +188,8 @@ def generate_stimulus(intro_audio: Audio,
                       option_audios: Sequence[Audio],
                       option_texts: Sequence[str],
                       target: int,
-                      pause_secs: float) -> Stimulus:
+                      pause_secs: float,
+                      tagger: AAudioTagger) -> Stimulus:
     """Constructs a stimulus instance by combining the given parameters.
 
     :param intro_audio: An audio, containing a short introduction to the generated stimulus.
@@ -225,6 +198,7 @@ def generate_stimulus(intro_audio: Audio,
     :param option_texts: A sequence of transcriptions of the different options.
     :param target: An index, determining which of the options is the target of the stimulus.
     :param pause_secs: How long, in seconds, the break between two options is.
+    :param tagger: The tagger used to generate the stimulus.
     :return:
     """
 
@@ -245,23 +219,111 @@ def generate_stimulus(intro_audio: Audio,
     prompt = __generate_prompt(intro_text, option_texts)
     primer = option_texts[target]  # given the target, creates a primer sentence
 
-    stimulus = Stimulus(audio=audio,
+    tagged_audio = tagger.create(audio, time_stamps)
+
+    stimulus = Stimulus(audio=tagged_audio,
+                        used_tagger=tagger,
                         prompt=prompt,
                         primer=primer,
                         options=option_texts,
                         time_stamps=time_stamps,
-                        target=target)
+                        target_index=target)
     return stimulus
 
 
-def generate_created_stimuli(n_repetitions: int,
-                             taggers: List[AAudioTagger],
-                             n_stimuli: int,
-                             pause_secs: float,
-                             number_stimuli_interval: Tuple[int, int],
-                             intro_transcription_path: PathLike,
-                             voices_folders: List[pathlib.Path],
-                             rng: Random) -> List[CreatedStimulus]:
+def generate_attention_check_stimulus(intro_audio: Audio,
+                                      intro_text: str,
+                                      option_audios: Sequence[Audio],
+                                      option_texts: Sequence[str],
+                                      pause_secs: float,
+                                      primer: str,
+                                      tagger: AAudioTagger) -> AttentionCheckStimulus:
+    """Constructs an AttentionCheckStimulus instance by combining the given parameters.
+
+    :param intro_audio: An audio, containing a short introduction to the generated stimulus.
+    :param intro_text: The transcription of the given audio
+    :param option_audios: A sequence of audios, containing the stimuli options.
+    :param option_texts: A sequence of transcriptions of the different options.
+    :param pause_secs: How long, in seconds, the break between two options is.
+    :param primer: The shown primer.
+    :param tagger: The tagger used to generate the stimulus.
+    :return:
+    """
+
+    if len(option_texts) != len(option_audios):
+        raise ValueError("The same number of number_audios and number_texts must be provided")
+
+    if pause_secs < 0:
+        raise ValueError("Pause secs must be non-negative")
+
+    audio = __combine_parts(intro_audio, option_audios, pause_secs)
+    time_stamps = __extract_time_stamps(intro_audio, option_audios, pause_secs)
+    prompt = __generate_prompt(intro_text, option_texts)
+
+    tagged_audio = tagger.create(audio, time_stamps)
+
+    stimulus = AttentionCheckStimulus(audio=tagged_audio,
+                                      used_tagger=tagger,
+                                      prompt=prompt,
+                                      primer=primer,
+                                      options=option_texts,
+                                      time_stamps=time_stamps)
+    return stimulus
+
+
+def __make_generate_stimulus_parameters(target_number: int,
+                                        n_stimuli: int,
+                                        number_stimuli_interval: Tuple[int, int],
+                                        input_text_dict: Dict[str, str],
+                                        voices_folders: List[pathlib.Path],
+                                        is_attention_check_stimulus: bool,
+                                        rng: Random) \
+        -> Tuple[Audio, str, Sequence[Audio], Sequence[str], Optional[int]]:
+    # randomly draw, which voice is used
+    voice_folder = rng.choice(voices_folders)
+
+    # randomly draw which of the intros will be used
+    intro = rng.choice(list(input_text_dict.keys()))
+
+    # draw what numbers will be contained within the stimulus (without the target if flag is set)
+    generated_amount = n_stimuli if is_attention_check_stimulus else n_stimuli - 1
+    number_stimuli = []
+    first = True
+    while first or target_number in number_stimuli or len(set(number_stimuli)) != len(number_stimuli):
+        first = False
+        number_stimuli = [str(rng.randint(number_stimuli_interval[0], number_stimuli_interval[1]))
+                          for _ in range(generated_amount)]
+
+    # if flag set append the target to the number stimuli and get the index of the target
+    if is_attention_check_stimulus:
+        target = None
+    else:
+        number_stimuli.append(str(target_number))
+        rng.shuffle(number_stimuli)
+        target = number_stimuli.index(str(target_number))
+
+    # load the necessary audios to construct the stimulus
+    try:
+        loaded_intro = load_wav_as_audio(voice_folder / f"{intro}.wav")
+        loaded_numbers = [load_wav_as_audio(voice_folder / f"{num}.wav") for num in number_stimuli]
+        assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
+
+    except FileNotFoundError as e:
+        raise FileNotFoundError(str(e) + f"\nAre you sure you downloaded and extracted the stimuli correctly?"
+                                         f" Please check the installation section of the README!")
+
+    assert len(loaded_numbers) == len(number_stimuli)
+    return loaded_intro, input_text_dict[intro], loaded_numbers, number_stimuli, target
+
+
+def generate_stimuli(n_repetitions: int,
+                     taggers: List[AAudioTagger],
+                     n_stimuli: int,
+                     pause_secs: float,
+                     number_stimuli_interval: Tuple[int, int],
+                     intro_transcription_path: PathLike,
+                     voices_folders: List[pathlib.Path],
+                     rng: Random) -> List[AStimulus]:
     """Generates $len(taggers) * n_repetitions$ stimuli. The stimuli are generated in the following way:
      1. Repeat n_repetition times:
         2. A target number is generated.
@@ -290,54 +352,63 @@ def generate_created_stimuli(n_repetitions: int,
         input_text_dict_raw = yaml.safe_load(file)
     input_text_dict = {key: input_text_dict_raw[key][0] for key in input_text_dict_raw}
 
-    stimuli: List[CreatedStimulus] = []
+    stimuli: List[AStimulus] = []
     for i in range(n_repetitions):
 
         # draw what target is used
-        target_number = str(rng.randint(number_stimuli_interval[0], number_stimuli_interval[1]))
+        target_number = rng.randint(number_stimuli_interval[0], number_stimuli_interval[1])
 
         taggers_clone = taggers.copy()
         rng.shuffle(taggers_clone)
+
+        block_of_stimuli: List[AStimulus] = []
         for tagger in taggers_clone:
-            # randomly draw, which voice is used
-            folder = rng.choice(voices_folders)
-
-            # randomly draw which of the intros will be used
-            intro = rng.choice(list(input_text_dict.keys()))
-
-            # draw what numbers will be contained within the stimulus (minus the target which is already chosen)
-            number_stimuli = []
-            first = True
-            while first or target_number in number_stimuli:
-                first = False
-                number_stimuli = [str(rng.randint(number_stimuli_interval[0], number_stimuli_interval[1]))
-                                  for _ in range(n_stimuli - 1)]
-
-            # append the target to the number stimuli and get the index of the target
-            number_stimuli.append(target_number)
-            rng.shuffle(number_stimuli)
-            target = number_stimuli.index(target_number)
-
-            # load the necessary audios to construct the stimulus
-            try:
-                loaded_intro = load_wav_as_audio(folder / f"{intro}.wav")
-                loaded_numbers = [load_wav_as_audio(folder / f"{num}.wav") for num in number_stimuli]
-                assert all(loaded_intro.sampling_frequency == audio.sampling_frequency for audio in loaded_numbers)
-
-            except FileNotFoundError as e:
-                raise FileNotFoundError(str(e) + f"\nAre you sure you downloaded and extracted the stimuli correctly?"
-                                                 f" Please check the installation section of the README!")
+            loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
+                = __make_generate_stimulus_parameters(target_number,
+                                                      n_stimuli,
+                                                      number_stimuli_interval,
+                                                      input_text_dict,
+                                                      voices_folders,
+                                                      False,
+                                                      rng)
+            assert target is not None
 
             # generate stimulus
-            raw_stimulus = generate_stimulus(loaded_intro,
-                                             input_text_dict[intro],
-                                             loaded_numbers,
-                                             number_stimuli,
-                                             target,
-                                             pause_secs)
-            modified_audio = tagger.create(raw_stimulus.audio, raw_stimulus.time_stamps)
-            stimulus = CreatedStimulus(raw_stimulus, modified_audio, tagger)
-            stimuli.append(stimulus)
+            stimulus = generate_stimulus(loaded_intro,
+                                         intro_text,
+                                         loaded_numbers,
+                                         number_stimuli,
+                                         target,
+                                         pause_secs,
+                                         tagger)
+            block_of_stimuli.append(stimulus)
 
-    assert len(stimuli) == n_repetitions * len(taggers)
+        # TODO: I don't think this is the best place for this. An API user might not expect this function to do this.
+
+        # generate an AttentionCheckStimulus
+        attention_check_tagger = rng.choice(taggers_clone)
+        loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
+            = __make_generate_stimulus_parameters(target_number,
+                                                  n_stimuli,
+                                                  number_stimuli_interval,
+                                                  input_text_dict,
+                                                  voices_folders,
+                                                  True,
+                                                  rng)
+        assert target is None
+        attention_check = generate_attention_check_stimulus(loaded_intro,
+                                                            intro_text,
+                                                            loaded_numbers,
+                                                            number_stimuli,
+                                                            pause_secs,
+                                                            str(target_number),
+                                                            attention_check_tagger)
+        block_of_stimuli.append(attention_check)
+
+        # shuffle the block of stimuli and add them to the final list of stimuli
+        rng.shuffle(block_of_stimuli)
+        stimuli += block_of_stimuli
+
+    # + 1 due to the attention check stimulus
+    assert len(stimuli) == n_repetitions * (len(taggers) + 1)
     return stimuli
