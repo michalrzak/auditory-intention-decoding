@@ -15,6 +15,8 @@ LETTER_SIZE = 0.05
 TEXT_BOX_COLOR = 1.
 TEXT_BOX_COLOR_SPACE = 'rgb'
 
+PRIMER_LETTER_SIZE = 0.12
+
 EXPERIMENT_STATE_TEXT_BOX_POSITION = (0, 0)
 EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.8, 0.5)
 
@@ -96,8 +98,11 @@ class PsychopyView(AView):
     def _update_new_primer(self, primer: str) -> None:
         self.__try_to_quit()
 
-        prompt = self.__create_text_box(primer, EXPERIMENT_STATE_TEXT_BOX_POSITION,
-                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[0], EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
+        prompt = self.__create_text_box(primer,
+                                        PRIMER_LETTER_SIZE,
+                                        EXPERIMENT_STATE_TEXT_BOX_POSITION,
+                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
+                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
         self.__draw(prompt, True)
 
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
@@ -115,6 +120,7 @@ class PsychopyView(AView):
                 self._experiment_texts[data] = ""
 
             drawn_item = self.__create_text_box(self._experiment_texts[data],
+                                                LETTER_SIZE,
                                                 EXPERIMENT_STATE_TEXT_BOX_POSITION,
                                                 EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
                                                 EXPERIMENT_STATE_TEXT_BOX_SIZE[1],
@@ -131,7 +137,7 @@ class PsychopyView(AView):
     def get_confirmation(self) -> bool:
         self.__try_to_quit()
 
-        text = self.__create_text_box(CONFIRMATION_TEXT, CONFIRMATION_TEXT_BOX_POSITION)
+        text = self.__create_text_box(CONFIRMATION_TEXT, LETTER_SIZE, CONFIRMATION_TEXT_BOX_POSITION)
         self.__draw(text, False)
 
         self.__keyboard.clearEvents()  # clear keys in case the key was already pressed before
@@ -152,6 +158,7 @@ class PsychopyView(AView):
 
     def __create_text_box(self,
                           text: str,
+                          letter_size: float,
                           position: Tuple[float, float],
                           width: Optional[float] = None,
                           height: Optional[float] = None,
@@ -161,6 +168,7 @@ class PsychopyView(AView):
         normalized units, hence your screen edges are located 1 and -1 each in both dimensions.
 
         :param text: The drawn text inside the stimulus
+        :param letter_size: The size of the drawn letters.
         :param position: The relative position on the screen.
         :param width: The width of the created stimulus, if left empty the width is set to a default value by psychopy
          and grows dynamically, with longer text. If specified, fixes a width for the TextBox
@@ -174,7 +182,7 @@ class PsychopyView(AView):
 
         text_box = psychopy.visual.TextBox2(win=self.__window,
                                             text=text,
-                                            letterHeight=LETTER_SIZE,
+                                            letterHeight=letter_size,
                                             alignment=alignment.value,
                                             pos=position,
                                             size=size,
