@@ -69,6 +69,15 @@ class Experiment:
 
         self.__resting_state()
 
+        # example
+        self.__model.change_experiment_state(EExperimentState.EXAMPLE)
+        self.__view.get_confirmation()
+
+        for stimulus in self.__model.example_stimuli:
+            self.__present_stimulus(stimulus)
+            self.__view.wait(self.__experiment_durations.attention_check_secs)
+
+        # experiment
         self.__model.change_experiment_state(EExperimentState.EXPERIMENT_INTRODUCTION)
         self.__view.get_confirmation()
 

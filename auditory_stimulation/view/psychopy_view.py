@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Callable, Protocol, Dict, Optional, Tuple, List
+from typing import Callable, Protocol, Dict, Optional, Tuple, List, Union, Iterable
 
 import numpy as np
 import psychopy
@@ -19,6 +19,8 @@ PRIMER_LETTER_SIZE = 0.12
 
 EXPERIMENT_STATE_TEXT_BOX_POSITION = (0, 0)
 EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.8, 0.5)
+
+EXAMPLE_TEXT_BOX_POSITION = (0, -0.5)
 
 CONFIRMATION_TEXT = "Please press 'space' to continue"
 CONFIRMATION_TEXT_BOX_POSITION = (0, -0.8)
@@ -77,11 +79,15 @@ class PsychopyView(AView):
             self.close_view()
             raise ViewInterrupted("The user has pressed 'escape', indicating they want to quit the view.")
 
-    def __draw(self, item: Drawable, clear_buffer: bool):
+    def __draw(self, item: Union[Drawable, Iterable[Drawable]], clear_buffer: bool):
         if clear_buffer:
             self.__draw_buffer = []
 
-        self.__draw_buffer.append(item)
+        if isinstance(item, Iterable):
+            for ele in item:
+                self.__draw_buffer.append(ele)
+        else:
+            self.__draw_buffer.append(item)
 
         for buffered_item in self.__draw_buffer:
             buffered_item.draw()
@@ -98,12 +104,22 @@ class PsychopyView(AView):
     def _update_new_primer(self, primer: str) -> None:
         self.__try_to_quit()
 
-        prompt = self.__create_text_box(primer,
-                                        PRIMER_LETTER_SIZE,
-                                        EXPERIMENT_STATE_TEXT_BOX_POSITION,
-                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
-                                        EXPERIMENT_STATE_TEXT_BOX_SIZE[1])
-        self.__draw(prompt, True)
+        drawing = []
+        if self.__previous_state == EExperimentState.EXAMPLE:
+            # if the state is example, print the primer in a special way
+            primer, description = primer.split("\n\n")
+            drawing.append(self.__create_text_box(description,
+                                                  LETTER_SIZE,
+                                                  EXAMPLE_TEXT_BOX_POSITION,
+                                                  EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
+                                                  EXPERIMENT_STATE_TEXT_BOX_SIZE[1]))
+
+        drawing.append(self.__create_text_box(primer,
+                                              PRIMER_LETTER_SIZE,
+                                              EXPERIMENT_STATE_TEXT_BOX_POSITION,
+                                              EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
+                                              EXPERIMENT_STATE_TEXT_BOX_SIZE[1]))
+        self.__draw(drawing, True)
 
     def _update_experiment_state_changed(self, data: EExperimentState) -> None:
         self.__try_to_quit()

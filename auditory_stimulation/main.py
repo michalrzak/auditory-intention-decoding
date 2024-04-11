@@ -18,7 +18,7 @@ from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.model.stimulus import generate_stimuli
+from auditory_stimulation.model.stimulus import generate_stimuli, generate_example_stimuli
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 from auditory_stimulation.view.view import ViewInterrupted
@@ -58,7 +58,24 @@ def main() -> None:
                                intro_transcription_path=config.intros_transcription_path,
                                voices_folders=config.voices_folders,
                                rng=Random(config.subject_id))
-    model = Model(stimuli)
+
+    stimuli_prefixes = \
+        ["Each stimulus starts with primer number. Focus on this number, while you listen to the audio.",
+         "The primer number does not change, but the audio changes."]
+    attention_check_prefixes = [
+        "Sometimes the stimulus is missing the primer number. In that case hit 'spacebar' after the"
+        " stimulus is finished."]
+    example_stimuli = generate_example_stimuli(regular_stimuli_primer_prefix=stimuli_prefixes,
+                                               attention_check_stimuli_primer_prefix=attention_check_prefixes,
+                                               tagger=RawTagger(),
+                                               n_stimuli=config.n_stimuli,
+                                               pause_secs=config.pause_secs,
+                                               number_stimuli_interval=config.stimuli_numbers_interval,
+                                               intro_transcription_path=config.intros_transcription_path,
+                                               voices_folders=config.voices_folders,
+                                               rng=Random(config.subject_id))
+
+    model = Model(stimuli, example_stimuli)
 
     logger = Logger(logging_folder)
     model.register(logger, 10)
