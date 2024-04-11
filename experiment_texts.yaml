@@ -5,6 +5,7 @@ resting-state-eyes-open:
 resting-state-eyes-closed-introduction: "Great job!\nNext, we'll record your brain activity with your eyes closed. After pressing space, you'll hear a beep. Close your eyes after this beep, relax, and wait for another beep before opening your eyes."
 resting-state-eyes-closed:
 experiment-introduction: "Now, let's begin the actual experiment. You'll focus on a target number presented to you. Then, you'll hear sentences containing your target and other numbers.\nYour task is to concentrate solely on your target number during playback. Multiple sentences will be presented for each target, after which you will be able to take a break.\nIf you have any questions, feel free to ask now."
+example: "In this section we will walk you through an example block of scenarios. Please follow the instructions on screen. You will have another opportunity to ask question after this section is over."
 experiment:
 break: "Take a brief break and press space when you're ready.\nDon't hesitate to call the experimenter if you need anything or wish to chat for a bit."
 outro: "Thank you for participating in the experiment! :)"
