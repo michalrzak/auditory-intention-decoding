@@ -14,7 +14,7 @@ voices_folders: [ "stimuli_sounds/eric", "stimuli_sounds/natasha" ]
 
 # experiment flow parameters
 repetitions: 2
-resting_state_secs: 5
+resting_state_secs: 180
 primer_secs: 5
 break_secs: 5
 attention_check_secs: 1
