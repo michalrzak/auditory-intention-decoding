@@ -21,6 +21,7 @@ def create_test_configuration_file(tmp_path,
                                    resting_state_secs,
                                    primer_secs,
                                    break_secs,
+                                   attention_check_secs,
                                    experiment_texts_file_path):
     contents = {"subject_id": subject_id,
                 "logging_directory_path": logging_directory_path,
@@ -34,6 +35,7 @@ def create_test_configuration_file(tmp_path,
                 "resting_state_secs": resting_state_secs,
                 "primer_secs": primer_secs,
                 "break_secs": break_secs,
+                "attention_check_secs": attention_check_secs,
                 "experiment_texts_file_path": experiment_texts_file_path
                 }
     file = tmp_path / "test.yaml"
@@ -54,6 +56,7 @@ def test_get_configuration_yaml_valid_call(tmp_path):
     resting_state_secs = 1
     primer_secs = 1
     break_secs = 1
+    attention_check_secs = 1
     experiment_texts_file_path = "some_texts_path"
 
     file = create_test_configuration_file(tmp_path,
@@ -69,6 +72,7 @@ def test_get_configuration_yaml_valid_call(tmp_path):
                                           resting_state_secs,
                                           primer_secs,
                                           break_secs,
+                                          attention_check_secs,
                                           experiment_texts_file_path)
 
     config = get_configuration_yaml(file)

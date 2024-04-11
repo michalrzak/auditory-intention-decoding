@@ -126,7 +126,7 @@ def test_file_trigger_sender_send_trigger_two_new_stimuli_valid_call(tmp_path):
         send_ts = datetime.timestamp(datetime.today()) * 1000
         trigger_sender.update(data, identifier)
 
-        time.sleep(data.audio.secs)
+        time.sleep(data.audio.secs + 1)
 
         send_ts2 = datetime.timestamp(datetime.today()) * 1000
         trigger_sender.update(data, identifier)
