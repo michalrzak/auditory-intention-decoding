@@ -3,7 +3,6 @@ from bisect import bisect_right
 from typing import List, Any, Optional, Collection, Tuple
 
 from auditory_stimulation.audio import Audio
-from auditory_stimulation.auditory_tagging.auditory_tagger import AAudioTagger
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.model.stimulus import AStimulus
@@ -18,8 +17,8 @@ class AObserver(ABC):
 class Model:
     """Class, containing all  relevant data for the experiment. Is an observable of the observer pattern
     """
-    __auditory_taggers: Collection[AAudioTagger]
     __created_stimuli: Collection[AStimulus]
+    __example_stimuli: Collection[AStimulus]
 
     __stimulus_history: List[AStimulus]
     __primer_history: List[str]
@@ -28,7 +27,7 @@ class Model:
 
     __observers: List[Tuple[AObserver, int]]
 
-    def __init__(self, stimuli: Collection[AStimulus]) -> None:
+    def __init__(self, stimuli: Collection[AStimulus], example_stimuli: Collection[AStimulus]) -> None:
         """Creates a model object.
 
         :param stimuli: A list of stimuli which will be used throughout the experiment.
@@ -40,6 +39,7 @@ class Model:
         self.__observers = []
 
         self.__created_stimuli = stimuli
+        self.__example_stimuli = example_stimuli
 
     def __notify(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
         for observer, _ in self.__observers:
@@ -131,3 +131,7 @@ class Model:
     @property
     def created_stimuli(self) -> Collection[AStimulus]:
         return self.__created_stimuli
+
+    @property
+    def example_stimuli(self) -> Collection[AStimulus]:
+        return self.__example_stimuli

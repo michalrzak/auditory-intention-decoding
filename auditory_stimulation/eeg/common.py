@@ -11,6 +11,7 @@ class ETrigger(Enum):
     END_STIMULUS = 102
     OPTION_START = 111
     OPTION_END = 112
+    ATTENTION_CHECK = 120
 
     RESTING_STATE_EYES_OPEN_INTRODUCTION = 20
     RESTING_STATE_EYES_OPEN = 21
@@ -22,7 +23,7 @@ class ETrigger(Enum):
     EXPERIMENT = 3
     BREAK_START = 4
     OUTRO = 5
-    ATTENTION_CHECK = 6
+    EXAMPLE = 6
 
     INACTIVE = 200
 
@@ -56,5 +57,7 @@ class ETrigger(Enum):
                 return ETrigger.RESTING_STATE_EYES_CLOSED_INTRODUCTION
             elif data == EExperimentState.OUTRO:
                 return ETrigger.OUTRO
+            elif data == EExperimentState.EXAMPLE:
+                return ETrigger.EXAMPLE
 
         raise NotImplementedError(f"Could not resolve trigger for data: {data} and identifier: {identifier}")

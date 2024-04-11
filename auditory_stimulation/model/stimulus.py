@@ -412,3 +412,93 @@ def generate_stimuli(n_repetitions: int,
     # + 1 due to the attention check stimulus
     assert len(stimuli) == n_repetitions * (len(taggers) + 1)
     return stimuli
+
+
+def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
+                             attention_check_stimuli_primer_prefix: Collection[str],
+                             tagger: AAudioTagger,
+                             n_stimuli: int,
+                             pause_secs: float,
+                             number_stimuli_interval: Tuple[int, int],
+                             intro_transcription_path: PathLike,
+                             voices_folders: List[pathlib.Path],
+                             rng: Random) -> Collection[AStimulus]:
+    """Generates a collection of stimuli to be used as an example for the experiment.
+
+    TODO: The location of this function is not ideal as it incorporates a bit of experiment knowledge (how do I know
+     what a collection of example stimuli is?) for simplicity reasons it is here, but could be moved somewhere in the
+     future
+
+    :param regular_stimuli_primer_prefix: Defines what the primer prefixes of the regular stimuli will be. Indirectly
+     specifies the amount of generated stimuli.
+    :param attention_check_stimuli_primer_prefix: Defines what the primer prefixes of the attention check stimuli will
+     be. Indirectly specifies the amount of attention check stimuli.
+    :param tagger: The tagger used throughout the examples.
+    :param n_stimuli: The amount of options generated in each stimulus.
+    :param pause_secs: Define how long the pause is between two adjacent numbers.
+    :param number_stimuli_interval: Defines from what number interval the stimuli will be drawn.
+    :param intro_transcription_path: The path to the intro transcription file.
+    :param voices_folders: Paths to all folders of voices available.
+    :param rng: The random number generator, used to generate all items in this function.
+    :return: A list of the example stimuli.
+    """
+
+    with open(intro_transcription_path, 'r') as file:
+        input_text_dict_raw = yaml.safe_load(file)
+    input_text_dict = {key: input_text_dict_raw[key][0] for key in input_text_dict_raw}
+
+    target_number = rng.randint(number_stimuli_interval[0], number_stimuli_interval[1])
+    stimuli: List[AStimulus] = []
+    for prefix in regular_stimuli_primer_prefix:
+        # draw what target is used
+
+        loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
+            = __make_generate_stimulus_parameters(target_number,
+                                                  n_stimuli,
+                                                  number_stimuli_interval,
+                                                  input_text_dict,
+                                                  voices_folders,
+                                                  False,
+                                                  rng)
+        assert target is not None
+
+        # generate stimulus
+        stimulus = generate_stimulus(loaded_intro,
+                                     intro_text,
+                                     loaded_numbers,
+                                     number_stimuli,
+                                     target,
+                                     pause_secs,
+                                     tagger)
+
+        new_primer = f"{stimulus.primer}\n\n{prefix}"
+        new_stimulus = Stimulus(audio=stimulus.audio,
+                                target_index=stimulus.target_index,
+                                used_tagger=stimulus.used_tagger,
+                                time_stamps=stimulus.time_stamps,
+                                primer=new_primer,
+                                prompt=stimulus.prompt,
+                                options=stimulus.options)
+
+        stimuli.append(new_stimulus)
+
+    for prefix in attention_check_stimuli_primer_prefix:
+        loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
+            = __make_generate_stimulus_parameters(target_number,
+                                                  n_stimuli,
+                                                  number_stimuli_interval,
+                                                  input_text_dict,
+                                                  voices_folders,
+                                                  True,
+                                                  rng)
+        assert target is None
+        attention_check = generate_attention_check_stimulus(loaded_intro,
+                                                            intro_text,
+                                                            loaded_numbers,
+                                                            number_stimuli,
+                                                            pause_secs,
+                                                            f"{str(target_number)}\n\n{prefix}",
+                                                            tagger)
+        stimuli.append(attention_check)
+
+    return stimuli

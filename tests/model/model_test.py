@@ -12,7 +12,8 @@ from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
 def create_model() -> Model:
     stimuli = [mockito.mock(AStimulus)]
-    return Model(stimuli)
+    example_stimuli = [mockito.mock(AStimulus)]
+    return Model(stimuli, example_stimuli)
 
 
 def mock_observer() -> AObserver:

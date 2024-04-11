@@ -16,6 +16,7 @@ class EExperimentState(Enum):
     EXPERIMENT = "experiment"
     BREAK = "break"
     OUTRO = "outro"
+    EXAMPLE = "example"
 
 
 def __experiment_text_validate(experiment_texts_raw: Dict[str, Any]) -> None:
@@ -39,7 +40,6 @@ def __to_enum_dictionary(experiment_texts: Dict[str, Optional[str]]) -> Dict[EEx
 
 def load_experiment_texts(path_to_yaml: PathLike) -> Dict[EExperimentState, Optional[str]]:
     """Loads the experiments texts specified int the yaml and returns them as a dictionary.
-    TODO: document structure of yaml somewhere
 
     :param path_to_yaml: A path to the to be loaded yaml.
     :return: A dictionary containing the contents of the yaml.
