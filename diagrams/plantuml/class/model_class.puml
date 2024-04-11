@@ -41,6 +41,9 @@ package model {
             RESTING_STATE_EYES_CLOSED
             EXPERIMENT_INTRODUCTION
             EXPERIMENT
+            BREAK
+            OUTRO
+            EXAMPLE
         }
 
         enum EModelUpdateIdentifier {
@@ -70,6 +73,7 @@ package model {
 }
 Model "1" *-r- "*" AStimulus: "stimulus_history"
 Model "1" *-r- "*" AStimulus: created_stimuli
+Model "1" *-r- "*" AStimulus: "example_stimuli"
 Model "*" o--- "1" EExperimentState: "experiment_state"
 Model "1" o-l-- "*" AObserver
 
