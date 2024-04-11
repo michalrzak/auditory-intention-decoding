@@ -72,12 +72,8 @@ def main() -> None:
 
     with trigger_sender.start() as ts:
         model.register(ts, 1)
-        experiment = Experiment(model,
-                                view,
-                                len(taggers),
-                                config.resting_state_secs,
-                                config.primer_secs,
-                                config.break_secs)
+        experiment = Experiment(model, view, len(taggers) + 1, config)  # + 1 due to attention check stimulus
+
         try:
             experiment.run()
         except ViewInterrupted:

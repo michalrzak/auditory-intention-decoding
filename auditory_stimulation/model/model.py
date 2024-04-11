@@ -23,6 +23,7 @@ class Model:
 
     __stimulus_history: List[AStimulus]
     __primer_history: List[str]
+    __attention_check_indices: List[int]
     __experiment_state: EExperimentState
 
     __observers: List[Tuple[AObserver, int]]
@@ -34,6 +35,7 @@ class Model:
         """
         self.__stimulus_history = []
         self.__primer_history = []
+        self.__attention_check_indices = []
         self.__experiment_state = EExperimentState.INACTIVE
         self.__observers = []
 
@@ -91,6 +93,18 @@ class Model:
         assert new_state != self.__experiment_state
         self.__experiment_state = new_state
         self.__notify(self.__experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED)
+
+    def add_attention_check(self, stimulus_index: int) -> None:
+        """Save that an attention check was conducted on the stimulus with the given index.
+
+        :param stimulus_index: The stimulus on which the attention check was conducted.
+        :return:
+        """
+        if not (0 <= stimulus_index < len(self.__created_stimuli)):
+            raise ValueError("Must provide a valid index!")
+
+        self.__attention_check_indices.append(stimulus_index)
+        self.__notify(stimulus_index, EModelUpdateIdentifier.ATTENTION_CHECK)
 
     @property
     def current_prompt(self) -> Optional[str]:

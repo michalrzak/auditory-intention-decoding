@@ -27,6 +27,7 @@ class Configuration:
     resting_state_secs: float
     primer_secs: float
     break_secs: float
+    attention_check_secs: float
     experiment_texts_file_path: pathlib.Path
 
 
@@ -73,6 +74,7 @@ def get_configuration_psychopy(defaults: Configuration,
     dlg.addField(label="Resting state secs", initial=defaults.resting_state_secs)
     dlg.addField(label="Primer secs", initial=defaults.primer_secs)
     dlg.addField(label="Break secs", initial=defaults.break_secs)
+    dlg.addField(label="Attention check secs", initial=defaults.attention_check_secs)
     dlg.addField(label="Experiment texts file path", initial=str(defaults.experiment_texts_file_path))
 
     results = dlg.show()
@@ -82,7 +84,7 @@ def get_configuration_psychopy(defaults: Configuration,
 
     voices = [voice for voice, choice in zip(defaults.voices_folders, [results[8], results[9]]) if choice]
 
-    assert len(results) == 15
+    assert len(results) == 16
     config = Configuration(subject_id=int(results[0]),
                            logging_directory_path=pathlib.Path(results[1]),
                            trigger_directory_path=pathlib.Path(results[2]),
@@ -95,7 +97,8 @@ def get_configuration_psychopy(defaults: Configuration,
                            resting_state_secs=float(results[11]),
                            primer_secs=float(results[12]),
                            break_secs=float(results[13]),
-                           experiment_texts_file_path=pathlib.Path(results[14]))
+                           attention_check_secs=float(results[14]),
+                           experiment_texts_file_path=pathlib.Path(results[15]))
 
     return config
 
@@ -131,6 +134,7 @@ def get_configuration_yaml(configuration_path: PathLike) -> Configuration:
         resting_state_secs=float(configuration_raw["resting_state_secs"]),
         primer_secs=float(configuration_raw["primer_secs"]),
         break_secs=float(configuration_raw["break_secs"]),
+        attention_check_secs=float(configuration_raw["attention_check_secs"]),
         experiment_texts_file_path=pathlib.Path(configuration_raw["experiment_texts_file_path"]))
 
     return configuration

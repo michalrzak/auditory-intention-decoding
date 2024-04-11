@@ -145,6 +145,11 @@ class PsychopyView(AView):
 
         psychopy.core.wait(secs)
 
+    def attention_check(self) -> bool:
+        result = len(self.__keyboard.getKeys(["space"])) != 0
+        self.__keyboard.clearEvents()
+        return result
+
     def __create_text_box(self,
                           text: str,
                           position: Tuple[float, float],

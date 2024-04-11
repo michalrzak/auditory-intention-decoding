@@ -52,5 +52,8 @@ class Logger(AObserver):
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             logging.info(f"Changing experiment state to {data}")
 
+        elif identifier == EModelUpdateIdentifier.ATTENTION_CHECK:
+            logging.info(f"Attention check action conducted")
+
         else:
             assert False, f"Unexpected identifier: {identifier}"

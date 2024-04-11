@@ -21,5 +21,9 @@ class CLIView(AView):
         input("Please press the enter key")
         return True
 
+    def attention_check(self) -> bool:
+        result = input("Was your stimulus present? [y/n]: ")
+        return result == "y"
+
     def wait(self, secs: float) -> None:
         time.sleep(secs)
