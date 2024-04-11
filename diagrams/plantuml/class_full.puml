@@ -235,18 +235,22 @@ AView <|-- CLIView
 
 
 
-class Experiment {
-    -Model model
-    -AView view
-    -int stimulus_repeat
-    -float resting_state_secs
-    -float primer_secs
-    -float break_secs
+interface ExperimentDurations {
+    +float resting_state_secs
+    +float primer_secs
+    +float break_secs
+    +float attention_check_secs
 
-    +Experiment(model, view, stimulus_repeat, resting_state_secs, primer_secs, break_secs)
+}
+
+class Experiment {
+    -int stimulus_repeat
+
+    +Experiment(model, view, stimulus_repeat, experiment_durations)
     +void create_stimuli()
     +void run()
 }
+Experiment "*" o-l- "1" ExperimentDurations
 Experiment "1" *-- "1" Model
 Experiment "1" *-- "1" AView
 
