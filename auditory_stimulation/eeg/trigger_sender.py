@@ -115,7 +115,6 @@ class ATriggerSender(AObserver):
         if not self.__thread.is_alive():
             raise ThreadDiedException("The trigger sending thread died. Did you use the `with` syntax to start the "
                                       "thread?")
-        
         self.__queue_trigger(ETrigger.get_trigger(data, identifier))
 
         # in case a new stimulus is received, also queue sending trigger after it finishes playing and at the beginning
