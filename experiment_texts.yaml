@@ -10,5 +10,4 @@ experiment-introduction: "The actual experiment begins in the next section. If y
 experiment:
 break: "Take a brief break and press space when you're ready.\nDon't hesitate to call the experimenter if you need anything or wish to chat for a bit."
 outro: "Thank you for participating in the experiment! :)"
-#attention-check: "Press 'spacebar' if your audio was invalid."
 attention-check: "Invalid?"
