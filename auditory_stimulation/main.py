@@ -65,8 +65,8 @@ def main() -> None:
          "The primer number does not change, but the audio changes.",
          "The sentences are further usually distorted using various distortion techniques."]
     attention_check_prefixes = [
-        "Sometimes the audio is missing the primer number. In that case hit 'spacebar' after the"
-        " audio is finished."]
+        "Sometimes the audio is missing the primer number. In that case the audio is invalid and you must hit "
+        "'spacebar' after the audio is finished."]
     example_stimuli = generate_example_stimuli(regular_stimuli_primer_prefix=stimuli_prefixes,
                                                attention_check_stimuli_primer_prefix=attention_check_prefixes,
                                                taggers=[RawTagger(), RawTagger(), taggers[4]],

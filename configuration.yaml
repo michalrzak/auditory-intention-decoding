@@ -16,7 +16,7 @@ voices_folders: [ "stimuli_sounds/natasha" ]
 # experiment flow parameters
 repetitions: 2
 resting_state_secs: 180
-primer_secs: 4
+primer_secs: 3
 break_secs: 5
-attention_check_secs: 1
+attention_check_secs: 2
 experiment_texts_file_path: "experiment_texts.yaml"

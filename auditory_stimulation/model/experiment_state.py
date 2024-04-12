@@ -17,6 +17,8 @@ class EExperimentState(Enum):
     BREAK = "break"
     OUTRO = "outro"
     EXAMPLE = "example"
+    EXAMPLE_INTRODUCTION = "example-introduction"
+    ATTENTION_CHECK = "attention-check"
 
 
 def __experiment_text_validate(experiment_texts_raw: Dict[str, Any]) -> None:

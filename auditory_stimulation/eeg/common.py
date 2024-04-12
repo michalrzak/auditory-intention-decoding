@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any
+from typing import Any, Optional
 
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
@@ -26,11 +26,12 @@ class ETrigger(Enum):
     BREAK_START = 4
     OUTRO = 5
     EXAMPLE = 6
+    EXAMPLE_INTRODUCTION = 7
 
     INACTIVE = 200
 
     @staticmethod
-    def get_trigger(data: Any, identifier: EModelUpdateIdentifier) -> "ETrigger":
+    def get_trigger(data: Any, identifier: EModelUpdateIdentifier) -> Optional["ETrigger"]:
         if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
             return ETrigger.NEW_STIMULUS
         elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
@@ -61,5 +62,9 @@ class ETrigger(Enum):
                 return ETrigger.OUTRO
             elif data == EExperimentState.EXAMPLE:
                 return ETrigger.EXAMPLE
+            elif data == EExperimentState.EXAMPLE_INTRODUCTION:
+                return ETrigger.EXAMPLE_INTRODUCTION
+            elif data == EExperimentState.ATTENTION_CHECK:
+                return None
 
         raise NotImplementedError(f"Could not resolve trigger for data: {data} and identifier: {identifier}")
