@@ -273,6 +273,7 @@ def generate_attention_check_stimulus(intro_audio: Audio,
 
 def __make_generate_stimulus_parameters(target_number: int,
                                         n_stimuli: int,
+                                        intro_indices: Sequence[int],
                                         number_stimuli_interval: Tuple[int, int],
                                         input_text_dict: Dict[str, str],
                                         voices_folders: List[pathlib.Path],
@@ -283,7 +284,10 @@ def __make_generate_stimulus_parameters(target_number: int,
     voice_folder = rng.choice(voices_folders)
 
     # randomly draw which of the intros will be used
-    intro = rng.choice(list(input_text_dict.keys()))
+    all_intros = list(input_text_dict.keys())
+    all_intros.sort()
+    chosen_intro = rng.choice(intro_indices)
+    intro = all_intros[chosen_intro]
 
     # draw what numbers will be contained within the stimulus (without the target if flag is set)
     generated_amount = n_stimuli if is_attention_check_stimulus else n_stimuli - 1
@@ -320,6 +324,7 @@ def generate_stimuli(n_repetitions: int,
                      taggers: List[AAudioTagger],
                      n_stimuli: int,
                      pause_secs: float,
+                     intros_indices: Sequence[int],
                      number_stimuli_interval: Tuple[int, int],
                      intro_transcription_path: PathLike,
                      voices_folders: List[pathlib.Path],
@@ -338,6 +343,7 @@ def generate_stimuli(n_repetitions: int,
     :param taggers: The used taggers.
     :param n_stimuli: The amount of options generated in each stimulus.
     :param pause_secs: Define how long the pause is between two adjacent numbers.
+    :param intros_indices: The indices of the intros which will be used in the generated stimuli.
     :param number_stimuli_interval: Defines from what number interval the stimuli will be drawn.
     :param intro_transcription_path: The path to the intro transcription file.
     :param voices_folders: Paths to all folders of voices available.
@@ -366,6 +372,7 @@ def generate_stimuli(n_repetitions: int,
             loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
                 = __make_generate_stimulus_parameters(target_number,
                                                       n_stimuli,
+                                                      intros_indices,
                                                       number_stimuli_interval,
                                                       input_text_dict,
                                                       voices_folders,
@@ -390,6 +397,7 @@ def generate_stimuli(n_repetitions: int,
         loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
             = __make_generate_stimulus_parameters(target_number,
                                                   n_stimuli,
+                                                  intros_indices,
                                                   number_stimuli_interval,
                                                   input_text_dict,
                                                   voices_folders,
@@ -419,6 +427,7 @@ def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
                              tagger: AAudioTagger,
                              n_stimuli: int,
                              pause_secs: float,
+                             intros_indices: Sequence[int],
                              number_stimuli_interval: Tuple[int, int],
                              intro_transcription_path: PathLike,
                              voices_folders: List[pathlib.Path],
@@ -436,6 +445,7 @@ def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
     :param tagger: The tagger used throughout the examples.
     :param n_stimuli: The amount of options generated in each stimulus.
     :param pause_secs: Define how long the pause is between two adjacent numbers.
+    :param intros_indices: The indices of the intros which will be used in the generated stimuli.
     :param number_stimuli_interval: Defines from what number interval the stimuli will be drawn.
     :param intro_transcription_path: The path to the intro transcription file.
     :param voices_folders: Paths to all folders of voices available.
@@ -455,6 +465,7 @@ def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
         loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
             = __make_generate_stimulus_parameters(target_number,
                                                   n_stimuli,
+                                                  intros_indices,
                                                   number_stimuli_interval,
                                                   input_text_dict,
                                                   voices_folders,
@@ -486,6 +497,7 @@ def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
         loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
             = __make_generate_stimulus_parameters(target_number,
                                                   n_stimuli,
+                                                  intros_indices,
                                                   number_stimuli_interval,
                                                   input_text_dict,
                                                   voices_folders,

@@ -18,6 +18,7 @@ class Configuration:
     # stimulus generation parameters
     n_stimuli: int
     pause_secs: float
+    intro_indices: List[int]
     stimuli_numbers_interval: Tuple[int, int]
     intros_transcription_path: pathlib.Path
     voices_folders: List[pathlib.Path]
@@ -46,6 +47,8 @@ def get_configuration_psychopy(defaults: Configuration,
     # only import this if the function is run; I don't want the entire module to depend on psychopy
     import psychopy.gui
 
+    default_intros = ",".join([str(ele) for ele in defaults.intro_indices])
+
     separator = "_________________"
 
     dlg = psychopy.gui.Dlg(title=window_title)
@@ -60,11 +63,12 @@ def get_configuration_psychopy(defaults: Configuration,
     dlg.addText("<b>Stimulus generation parameters</b>")
     dlg.addField(label="n_stimuli", initial=defaults.n_stimuli)
     dlg.addField(label="Pause secs", initial=defaults.pause_secs)
+    dlg.addField(label="Valid indices (comma seperated)", initial=default_intros)
     dlg.addField(label="Stimuli numbers interval lower", initial=defaults.stimuli_numbers_interval[0])
     dlg.addField(label="Stimuli numbers interval upper", initial=defaults.stimuli_numbers_interval[1])
     dlg.addField(label="Intro transcription file path", initial=str(defaults.intros_transcription_path))
     dlg.addText("Voices")
-    dlg.addField(label="  - eric", initial=True)
+    dlg.addField(label="  - eric", initial=False)
     dlg.addField(label="  - natasha", initial=True)
 
     dlg.addText(separator)
@@ -82,23 +86,27 @@ def get_configuration_psychopy(defaults: Configuration,
     if results is None:
         raise FailedToGetConfigurationException("The user has aborted the dialogue!")
 
-    voices = [voice for voice, choice in zip(defaults.voices_folders, [results[8], results[9]]) if choice]
+    intro_indices = [int(ele) for ele in results[5].split(",")]
 
-    assert len(results) == 16
+    voices_choices = [pathlib.Path("stimuli_sounds/eric"), pathlib.Path("stimuli_sounds/natasha")]
+    voices = [voice for voice, choice in zip(voices_choices, [results[9], results[10]]) if choice]
+
+    assert len(results) == 17
     config = Configuration(subject_id=int(results[0]),
                            logging_directory_path=pathlib.Path(results[1]),
                            trigger_directory_path=pathlib.Path(results[2]),
                            n_stimuli=int(results[3]),
                            pause_secs=float(results[4]),
-                           stimuli_numbers_interval=(int(results[5]), int(results[6])),
-                           intros_transcription_path=pathlib.Path(results[7]),
+                           intro_indices=intro_indices,
+                           stimuli_numbers_interval=(int(results[6]), int(results[7])),
+                           intros_transcription_path=pathlib.Path(results[8]),
                            voices_folders=voices,
-                           repetitions=int(results[10]),
-                           resting_state_secs=float(results[11]),
-                           primer_secs=float(results[12]),
-                           break_secs=float(results[13]),
-                           attention_check_secs=float(results[14]),
-                           experiment_texts_file_path=pathlib.Path(results[15]))
+                           repetitions=int(results[11]),
+                           resting_state_secs=float(results[12]),
+                           primer_secs=float(results[13]),
+                           break_secs=float(results[14]),
+                           attention_check_secs=float(results[15]),
+                           experiment_texts_file_path=pathlib.Path(results[16]))
 
     return config
 
@@ -126,6 +134,7 @@ def get_configuration_yaml(configuration_path: PathLike) -> Configuration:
 
         n_stimuli=int(configuration_raw["n_stimuli"]),
         pause_secs=float(configuration_raw["pause_secs"]),
+        intro_indices=configuration_raw["intro_indices"],
         stimuli_numbers_interval=(configuration_raw["stimuli_numbers_interval"]),
         intros_transcription_path=pathlib.Path(configuration_raw["intros_transcription_path"]),
         voices_folders=voices_folders,
