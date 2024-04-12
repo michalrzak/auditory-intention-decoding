@@ -63,7 +63,7 @@ def main() -> None:
     stimuli_prefixes = \
         ["Each round starts with a primer number. Focus on this number, while you listen to the audio.",
          "The primer number does not change, but the audio changes.",
-         "The sentences are further usually distorted using various distortion techniques."]
+         "The sentences are usually distorted using various distortion techniques."]
     attention_check_prefixes = [
         "Sometimes the audio is missing the primer number. In that case the audio is invalid and you must hit "
         "'spacebar' after the audio is finished."]

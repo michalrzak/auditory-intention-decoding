@@ -40,7 +40,7 @@ class AStimulus(ABC):
 
     def _common_repr(self) -> str:
         return f"{repr(self.audio)}, prompt={self.prompt}, primer={self.primer}, options={self.options}, " \
-               f"time_stamps={self.time_stamps}"
+               f"time_stamps={self.time_stamps}, used_tagger={repr(self.used_tagger)}"
 
 
 @dataclass(frozen=True)
