@@ -13,7 +13,7 @@ class ETrigger(Enum):
     OPTION_END = 112
     TARGET_START = 113
     TARGET_END = 114
-    ATTENTION_CHECK = 120
+    ATTENTION_CHECK_ACTION = 120
 
     RESTING_STATE_EYES_OPEN_INTRODUCTION = 20
     RESTING_STATE_EYES_OPEN = 21
@@ -26,6 +26,8 @@ class ETrigger(Enum):
     BREAK_START = 4
     OUTRO = 5
     EXAMPLE = 6
+    EXAMPLE_INTRODUCTION = 7
+    ATTENTION_CHECK = 8
 
     INACTIVE = 200
 
@@ -36,7 +38,7 @@ class ETrigger(Enum):
         elif identifier == EModelUpdateIdentifier.NEW_PRIMER:
             return ETrigger.NEW_PROMPT
         elif identifier == EModelUpdateIdentifier.ATTENTION_CHECK:
-            return ETrigger.ATTENTION_CHECK
+            return ETrigger.ATTENTION_CHECK_ACTION
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
             assert isinstance(data, EExperimentState)
             if data == EExperimentState.INTRODUCTION:
@@ -61,5 +63,9 @@ class ETrigger(Enum):
                 return ETrigger.OUTRO
             elif data == EExperimentState.EXAMPLE:
                 return ETrigger.EXAMPLE
+            elif data == EExperimentState.EXAMPLE_INTRODUCTION:
+                return ETrigger.EXAMPLE_INTRODUCTION
+            elif data == EExperimentState.ATTENTION_CHECK:
+                return ETrigger.ATTENTION_CHECK
 
         raise NotImplementedError(f"Could not resolve trigger for data: {data} and identifier: {identifier}")

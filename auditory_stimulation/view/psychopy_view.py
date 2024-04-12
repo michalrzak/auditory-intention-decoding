@@ -20,6 +20,8 @@ PRIMER_LETTER_SIZE = 0.12
 EXPERIMENT_STATE_TEXT_BOX_POSITION = (0, 0)
 EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.8, 0.5)
 
+ATTENTION_CHECK_POSITION = (0, -0.25)
+
 EXAMPLE_TEXT_BOX_POSITION = (0, -0.5)
 
 CONFIRMATION_TEXT = "Please press 'space' to continue"
@@ -128,6 +130,16 @@ class PsychopyView(AView):
         # if resting state measurement, show fixation cross instead of text
         if data == EExperimentState.RESTING_STATE_EYES_OPEN or data == EExperimentState.RESTING_STATE_EYES_CLOSED:
             drawn_item = self.__create_fixation_cross()
+
+        elif data == EExperimentState.ATTENTION_CHECK:
+            drawn_item = self.__create_text_box(self._experiment_texts[data],
+                                                LETTER_SIZE,
+                                                ATTENTION_CHECK_POSITION,
+                                                EXPERIMENT_STATE_TEXT_BOX_SIZE[0],
+                                                EXPERIMENT_STATE_TEXT_BOX_SIZE[1],
+                                                EAlignment.CENTER)
+            self.__draw(drawn_item, False)
+            return
 
         else:
             # if the data was not provided, skip showing anything

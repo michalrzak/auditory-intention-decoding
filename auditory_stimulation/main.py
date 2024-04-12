@@ -61,14 +61,15 @@ def main() -> None:
                                rng=Random(config.subject_id))
 
     stimuli_prefixes = \
-        ["Each stimulus starts with primer number. Focus on this number, while you listen to the audio.",
-         "The primer number does not change, but the audio changes."]
+        ["Each round starts with a primer number. Focus on this number, while you listen to the audio.",
+         "The primer number does not change, but the audio changes.",
+         "The sentences are further usually distorted using various distortion techniques."]
     attention_check_prefixes = [
-        "Sometimes the stimulus is missing the primer number. In that case hit 'spacebar' after the"
-        " stimulus is finished."]
+        "Sometimes the audio is missing the primer number. In that case the audio is invalid and you must hit "
+        "'spacebar' after the audio is finished."]
     example_stimuli = generate_example_stimuli(regular_stimuli_primer_prefix=stimuli_prefixes,
                                                attention_check_stimuli_primer_prefix=attention_check_prefixes,
-                                               tagger=RawTagger(),
+                                               taggers=[RawTagger(), RawTagger(), taggers[4]],
                                                n_stimuli=config.n_stimuli,
                                                pause_secs=config.pause_secs,
                                                intros_indices=config.intro_indices,

@@ -1,11 +1,13 @@
 inactive:
-introduction: "Welcome to the experiment! Our goal is to decode a specific target word from your brain activity in spoken sentences."
+introduction: "Welcome to the experiment! Our goal is to decode a specific target word from your brain activity while you are listening to spoken sentences."
 resting-state-eyes-open-introduction: "Now, we'll measure your resting brain waves. Please sit comfortably, relax, and keep your eyes open. Try to minimize blinking and swallowing until this section is complete."
 resting-state-eyes-open:
 resting-state-eyes-closed-introduction: "Great job!\nNext, we'll record your brain activity with your eyes closed. After pressing space, you'll hear a beep. Close your eyes after this beep, relax, and wait for another beep before opening your eyes."
 resting-state-eyes-closed:
-example: "Your sole task in this experiment is to focus on a given target number while listening to sentences. These sentences will contain your target number along with other numbers. Multiple sentences will be presented for each random target, followed by a break.\n\nOccasionally, a sentence may not contain your target. When this happens, please press the 'spacebar'.\n\nFeel free to ask any questions now.\nIn the next section, you'll be guided through an example block of scenarios. Please follow the on-screen instructions. You'll have another chance to ask questions afterward."
+example:
+example-introduction: "Your sole task in this experiment is to focus on a given target number while listening to sentences. These sentences will contain your target number along with other numbers. Multiple sentences will be presented for each random target, followed by a break.\n\nOccasionally, a sentence may not contain your target. When this happens, the sentence is invalid and you must press 'spacebar'.\n\nFeel free to ask any questions now.\nIn the next section, you'll be guided through an example block of sentences. Please follow the on-screen instructions. You'll have another chance to ask questions afterward."
 experiment-introduction: "The actual experiment begins in the next section. If you have any questions, please ask them now."
 experiment:
 break: "Take a brief break and press space when you're ready.\nDon't hesitate to call the experimenter if you need anything or wish to chat for a bit."
 outro: "Thank you for participating in the experiment! :)"
+attention-check: "Invalid?"

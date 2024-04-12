@@ -424,7 +424,7 @@ def generate_stimuli(n_repetitions: int,
 
 def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
                              attention_check_stimuli_primer_prefix: Collection[str],
-                             tagger: AAudioTagger,
+                             taggers: Sequence[AAudioTagger],
                              n_stimuli: int,
                              pause_secs: float,
                              intros_indices: Sequence[int],
@@ -442,7 +442,7 @@ def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
      specifies the amount of generated stimuli.
     :param attention_check_stimuli_primer_prefix: Defines what the primer prefixes of the attention check stimuli will
      be. Indirectly specifies the amount of attention check stimuli.
-    :param tagger: The tagger used throughout the examples.
+    :param taggers: The taggers used throughout the examples. Must be same shape as the regular_stimuli_primer_prefix.
     :param n_stimuli: The amount of options generated in each stimulus.
     :param pause_secs: Define how long the pause is between two adjacent numbers.
     :param intros_indices: The indices of the intros which will be used in the generated stimuli.
@@ -459,7 +459,7 @@ def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
 
     target_number = rng.randint(number_stimuli_interval[0], number_stimuli_interval[1])
     stimuli: List[AStimulus] = []
-    for prefix in regular_stimuli_primer_prefix:
+    for tagger, prefix in zip(taggers, regular_stimuli_primer_prefix):
         # draw what target is used
 
         loaded_intro, intro_text, loaded_numbers, number_stimuli, target \
@@ -510,7 +510,7 @@ def generate_example_stimuli(regular_stimuli_primer_prefix: Collection[str],
                                                             number_stimuli,
                                                             pause_secs,
                                                             f"{str(target_number)}\n\n{prefix}",
-                                                            tagger)
+                                                            taggers[0])  # just pick the first tagger for all
         stimuli.append(attention_check)
 
     return stimuli

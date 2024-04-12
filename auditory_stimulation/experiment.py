@@ -61,6 +61,12 @@ class Experiment:
         self.__model.change_experiment_state(EExperimentState.RESTING_STATE_EYES_CLOSED)
         self.__view.wait(self.__experiment_durations.resting_state_secs)
 
+    def __attention_check(self, stimulus_id: int) -> None:
+        self.__model.change_experiment_state(EExperimentState.ATTENTION_CHECK)
+        self.__view.wait(self.__experiment_durations.attention_check_secs)
+        if self.__view.attention_check():
+            self.__model.add_attention_check(stimulus_id)
+
     def run(self) -> None:
         """Runs the experiment.
         """
@@ -70,30 +76,27 @@ class Experiment:
         self.__resting_state()
 
         # example
-        self.__model.change_experiment_state(EExperimentState.EXAMPLE)
+        self.__model.change_experiment_state(EExperimentState.EXAMPLE_INTRODUCTION)
         self.__view.get_confirmation()
 
-        for stimulus in self.__model.example_stimuli:
+        for i, stimulus in enumerate(self.__model.example_stimuli):
+            self.__model.change_experiment_state(EExperimentState.EXAMPLE)
             self.__present_stimulus(stimulus)
-            self.__view.wait(self.__experiment_durations.attention_check_secs)
+            self.__attention_check(i)
 
         # experiment
         self.__model.change_experiment_state(EExperimentState.EXPERIMENT_INTRODUCTION)
         self.__view.get_confirmation()
 
-        self.__model.change_experiment_state(EExperimentState.EXPERIMENT)
         for i, stimulus in enumerate(self.__model.created_stimuli):
+            self.__model.change_experiment_state(EExperimentState.EXPERIMENT)
             self.__present_stimulus(stimulus)
-
-            self.__view.wait(self.__experiment_durations.attention_check_secs)
-            if self.__view.attention_check():
-                self.__model.add_attention_check(i)
+            self.__attention_check(i)
 
             if (i + 1) % self.__block_size == 0:
                 self.__model.change_experiment_state(EExperimentState.BREAK)
                 self.__view.wait(self.__experiment_durations.break_secs)
                 self.__view.get_confirmation()
-                self.__model.change_experiment_state(EExperimentState.EXPERIMENT)
 
         self.__resting_state()
 
