@@ -9,7 +9,7 @@ from typing import Any, List
 from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.model.model import AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
-from auditory_stimulation.model.stimulus import AStimulus
+from auditory_stimulation.model.stimulus import AStimulus, Stimulus
 
 
 class ThreadDiedException(Exception):
@@ -121,7 +121,15 @@ class ATriggerSender(AObserver):
         #  of each option
         if identifier == EModelUpdateIdentifier.NEW_STIMULUS:
             assert isinstance(data, AStimulus)
-            for time_stamp in data.time_stamps:
+            for i, time_stamp in enumerate(data.time_stamps):
+
+                # this could probably be done a bit better, but as the AttentionCheckStimulus is a bit of an
+                # afterthought, this `if` is not very clean.
+                if isinstance(data, Stimulus) and i == data.target_index:
+                    self.__queue_trigger(ETrigger.TARGET_START, time_stamp[0])
+                    self.__queue_trigger(ETrigger.TARGET_END, time_stamp[1])
+                    continue
+
                 self.__queue_trigger(ETrigger.OPTION_START, time_stamp[0])
                 self.__queue_trigger(ETrigger.OPTION_END, time_stamp[1])
 
