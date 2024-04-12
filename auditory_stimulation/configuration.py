@@ -64,7 +64,7 @@ def get_configuration_psychopy(defaults: Configuration,
     dlg.addField(label="Stimuli numbers interval upper", initial=defaults.stimuli_numbers_interval[1])
     dlg.addField(label="Intro transcription file path", initial=str(defaults.intros_transcription_path))
     dlg.addText("Voices")
-    dlg.addField(label="  - eric", initial=True)
+    dlg.addField(label="  - eric", initial=False)
     dlg.addField(label="  - natasha", initial=True)
 
     dlg.addText(separator)
@@ -82,7 +82,8 @@ def get_configuration_psychopy(defaults: Configuration,
     if results is None:
         raise FailedToGetConfigurationException("The user has aborted the dialogue!")
 
-    voices = [voice for voice, choice in zip(defaults.voices_folders, [results[8], results[9]]) if choice]
+    voices_choices = [pathlib.Path("stimuli_sounds/eric"), pathlib.Path("stimuli_sounds/natasha")]
+    voices = [voice for voice, choice in zip(voices_choices, [results[8], results[9]]) if choice]
 
     assert len(results) == 16
     config = Configuration(subject_id=int(results[0]),
