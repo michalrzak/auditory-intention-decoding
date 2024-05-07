@@ -1,6 +1,8 @@
 import numpy as np
+import numpy.typing as npt
 import pytest
 
+from auditory_stimulation.audio import Audio
 from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, SpectrumShiftTagger, BinauralTagger
 from tests.auditory_tagging.stimulus_test_helpers import get_mock_audio
 
@@ -54,3 +56,32 @@ def test_shift_tagger_invalid_shift_by_should_fail(tagger_getters):
 
     with pytest.raises(ValueError):
         tagger_getters(shift_by)
+
+
+def _get_spectrum(audio: Audio) -> npt.NDArray:
+    return np.abs(np.fft.fftshift(np.fft.fft(audio.array[:, 0]))[audio.array.shape[0] // 2:])
+
+
+def test_spectrum_shift_tagger_constant_shifted_correctly():
+    f_audio = 1000
+    audio_s = 5
+    note = 10
+
+    sample_count = f_audio * audio_s
+    samples = 2 * np.pi / (f_audio / note) * np.arange(sample_count)
+    signal = np.sin(samples, dtype=np.float32) * 0.8
+    signal_shaped = np.ascontiguousarray(np.array([signal, signal]).T)
+    audio = Audio(signal_shaped, f_audio)
+
+    freq_resolution = f_audio / signal_shaped.shape[0]
+
+    original_spectrum = _get_spectrum(audio)
+    original_peak = np.argmax(original_spectrum)
+
+    assert original_peak == (note / freq_resolution)
+
+    shift = 40
+    tagger = SpectrumShiftTagger(shift)
+    modified_audio = tagger.create(audio, [(0, audio.secs)])
+    modified_spectrum = _get_spectrum(modified_audio)
+    original_peak = np.argmax(original_spectrum)
