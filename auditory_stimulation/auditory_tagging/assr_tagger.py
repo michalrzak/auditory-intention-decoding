@@ -57,7 +57,7 @@ def frequency_modulation(signal: npt.NDArray[np.float32],
                          f_sampling: int,
                          f_carrier: int,
                          modulation_factor: float = 1) -> npt.NDArray[np.float32]:
-    """Applies frequency modulation to the provided signal. Done by FM the a sine wave with f = carrier_frequency with
+    """Applies frequency modulation to the provided signal. Done by FM the sine wave with f = carrier_frequency with
     the signal. (Cannot be done other way around, or with an arbitrary carrier signal, as FM requires an underlying
     periodic signal)
 
