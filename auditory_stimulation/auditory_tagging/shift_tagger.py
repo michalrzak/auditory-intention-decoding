@@ -40,7 +40,7 @@ class ShiftSumTagger(AAudioTagger):
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
         shift_multiplier = _get_shift_multiplier(self.__shift_by, audio_array_chunk.shape[0], fs)
 
-        audio_array_shifted = np.array(np.abs(audio_array_chunk * shift_multiplier), dtype=np.float32)
+        audio_array_shifted = np.array(np.real(audio_array_chunk * shift_multiplier), dtype=np.float32)
         audio_array_combined = audio_array_shifted + audio_array_chunk
         audio_array_combined_scaled = _scale_down_signal(audio_array_combined)
 
@@ -67,7 +67,7 @@ class SpectrumShiftTagger(AAudioTagger):
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
         shift_multiplier = _get_shift_multiplier(self.__shift_by, audio_array_chunk.shape[0], fs)
 
-        audio_array_shifted = np.array(np.abs(audio_array_chunk * shift_multiplier), dtype=np.float32)
+        audio_array_shifted = np.array(np.real(audio_array_chunk * shift_multiplier), dtype=np.float32)
         audio_array_shifted_scaled = _scale_down_signal(audio_array_shifted)
 
         return audio_array_shifted_scaled
@@ -97,7 +97,7 @@ class BinauralTagger(AAudioTagger):
     def _modify_chunk(self, audio_array_chunk: npt.NDArray[np.float32], fs: int) -> npt.NDArray[np.float32]:
         shift_multiplier = _get_shift_multiplier(self.__shift_by, audio_array_chunk.shape[0], fs)
 
-        audio_array_shifted = np.array(np.abs(audio_array_chunk * shift_multiplier), dtype=np.float32)
+        audio_array_shifted = np.array(np.real(audio_array_chunk * shift_multiplier), dtype=np.float32)
         audio_array_shifted_scaled = _scale_down_signal(audio_array_shifted)
 
         audio_combined = audio_array_shifted_scaled
