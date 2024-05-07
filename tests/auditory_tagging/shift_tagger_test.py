@@ -84,4 +84,6 @@ def test_spectrum_shift_tagger_constant_shifted_correctly():
     tagger = SpectrumShiftTagger(shift)
     modified_audio = tagger.create(audio, [(0, audio.secs)])
     modified_spectrum = _get_spectrum(modified_audio)
-    original_peak = np.argmax(original_spectrum)
+    modified_peak = np.argmax(modified_spectrum)
+
+    assert (modified_peak * freq_resolution) == (shift + note)

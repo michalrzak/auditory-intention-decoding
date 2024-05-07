@@ -15,14 +15,14 @@ def mock_tag_generation(length: int, frequency: int, sampling_frequency: int) ->
     return -np.ones(length, dtype=np.float32)
 
 
-SAMPLING_FREQUENCY = 2
+SAMPLING_FREQUENCY = 1000
 
 AUDIO_TAGGERS = [
     AMTagger(1, mock_tag_generation),
     FMTagger(42, 100),
     FlippedFMTagger(42, 1),
     NoiseTaggingTagger(SAMPLING_FREQUENCY, 2, 10, np.random.default_rng()),
-    ShiftSumTagger(3),
+    ShiftSumTagger(20),
     SpectrumShiftTagger(3),
     BinauralTagger(3)
 ]
@@ -30,7 +30,7 @@ AUDIO_TAGGERS = [
 
 @pytest.mark.parametrize("audio_tagger", AUDIO_TAGGERS)
 def test_audio_taggers_create_valid_call_audio_should_be_modified_to_half_point(audio_tagger):
-    n_input = 100
+    n_input = 5000
     sampling_frequency = SAMPLING_FREQUENCY
     audio = get_mock_audio(n_input, sampling_frequency)
 
