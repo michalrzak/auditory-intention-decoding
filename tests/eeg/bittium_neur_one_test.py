@@ -7,8 +7,9 @@ from mockito import when, verify
 from mockito.matchers import ANY
 
 from auditory_stimulation.audio import Audio
+from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
 from auditory_stimulation.eeg.bittium_neur_one import BittiumTriggerSender, IParallelPort
-from auditory_stimulation.eeg.common import ETrigger
+from auditory_stimulation.eeg.common import ETrigger, get_trigger
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.model.stimulus import AStimulus
@@ -18,6 +19,7 @@ MOCK_AUDIO.secs = 0.3
 MOCK_STIMULUS = mockito.mock(AStimulus)
 MOCK_STIMULUS.time_stamps = [[0.1, 0.2]]
 MOCK_STIMULUS.audio = MOCK_AUDIO
+MOCK_STIMULUS.used_tagger = mockito.mock(RawTagger)
 
 THREAD_TIMOUT = 0
 
@@ -41,7 +43,7 @@ def test_bittium_trigger_sender_update_easy_valid_call(update_identifier: EModel
         ts.update(data=data, identifier=update_identifier)
     wait_for_threads(previous_count)
 
-    verify(parallel_port, times=1).setData(ETrigger.get_trigger(data, update_identifier).value)
+    verify(parallel_port, times=1).setData(get_trigger(data, update_identifier))
     verify(parallel_port, times=1).setData(0)
 
 
@@ -58,7 +60,7 @@ def test_bittium_trigger_sender_update_experiment_state_changed_valid_call(exper
     wait_for_threads(previous_count)
 
     verify(parallel_port, times=1).setData(
-        ETrigger.get_trigger(experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED).value)
+        get_trigger(experiment_state, EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED))
     verify(parallel_port, times=1).setData(0)
 
 
@@ -76,7 +78,7 @@ def test_bittium_trigger_sender_update_new_stimulus_threads():
         ts.update(data=data, identifier=update_identifier)
     wait_for_threads(previous_count)
 
-    verify(parallel_port, times=1).setData(ETrigger.get_trigger(data, update_identifier).value)
+    verify(parallel_port, times=1).setData(get_trigger(data, update_identifier))
     verify(parallel_port, times=1).setData(ETrigger.END_STIMULUS.value)
     verify(parallel_port, times=len(data.time_stamps)).setData(ETrigger.OPTION_START.value)
     verify(parallel_port, times=len(data.time_stamps)).setData(ETrigger.OPTION_END.value)

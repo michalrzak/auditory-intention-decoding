@@ -1,7 +1,6 @@
 from os import PathLike
 from typing import IO
 
-from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.eeg.trigger_sender import ATriggerSender
 
 
@@ -28,5 +27,5 @@ class FileTriggerSender(ATriggerSender):
 
         self.__file.close()
 
-    def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
-        self.__file.write(f"{timestamp},{str(trigger)}\n")
+    def _send_trigger(self, trigger: int, timestamp: float) -> None:
+        self.__file.write(f"{timestamp},{trigger}\n")

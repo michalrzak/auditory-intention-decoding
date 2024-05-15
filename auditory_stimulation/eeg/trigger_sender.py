@@ -6,7 +6,7 @@ from datetime import datetime
 from threading import Timer
 from typing import Any, List
 
-from auditory_stimulation.eeg.common import ETrigger
+from auditory_stimulation.eeg.common import ETrigger, get_trigger, get_target_trigger, get_option_trigger
 from auditory_stimulation.model.model import AObserver
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
 from auditory_stimulation.model.stimulus import AStimulus, Stimulus
@@ -80,7 +80,7 @@ class ATriggerSender(AObserver):
             self._send_trigger(item, ts)
             self.__trigger_queue.task_done()
 
-    def __queue_trigger(self, trigger: ETrigger, offset_secs: float = 0) -> None:
+    def __queue_trigger(self, trigger: int, offset_secs: float = 0) -> None:
         """Enqueues the given trigger, to be sent after the specified amount.
 
         :param trigger: The to be sent trigger.
@@ -108,14 +108,14 @@ class ATriggerSender(AObserver):
         :param timestamp: Timestamp of the trigger.
         :return: None
         """
-        ...
+        pass
 
     def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
         """The method, called by the observer."""
         if not self.__thread.is_alive():
             raise ThreadDiedException("The trigger sending thread died. Did you use the `with` syntax to start the "
                                       "thread?")
-        self.__queue_trigger(ETrigger.get_trigger(data, identifier))
+        self.__queue_trigger(get_trigger(data, identifier))
 
         # in case a new stimulus is received, also queue sending trigger after it finishes playing and at the beginning
         #  of each option
@@ -126,14 +126,14 @@ class ATriggerSender(AObserver):
                 # this could probably be done a bit better, but as the AttentionCheckStimulus is a bit of an
                 # afterthought, this `if` is not very clean.
                 if isinstance(data, Stimulus) and i == data.target_index:
-                    self.__queue_trigger(ETrigger.TARGET_START, time_stamp[0])
-                    self.__queue_trigger(ETrigger.TARGET_END, time_stamp[1])
+                    self.__queue_trigger(get_target_trigger(data.used_tagger), time_stamp[0])
+                    self.__queue_trigger(ETrigger.TARGET_END.value, time_stamp[1])
                     continue
 
-                self.__queue_trigger(ETrigger.OPTION_START, time_stamp[0])
-                self.__queue_trigger(ETrigger.OPTION_END, time_stamp[1])
+                self.__queue_trigger(get_option_trigger(data.used_tagger), time_stamp[0])
+                self.__queue_trigger(ETrigger.OPTION_END.value, time_stamp[1])
 
-            self.__queue_trigger(ETrigger.END_STIMULUS, data.audio.secs)
+            self.__queue_trigger(ETrigger.END_STIMULUS.value, data.audio.secs)
 
     @contextmanager
     def start(self) -> "ATriggerSender":

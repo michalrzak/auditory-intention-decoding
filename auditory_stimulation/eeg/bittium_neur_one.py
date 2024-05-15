@@ -7,13 +7,12 @@ The regular `PyParallel` is in beta and had the last commit 5 years ago.
 import time
 from typing import Protocol
 
-from auditory_stimulation.eeg.common import ETrigger
 from auditory_stimulation.eeg.trigger_sender import ATriggerSender
 
 
 class IParallelPort(Protocol):
     def setData(self, data: int) -> None:
-        ...
+        pass
 
 
 class BittiumTriggerSender(ATriggerSender):
@@ -36,9 +35,8 @@ class BittiumTriggerSender(ATriggerSender):
         self.__parallel_port = parallel_port
         self.__trigger_duration_s = trigger_duration_s
 
-    def _send_trigger(self, trigger: ETrigger, timestamp: float) -> None:
-        assert isinstance(trigger.value, int)
-        self.__parallel_port.setData(trigger.value)
+    def _send_trigger(self, trigger: int, timestamp: float) -> None:
+        self.__parallel_port.setData(trigger)
         time.sleep(self.__trigger_duration_s)
         self.__parallel_port.setData(0)
         time.sleep(self.__trigger_duration_s)
