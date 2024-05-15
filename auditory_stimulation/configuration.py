@@ -63,7 +63,7 @@ def get_configuration_psychopy(defaults: Configuration,
     dlg.addText("<b>Stimulus generation parameters</b>")
     dlg.addField(label="n_stimuli", initial=defaults.n_stimuli)
     dlg.addField(label="Pause secs", initial=defaults.pause_secs)
-    dlg.addField(label="Valid indices (comma seperated)", initial=default_intros)
+    dlg.addField(label="Valid audio intro indices (comma seperated)", initial=default_intros)
     dlg.addField(label="Stimuli numbers interval lower", initial=defaults.stimuli_numbers_interval[0])
     dlg.addField(label="Stimuli numbers interval upper", initial=defaults.stimuli_numbers_interval[1])
     dlg.addField(label="Intro transcription file path", initial=str(defaults.intros_transcription_path))
