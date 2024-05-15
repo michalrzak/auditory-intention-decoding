@@ -10,6 +10,10 @@ from auditory_stimulation.model.model_update_identifier import EModelUpdateIdent
 from auditory_stimulation.model.stimulus import AStimulus
 
 
+def _get_repr(data: Any) -> str:
+    return repr(data).replace("\n", "\\n")
+
+
 class Logger(AObserver):
     """ Observer class, used to log the Observed object.
 
@@ -31,11 +35,13 @@ class Logger(AObserver):
                             level=logging.DEBUG)
 
     def update(self, data: Any, identifier: EModelUpdateIdentifier) -> None:
+        data_repr = _get_repr(data)
+
         if identifier == EModelUpdateIdentifier.NEW_PRIMER:
-            logging.info(f"Added new primer {data}")
+            logging.info(f"Added new primer {data_repr}")
 
         elif identifier == EModelUpdateIdentifier.NEW_STIMULUS:
-            logging.info(f"Added new stimulus {data}")
+            logging.info(f"Added new stimulus {data_repr}")
 
             assert isinstance(data, AStimulus)
             stimulus: AStimulus = data
@@ -50,7 +56,7 @@ class Logger(AObserver):
             logging.info(f"Exported stimulus audio to: {export_file_name}")
 
         elif identifier == EModelUpdateIdentifier.EXPERIMENT_STATE_CHANGED:
-            logging.info(f"Changing experiment state to {data}")
+            logging.info(f"Changing experiment state to {data_repr}")
 
         elif identifier == EModelUpdateIdentifier.ATTENTION_CHECK:
             logging.info(f"Attention check action conducted")
