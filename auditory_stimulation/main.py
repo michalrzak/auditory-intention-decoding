@@ -4,13 +4,11 @@ from datetime import datetime
 from os import PathLike
 from random import Random
 
-import numpy as np
 import psychopy.visual
 
-from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FlippedFMTagger, FMTagger
-from auditory_stimulation.auditory_tagging.noise_tagging_tagger import NoiseTaggingTagger
+from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FMTagger
 from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
-from auditory_stimulation.auditory_tagging.shift_tagger import ShiftSumTagger, BinauralTagger, SpectrumShiftTagger
+from auditory_stimulation.auditory_tagging.shift_tagger import BinauralTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
 from auditory_stimulation.configuration import get_configuration_psychopy, get_configuration_yaml
 from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
@@ -34,11 +32,11 @@ def main() -> None:
     config = get_configuration_psychopy(defaults)
 
     taggers = [AMTagger(42, sine_signal),
-               FlippedFMTagger(40, 0.8),
-               NoiseTaggingTagger(44100, 126, 256, np.random.default_rng(config.subject_id)),
                FMTagger(40, 100),
-               ShiftSumTagger(40),
-               SpectrumShiftTagger(40),
+               BinauralTagger(40),
+               RawTagger(),
+               AMTagger(42, sine_signal),
+               FMTagger(40, 100),
                BinauralTagger(40),
                RawTagger()]
 
@@ -60,16 +58,16 @@ def main() -> None:
                                voices_folders=config.voices_folders,
                                rng=Random(config.subject_id))
 
-    stimuli_prefixes = \
-        ["Each round starts with a primer number. Focus on this number, while you listen to the audio.",
-         "The primer number does not change, but the audio changes.",
-         "The sentences are usually distorted using various distortion techniques."]
+    stimuli_prefixes = [
+        "Each round starts with a primer number. Focus on this number, while you listen to the audio.",
+        "The primer number does not change, but the audio changes.",
+        "The sentences are usually distorted using various distortion techniques."]
     attention_check_prefixes = [
         "Sometimes the audio is missing the primer number. In that case the audio is invalid and you must hit "
         "'spacebar' after the audio is finished."]
     example_stimuli = generate_example_stimuli(regular_stimuli_primer_prefix=stimuli_prefixes,
                                                attention_check_stimuli_primer_prefix=attention_check_prefixes,
-                                               taggers=[RawTagger(), RawTagger(), taggers[4]],
+                                               taggers=[RawTagger(), RawTagger(), taggers[0]],
                                                n_stimuli=config.n_stimuli,
                                                pause_secs=config.pause_secs,
                                                intros_indices=config.intro_indices,

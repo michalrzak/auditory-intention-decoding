@@ -293,7 +293,7 @@ def __make_generate_stimulus_parameters(target_number: int,
     generated_amount = n_stimuli if is_attention_check_stimulus else n_stimuli - 1
     number_stimuli = []
     first = True
-    while first or target_number in number_stimuli or len(set(number_stimuli)) != len(number_stimuli):
+    while first or str(target_number) in number_stimuli or len(set(number_stimuli)) != len(number_stimuli):
         first = False
         number_stimuli = [str(rng.randint(number_stimuli_interval[0], number_stimuli_interval[1]))
                           for _ in range(generated_amount)]

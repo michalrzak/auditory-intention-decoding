@@ -7,7 +7,8 @@ import mockito
 import pytest
 
 from auditory_stimulation.audio import Audio
-from auditory_stimulation.eeg.common import ETrigger
+from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
+from auditory_stimulation.eeg.common import ETrigger, get_trigger
 from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
 from auditory_stimulation.model.experiment_state import EExperimentState
 from auditory_stimulation.model.model_update_identifier import EModelUpdateIdentifier
@@ -20,6 +21,7 @@ MOCK_AUDIO.secs = 3
 MOCK_STIMULUS = mockito.mock(AStimulus)
 MOCK_STIMULUS.time_stamps = [[1, 2]]
 MOCK_STIMULUS.audio = MOCK_AUDIO
+MOCK_STIMULUS.used_tagger = mockito.mock(RawTagger)
 
 
 def target_file(tmp_path):
@@ -54,7 +56,7 @@ def test_file_trigger_sender_send_trigger_experiment_state_changed_valid_call(da
         assert len(results) == 1
         assert len(results[0]) == 2
         assert send_ts - epsilon <= float(results[0][0]) <= send_ts + epsilon
-        assert results[0][1] == str(ETrigger.get_trigger(data, identifier))
+        assert results[0][1] == str(get_trigger(data, identifier))
 
 
 @pytest.mark.parametrize("data", ["test1", "test2", "", "Longer primer testing12345 abc"])
@@ -75,7 +77,7 @@ def test_file_trigger_sender_send_trigger_new_primer_valid_call(data, tmp_path):
         assert len(results) == 1
         assert len(results[0]) == 2
         assert send_ts - epsilon <= float(results[0][0]) <= send_ts + epsilon
-        assert results[0][1] == str(ETrigger.get_trigger(data, identifier))
+        assert results[0][1] == str(get_trigger(data, identifier))
 
 
 def test_file_trigger_sender_send_trigger_new_stimulus_valid_call(tmp_path):
@@ -97,21 +99,21 @@ def test_file_trigger_sender_send_trigger_new_stimulus_valid_call(tmp_path):
 
     # first trigger should be new stimulus
     assert send_ts - epsilon <= float(results[0][0]) <= send_ts + epsilon
-    assert results[0][1] == str(ETrigger.NEW_STIMULUS)
+    assert results[0][1] == str(ETrigger.NEW_STIMULUS.value)
 
     # last trigger should be end stimulus
     target_ts = send_ts + data.audio.secs * 1000
     assert target_ts - epsilon <= float(results[-1][0]) <= target_ts + epsilon
-    assert results[-1][1] == str(ETrigger.END_STIMULUS)
+    assert results[-1][1] == str(ETrigger.END_STIMULUS.value)
 
     for i, ts in enumerate(data.time_stamps):
         target_ts = send_ts + ts[0] * 1000
         assert target_ts - epsilon <= float(results[1 + i * 2][0]) <= target_ts + epsilon
-        assert results[1 + i * 2][1] == str(ETrigger.OPTION_START)
+        assert results[1 + i * 2][1] == str(ETrigger.OPTION_START.value)
 
         target_ts = send_ts + ts[1] * 1000
         assert target_ts - epsilon <= float(results[1 + i * 2 + 1][0]) <= target_ts + epsilon
-        assert results[1 + i * 2 + 1][1] == str(ETrigger.OPTION_END)
+        assert results[1 + i * 2 + 1][1] == str(ETrigger.OPTION_END.value)
 
 
 def test_file_trigger_sender_send_trigger_two_new_stimuli_valid_call(tmp_path):
@@ -145,20 +147,20 @@ def test_file_trigger_sender_send_trigger_two_new_stimuli_valid_call(tmp_path):
 
         # first trigger should be new stimulus
         assert send_ts - epsilon <= float(results[triggers_per_stimulus * j][0]) <= send_ts + epsilon
-        assert results[triggers_per_stimulus * j][1] == str(ETrigger.NEW_STIMULUS)
+        assert results[triggers_per_stimulus * j][1] == str(ETrigger.NEW_STIMULUS.value)
 
         # last trigger should be end stimulus
         last_trigger_i = triggers_per_stimulus * (1 + j) - 1
         target_ts = send_ts + data.audio.secs * 1000
         assert target_ts - epsilon <= float(results[last_trigger_i][0]) <= target_ts + epsilon
-        assert results[last_trigger_i][1] == str(ETrigger.END_STIMULUS)
+        assert results[last_trigger_i][1] == str(ETrigger.END_STIMULUS.value)
 
         for i, ts in enumerate(data.time_stamps):
             current_i = triggers_per_stimulus * j + 1 + i * 2
             target_ts = send_ts + ts[0] * 1000
             assert target_ts - epsilon <= float(results[current_i][0]) <= target_ts + epsilon
-            assert results[current_i][1] == str(ETrigger.OPTION_START)
+            assert results[current_i][1] == str(ETrigger.OPTION_START.value)
 
             target_ts = send_ts + ts[1] * 1000
             assert target_ts - epsilon <= float(results[current_i + 1][0]) <= target_ts + epsilon
-            assert results[current_i + 1][1] == str(ETrigger.OPTION_END)
+            assert results[current_i + 1][1] == str(ETrigger.OPTION_END.value)
