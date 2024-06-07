@@ -16,7 +16,7 @@ from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.model.stimulus import generate_stimuli, generate_example_stimuli
+from auditory_stimulation.model.stimulus import generate_example_stimuli, generate_stimuli
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 from auditory_stimulation.view.view import ViewInterrupted
@@ -81,7 +81,7 @@ def main() -> None:
     logger = Logger(logging_folder)
     model.register(logger, 10)
 
-    window = psychopy.visual.Window(fullscr=True)
+    window = psychopy.visual.Window(fullscr=True, color='black')
     experiment_texts = load_experiment_texts(config.experiment_texts_file_path)
     view = PsychopyView(psychopy_player, experiment_texts, window)
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
