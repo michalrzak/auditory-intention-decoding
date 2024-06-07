@@ -14,7 +14,7 @@ intros_transcription_path: "stimuli_sounds/intro-transcriptions.yaml"
 voices_folders: [ "stimuli_sounds/natasha" ]
 
 # experiment flow parameters
-repetitions: 2
+repetitions: 20
 resting_state_secs: 180
 primer_secs: 3
 break_secs: 5
