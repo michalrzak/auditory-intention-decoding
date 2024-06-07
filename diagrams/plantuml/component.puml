@@ -1,29 +1,22 @@
 @startuml
-
 package model {
     component Model
     label observerable as observer
     Model --( observer
 
-    () model as model_provider
-    Model -u- model_provider
-
-    label audio_tagger_factory as atf
-    Model -u-( atf
-
     component Logger
     () observer as logger_observer
     Logger -r- logger_observer
 
+    component AStimulus
+
+    Model -r-> AStimulus
 }
 
 package view {
     component AView
-    () observer as view_observer
+    () "observer    " as view_observer
     AView -r- view_observer
-
-    () view as view_provider
-    AView -u- view_provider
 
 }
 
@@ -33,24 +26,17 @@ package eeg {
     TriggerSender -- trigger_observer
 }
 
-package audio_tagging {
+package auditory_tagging {
     component AAudioTagger
-    () audio_tagger
-    AAudioTagger -d- audio_tagger
-
-    component AAudioTaggerFactory
-    AAudioTaggerFactory -u-( audio_tagger
-    () audio_tagger_factory
-    AAudioTaggerFactory -- audio_tagger_factory
 }
-audio_tagger_factory .r.> atf
 
 component Experiment
-Experiment --( model_provider
-Experiment --( view_provider
+Experiment --> Model
+Experiment --> AView
 
 observer <.. view_observer
 observer <.. logger_observer
 observer <.. trigger_observer
 
+AStimulus -l-> AAudioTagger
 @enduml
