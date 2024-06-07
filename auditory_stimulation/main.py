@@ -83,7 +83,7 @@ def main() -> None:
     logger = Logger(logging_folder)
     model.register(logger, 10)
 
-    window = psychopy.visual.Window(fullscr=True, screen=0, color='black')
+    window = psychopy.visual.Window(fullscr=True, screen=1, color='black')
     experiment_texts = load_experiment_texts(config.experiment_texts_file_path)
     view = PsychopyView(psychopy_player, experiment_texts, window)
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
