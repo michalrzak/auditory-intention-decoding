@@ -4,6 +4,7 @@ from datetime import datetime
 from os import PathLike
 from random import Random
 
+import psychopy.parallel
 import psychopy.visual
 
 from auditory_stimulation.auditory_tagging.assr_tagger import AMTagger, FMTagger
@@ -11,12 +12,13 @@ from auditory_stimulation.auditory_tagging.raw_tagger import RawTagger
 from auditory_stimulation.auditory_tagging.shift_tagger import BinauralTagger
 from auditory_stimulation.auditory_tagging.tag_generators import sine_signal
 from auditory_stimulation.configuration import get_configuration_psychopy, get_configuration_yaml
+from auditory_stimulation.eeg.bittium_neur_one import BittiumTriggerSender
 from auditory_stimulation.eeg.file_trigger_sender import FileTriggerSender
 from auditory_stimulation.experiment import Experiment
 from auditory_stimulation.model.experiment_state import load_experiment_texts
 from auditory_stimulation.model.logging import Logger
 from auditory_stimulation.model.model import Model
-from auditory_stimulation.model.stimulus import generate_stimuli, generate_example_stimuli
+from auditory_stimulation.model.stimulus import generate_example_stimuli, generate_stimuli
 from auditory_stimulation.view.psychopy_view import PsychopyView
 from auditory_stimulation.view.sound_players import psychopy_player
 from auditory_stimulation.view.view import ViewInterrupted
@@ -81,15 +83,19 @@ def main() -> None:
     logger = Logger(logging_folder)
     model.register(logger, 10)
 
-    window = psychopy.visual.Window(fullscr=True)
+    window = psychopy.visual.Window(fullscr=True, screen=1, color='black')
     experiment_texts = load_experiment_texts(config.experiment_texts_file_path)
     view = PsychopyView(psychopy_player, experiment_texts, window)
     model.register(view, 99)  # set the lowest possible priority as the view is blocking and should get updated last
 
     trigger_sender = FileTriggerSender(5, config.trigger_directory_path / (day_id + ".csv"))
 
-    with trigger_sender.start() as ts:
+    parport = psychopy.parallel.ParallelPort(0x378)
+    parport_sender = BittiumTriggerSender(5, parport, 0.001)
+
+    with trigger_sender.start() as ts, parport_sender.start() as ps:
         model.register(ts, 1)
+        model.register(ps, 1)
         experiment = Experiment(model, view, len(taggers) + 1, config)  # + 1 due to attention check stimulus
 
         try:
