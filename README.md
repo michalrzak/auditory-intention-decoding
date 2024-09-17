@@ -1,13 +1,15 @@
 # About
 
-This project was developed as part of my [master thesis](TODO) - Title. The thesis aims to investigate and lay the
+This project was developed as part of my [master thesis](TODO) - Towards an intention decoding auditory BCI (working link TBD). The thesis aims to investigate and lay the
 groundwork for a potential future brain-computer interface (BCI) paradigm, where a system could decode an attended
 stimulus given sequentially presented auditory stimuli.
 The code in this repository contains all the necessary files to reproduce and re-run the experiment.
 
 ## Abstract
 
-...
+Despite its significant potential, the auditory brain-computer interface (BCI) field remains underexplored. Current paradigms predominantly focus on decoding which audio source among several a user is attending to, limiting their applicability in real-world scenarios. This thesis addresses this gap by conceptualizing and testing a novel BCI paradigm centered around auditory stimulation. Our approach, Auditory Intention Decoding (AID), is classified as a reactive BCI, relying on automatic brain responses rather than direct user input. The AID paradigm aims to infer a user's intended choice among multiple presented options, from the user's automatic brain response, without them needing to take any explicit action.
+
+Additionally, we investigate the effectiveness of modulating the auditory stimuli with distinct waveforms, akin to techniques used in visually evoked potentials, to enhance target decoding accuracy. These concepts were empirically tested through a controlled experiment, and the results, while showing a discernible effect, suggest that the paradigm in its current form is not yet robust enough for practical application. Nevertheless, the findings presented here lay a foundation for future research, offering a promising direction for developing more useful auditory BCIs.
 
 # Installation
 
@@ -90,8 +92,6 @@ poetry install
 
 **Note:** This requires that your virtual environment folder is located inside the repository. If it isn't, navigate
 to its location and activate the environment there, before navigating to the root of the repository.
-
-**TODO: test if this actually works**
 
 ### Psychopy
 
