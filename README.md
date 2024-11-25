@@ -1,12 +1,19 @@
 # About
 
 This project was developed as part of my [master thesis](TODO) - Towards an intention decoding auditory BCI (working link TBD). The thesis aims to investigate and lay the
-groundwork for a potential future brain-computer interface (BCI) paradigm, where a system could decode an attended
-stimulus given sequentially presented auditory stimuli.
+groundwork for a potential future brain-computer interface (BCI) paradigm, where a system could decode an attended stimulus given sequentially presented auditory stimuli.
 The code in this repository contains all the necessary files to reproduce and re-run the experiment.
 
-## Abstract
-[TBD]
+## Abstract of master thesis
+Auditory brain-computer interfaces (BCIs) prime users with auditory signals and observe their brain activity. These BCI types are relatively unexplored in literature even though we see great potential in the interaction they enable, especially if utilized in so-called reactive or passive BCI paradigms. In these, the user does not have to perform any explicit action, instead, the system infers information from the user's brain activity and controls the system implicitly.
+
+This thesis introduces the idea and prototype of a reactive auditory BCI based on electroencephalography (EEG), termed auditory intention decoding (AID). The goal of AID is to infer the user's intention by probing them with possible words and observing their brain response. We present an idea where such a system could be used in the future as a conversational aid for speech-impaired individuals. 
+
+The thesis further investigates modulating the options of AID with various techniques inspired by visually evoked potentials, termed taggers. With these, we hope to improve the decoding accuracy of AID, by highlighting involved brain regions in processing the words with simple-to-decode tags. 
+
+Four subject recordings in addition to three internal recordings were conducted on a simplified version of the AID paradigm to determine its feasibility. The data analysis revealed a significantly decodable effect, though it is not strong enough to be used in a practical setting. Further, the subset of tested taggers could not reveal any advantage in decoding performance, suggesting the need for further refinement. 
+
+While current results do not yet support AID's practical deployment, the findings provide a foundation for future research. Subsequent studies could explore untested tagging techniques or alternative auditory stimuli to improve accuracy, leveraging the methods and data established in this thesis to unlock AID's full potential.
 
 # Installation
 
