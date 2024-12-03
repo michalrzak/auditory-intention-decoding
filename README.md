@@ -1,6 +1,6 @@
 # About
 
-This project was developed as part of my [master thesis](TODO) - Towards an intention decoding auditory BCI (working link TBD). The thesis aims to investigate and lay the
+This project was developed as part of my [master thesis](https://repositorium.meduniwien.ac.at/obvumwhs/content/titleinfo/11238767) - Towards an intention decoding auditory BCI. The thesis aims to investigate and lay the
 groundwork for a potential future brain-computer interface (BCI) paradigm, where a system could decode an attended stimulus given sequentially presented auditory stimuli.
 The code in this repository contains all the necessary files to reproduce and re-run the experiment.
 
