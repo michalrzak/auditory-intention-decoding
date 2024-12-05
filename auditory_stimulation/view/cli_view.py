@@ -27,3 +27,6 @@ class CLIView(AView):
 
     def wait(self, secs: float) -> None:
         time.sleep(secs)
+
+    def show_progress(self, n_current: int, n_total: int) -> None:
+        print(f"Progress: {n_current}/{n_total}")
