@@ -56,6 +56,14 @@ class AView(AObserver):
             assert False  # this should never happen
 
     @abstractmethod
+    def show_progress(self, n_current: int, n_total: int) -> None:
+        """Shows the progress in the format {n_current}/{n_total}
+
+        :param n_current: Current progress number
+        :param n_total: Total number
+        """
+
+    @abstractmethod
     def get_confirmation(self) -> bool:
         """Wait for the user to confirm with some action.
         """

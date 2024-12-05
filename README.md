@@ -106,7 +106,7 @@ experiment. You can do this via the following commands on any Linux distribution
 sudo groupadd --force psychopy
 sudo usermod -a -G psychopy $USER
 
-sudo vim /etc/security/limits.d/99-psychopylimits.conf and copy/paste in the following text to that file:
+sudo vim /etc/security/limits.d/99-psychopylimits.conf 
 ```
 
 And paste the following into the opened file:

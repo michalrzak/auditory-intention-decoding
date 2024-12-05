@@ -20,6 +20,8 @@ PRIMER_LETTER_SIZE = 0.12
 EXPERIMENT_STATE_TEXT_BOX_POSITION = (0, 0)
 EXPERIMENT_STATE_TEXT_BOX_SIZE = (0.8, 0.5)
 
+PROGRESS_TEXT_BOX_POSITION = (0, 0.5)
+
 ATTENTION_CHECK_POSITION = (0, -0.25)
 
 EXAMPLE_TEXT_BOX_POSITION = (0, -0.5)
@@ -47,6 +49,7 @@ class Drawable(Protocol):
 class PsychopyView(AView):
     """A view, implementing the psychopy frontend.
     """
+
     __window: psychopy.visual.Window
     __keyboard: psychopy.hardware.keyboard.Keyboard
     __draw_buffer: List[Drawable]
@@ -173,6 +176,13 @@ class PsychopyView(AView):
             self.__try_to_quit()
 
         return True
+
+    def show_progress(self, n_current: int, n_total: int) -> None:
+        text = f"Progress: {n_current}/{n_total}"
+        textbox = self.__create_text_box(text,
+                                         LETTER_SIZE,
+                                         PROGRESS_TEXT_BOX_POSITION)
+        self.__draw(textbox, False)
 
     def wait(self, secs: float) -> None:
         self.__try_to_quit()

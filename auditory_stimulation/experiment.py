@@ -95,6 +95,8 @@ class Experiment:
 
             if (i + 1) % self.__block_size == 0:
                 self.__model.change_experiment_state(EExperimentState.BREAK)
+                self.__view.show_progress((i + 1) // self.__block_size,
+                                          len(self.__model.created_stimuli) // self.__block_size)
                 self.__view.wait(self.__experiment_durations.break_secs)
                 self.__view.get_confirmation()
 
